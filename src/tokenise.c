@@ -1,0 +1,86 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+#include "tokenise.h"
+
+#define ADD_TO_ROOT(R, N, V) \
+  N++; \
+  if (R == NULL) \
+    R = malloc(N*sizeof(char*)); \
+  else \
+    R = realloc(R, N*sizeof(char*)); \
+  R[N-1] = calloc((strlen(V)+1), sizeof(char)); \
+  strcpy( R[N-1], V ); // why does strncpy complain here?
+
+
+
+
+void tokenise(char *input, char ***tokens, int *n_tokens)
+{
+  char **_tokens = NULL;
+  int _n_tokens = 0;
+  /*
+   * A LISP token can be one of:
+   *  - an atom
+   *  - a list
+   *  - a name
+   *  - keyword
+   */
+
+  char *kw_or_name = NULL;
+  int kw_or_name_len = 0;
+  int n_open_parens = 0, line=1, col=1;
+
+  for (size_t i = 0; i < strlen(input); i++) {
+    col ++;
+
+    if (input[i] == '(') {
+      ADD_TO_ROOT(_tokens, _n_tokens, "(");
+      n_open_parens ++;
+    }
+    else if (input[i] == ')') {
+      if (!n_open_parens) {
+        fprintf(stderr, "Unmatched ')'.\n");
+      }
+      ADD_TO_ROOT(_tokens, _n_tokens, ")");
+      n_open_parens --;
+    }
+    else if ((input[i] == ' ') || (input[i] == '\n')) {
+      if (input[i] == '\n') {
+        col = 1;
+        line ++;
+      }
+
+      if (kw_or_name == NULL) {
+        // random whitespace
+      }
+      else {
+        ADD_TO_ROOT(_tokens, _n_tokens, kw_or_name);
+        free(kw_or_name);
+        kw_or_name = NULL;
+        kw_or_name_len = 0;
+      }
+
+    }
+    else {
+
+      kw_or_name_len++;
+
+      if (kw_or_name == NULL) {
+        kw_or_name = calloc(kw_or_name_len + 1, sizeof(char));
+      }
+      else{
+        kw_or_name = realloc(kw_or_name, (kw_or_name_len + 1)*sizeof(char));
+      }
+
+      kw_or_name[kw_or_name_len-1] = input[i];
+
+    }
+
+  }
+
+  (*tokens) = _tokens;
+  (*n_tokens) = _n_tokens;
+
+}
