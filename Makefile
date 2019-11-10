@@ -1,6 +1,6 @@
 CXX = gcc
 CFLAGS = -Wall -Wextra
-OBJ = obj/main.o obj/tokenise.o obj/parse.o obj/eval.c
+OBJ = obj/main.o obj/tokenise.o obj/parse.o obj/eval.o
 
 obj/%.o: src/%.c
 	mkdir -p obj
