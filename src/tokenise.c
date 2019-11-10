@@ -13,11 +13,13 @@
   R[N-1] = calloc((strlen(V)+1), sizeof(char)); \
   strcpy( R[N-1], V ); // why does strncpy complain here?
 
-
+#define INTERRUPT_KW
 
 
 void tokenise(char *input, char ***tokens, int *n_tokens)
 {
+
+  fprintf(stderr, "PARSING STRING: %s\n", input);
   char **_tokens = NULL;
   int _n_tokens = 0;
   /*
@@ -39,18 +41,7 @@ void tokenise(char *input, char ***tokens, int *n_tokens)
       ADD_TO_ROOT(_tokens, _n_tokens, "(");
       n_open_parens ++;
     }
-    else if (input[i] == ')') {
-      if (!n_open_parens) {
-        fprintf(stderr, "Unmatched ')'.\n");
-      }
-      ADD_TO_ROOT(_tokens, _n_tokens, ")");
-      n_open_parens --;
-    }
-    else if ((input[i] == ' ') || (input[i] == '\n')) {
-      if (input[i] == '\n') {
-        col = 1;
-        line ++;
-      }
+    else if ((input[i] == ' ') || (input[i] == '\n') || (input[i] == ')')) {
 
       if (kw_or_name == NULL) {
         // random whitespace
@@ -60,6 +51,18 @@ void tokenise(char *input, char ***tokens, int *n_tokens)
         free(kw_or_name);
         kw_or_name = NULL;
         kw_or_name_len = 0;
+      }
+
+      if (input[i] == '\n') {
+        col = 1;
+        line ++;
+      }
+      else if (input[i] == ')') {
+        if (!n_open_parens) {
+          fprintf(stderr, "Unmatched ')'.\n");
+        }
+        ADD_TO_ROOT(_tokens, _n_tokens, ")");
+        n_open_parens --;
       }
 
     }
