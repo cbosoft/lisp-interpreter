@@ -6,8 +6,8 @@ obj/%.o: src/%.c
 	mkdir -p obj
 	$(CXX) $(CFLAGS) $< -c -o $@
 
-int: $(OBJ)
+LISP: $(OBJ)
 	$(CXX) $(CFLAGS) $(OBJ) -o $@
 
 clean:
-	rm -rf src/*.o
+	rm -rf obj LISP
