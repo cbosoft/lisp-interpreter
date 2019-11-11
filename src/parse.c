@@ -5,12 +5,6 @@
 #include "parse.h"
 #include "ast.h"
 
-enum TOKEN_TYPE {
-  TOKEN_SYMBOL,
-  TOKEN_NAME
-};
-
-
 struct ast_node *new_token()
 {
   struct ast_node *rv = calloc(1, sizeof(struct ast_node));
@@ -31,13 +25,23 @@ struct ast_node *new_token()
     temp->prev = PARENT;                           \
     PARENT->next = temp;                           \
   }                                                    \
-  if (VALUE != NULL) { \
-    temp->value = calloc(strlen(VALUE)+1, sizeof(char));\
-    strncpy(temp->value, VALUE, strlen(VALUE));            \
-  }                                                        \
-  else {                                                   \
-    temp->value = VALUE;                                   \
-  }                                                        \
+  temp->value = calloc(strlen(VALUE)+1, sizeof(char));\
+  strcpy(temp->value, VALUE);            \
+  PARENT = temp;
+
+#define NEW_NULL_TOKEN(PARENT)             \
+  temp = calloc(1, sizeof(struct ast_node));   \
+  if (next_is_child) {                                 \
+    temp->parent = PARENT;                         \
+    PARENT->child = temp;                          \
+    next_is_child = 0;                                 \
+  }                                                    \
+  else {                                               \
+    temp->parent = PARENT->parent;                 \
+    temp->prev = PARENT;                           \
+    PARENT->next = temp;                           \
+  }                                                    \
+  temp->value = NULL;\
   PARENT = temp;
 
 
@@ -51,12 +55,12 @@ struct ast_node *get_ast(char **tokens, int n_tokens)
 
   for (int i = 0; i < n_tokens; i++) {
     if (strcmp(tokens[i], "(") == 0) {
-      NEW_TOKEN(current, NULL);
+      NEW_NULL_TOKEN(current);
       next_is_child = 1;
     }
     else if (strcmp(tokens[i], ")") == 0) {
       current = current->parent;
-      NEW_TOKEN(current, NULL);
+      NEW_NULL_TOKEN(current);
     }
     else {
       NEW_TOKEN(current, tokens[i]);
