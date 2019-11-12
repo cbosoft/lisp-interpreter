@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <assert.h>
 #include <string.h>
 
@@ -152,3 +153,45 @@ LispObject *pop(LispObject *list)
   p->list_next = NULL;
   return rv;
 }
+
+
+
+
+// Print the value of $o
+void LispObject_print(LispObject *o)
+{
+  LispObject *i = NULL;
+  FILE *fp = stdout;
+
+  switch (o->type) {
+
+    case LISPOBJECT_STRING:
+      fprintf(fp, "%s", o->value_string);
+      break;
+
+    case LISPOBJECT_INT:
+      fprintf(fp, "%d", o->value_int);
+      break;
+
+    case LISPOBJECT_FLOAT:
+      fprintf(fp, "%f", o->value_float);
+      break;
+
+    case LISPOBJECT_BOOL:
+      fprintf(fp, "%s", (o->value_bool)?"true":"false");
+      break;
+
+    case LISPOBJECT_LIST:
+      i = o->list_child;
+      fprintf(fp, " (");
+      while (i->list_next != NULL) {
+        LispObject_print(i);
+        fprintf(fp, " ");
+        i = i->list_next;
+      }
+      fprintf(stdout, ") ");
+      break;
+
+  }
+}
+

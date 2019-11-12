@@ -34,3 +34,4 @@ LispObject *new_object_guess_type(char *s);
 void add_object_to_list(LispObject *list, LispObject *toadd);
 LispObject *pop(LispObject *list);
 LispObject *pop_index(LispObject *list, int index);
+void LispObject_print(LispObject *o);
