@@ -4,6 +4,7 @@
 
 #include "parse.h"
 #include "ast.h"
+#include "object.h"
 
 struct ast_node *new_token()
 {
@@ -46,70 +47,33 @@ struct ast_node *new_token()
 
 
 
-struct ast_node *get_ast(char **tokens, int n_tokens)
+LispObject *parse(char **tokens, int n_tokens)
 {
-  struct ast_node *root = calloc(1, sizeof(struct ast_node));
-  struct ast_node *current = root, *temp;
+  LispObject *root = new_list_object();
+  LispObject *current = root, *new;
 
-  int next_is_child = 0;
+  LispObject **parents = NULL;
+  int nparents = 0;
 
   for (int i = 0; i < n_tokens; i++) {
     if (strcmp(tokens[i], "(") == 0) {
-      NEW_NULL_TOKEN(current);
-      next_is_child = 1;
+      new = new_list_object();
+      nparents ++;
+      parents = realloc(parents, nparents*sizeof(LispObject *));
+      parents[nparents-1] = current;
+      add_object_to_list(current, new);
+      current = new;
     }
     else if (strcmp(tokens[i], ")") == 0) {
-      current = current->parent;
-      NEW_NULL_TOKEN(current);
+      current = parents[nparents-1];
+      nparents --;
+      parents = realloc(parents, nparents*sizeof(LispObject *));
     }
     else {
-      NEW_TOKEN(current, tokens[i]);
+      new = new_object_guess_type(tokens[i]);
+      add_object_to_list(current, new);
     }
   }
 
   return root;
-}
-
-
-void print_ast(struct ast_node *ast)
-{
-  struct ast_node *current = ast;
-  while (1) {
-    if (current->value)
-      fprintf(stderr, " %s ", current->value);
-    if (current->child) {
-      fprintf(stderr, "[");
-      print_ast(current->child);
-      fprintf(stderr, "]");
-    }
-    if (current->next)
-      current = current->next;
-    else
-      break;
-  }
-}
-
-
-void free_ast(struct ast_node *ast) {
-  struct ast_node *current = ast, *next;
-  while (1) {
-
-    if (current->child)
-      free_ast(current->child);
-
-    if (current->next)
-      current = current->next;
-    else
-      break;
-  }
-
-  while (1) {
-    next = current->prev;
-    free(current);
-    current = next;
-
-    if (current->prev == NULL) {
-      break;
-    }
-  }
 }
