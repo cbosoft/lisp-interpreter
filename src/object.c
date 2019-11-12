@@ -198,6 +198,18 @@ void LispObject_print(LispObject *o)
 
 
 
+// Recursively free object $o
+void LispObject_free(LispObject *o)
+{
+  if (o->list_next)
+    LispObject_free(o->list_next);
+
+  if (o->list_child)
+    LispObject_free(o->list_child);
+
+  free(o);
+}
+
 
 
 void LispObject_make_nil(LispObject *o)

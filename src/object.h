@@ -36,3 +36,4 @@ LispObject *pop(LispObject *list);
 LispObject *pop_index(LispObject *list, int index);
 void LispObject_assign_value(LispObject *dest, LispObject *source);
 void LispObject_print(LispObject *o);
+void LispObject_free(LispObject *root);
