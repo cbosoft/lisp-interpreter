@@ -195,3 +195,55 @@ void LispObject_print(LispObject *o)
   }
 }
 
+
+
+
+
+
+void LispObject_make_nil(LispObject *o)
+{
+  if (o->value_string != NULL) {
+    free(o->value_string);
+    o->value_string = NULL;
+  }
+
+  o->value_int = 0;
+  o->value_float = 0.0;
+  o->value_bool = 0;
+  o->list_child = NULL;
+
+}
+
+
+
+
+// Copy value from 4source into $dest
+void LispObject_assign_value(LispObject *dest, LispObject *source)
+{
+  LispObject_make_nil(dest);
+
+  switch(source->type) {
+    case LISPOBJECT_STRING:
+      dest->value_string = calloc(strlen(source->value_string)+1, sizeof(char));
+      strcpy(dest->value_string, source->value_string);
+      break;
+
+    case LISPOBJECT_INT:
+      dest->value_int = source->value_int;
+      break;
+
+    case LISPOBJECT_FLOAT:
+      dest->value_float = source->value_float;
+      break;
+
+    case LISPOBJECT_BOOL:
+      dest->value_bool = source->value_bool;
+      break;
+
+    case LISPOBJECT_LIST:
+      dest->list_child = source->list_child;
+      break;
+  }
+
+  dest->type = source->type;
+}
