@@ -1,1 +1,4 @@
-void *eval(struct ast_node *ast);
+#pragma once
+#include "object.h"
+
+LispObject *eval(LispObject *ast);

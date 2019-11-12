@@ -1,97 +1,115 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <assert.h>
 
-#include "ast.h"
 #include "eval.h"
+#include "object.h"
+#include "exception.h"
 
-#define ADD_PARAM(V) \
-  nparams ++; \
-  if (params == NULL) { \
-    params = calloc(nparams, sizeof(void*));\
-  }\
-  else {\
-    params = realloc(params, nparams*sizeof(void*));\
-  }\
-  params[nparams-1] = calloc(strlen(V)+1, sizeof(char));\
-  strcpy(params[nparams-1], V);
 
-typedef char * (*lispfunc)(int, char**);
-struct func_name_pair {
+typedef LispObject * (*LispBuiltin)(LispObject *);
+
+struct function_table_entry {
   char *name;
   char *shorthand;
-  lispfunc function;
+  LispBuiltin function;
 };
 
 
 
-char *add(int argc, char **args)
+
+// Recursively get length of list
+int LispObject_list_size(LispObject *o)
 {
-
-  double total = 0.0;
-  for (int i = 0; i < argc; i++) {
-    char *d = (char*)args[i];
-    total += atof(d);
-  }
-
-  char *rv = calloc(100, sizeof(char));
-  snprintf(rv, 99, "%f", total);
-  return rv;
+  return o->list_next ? 1 + LispObject_list_size(o->list_next) : 1;
 }
 
-char *subtract(int argc, char **args)
-{
-  double val = atoi(args[0]);
 
-  for (int i = 1; i < argc; i++) {
-    double d = atoi(args[i]);
-    val -= d;
+
+
+// Add two numbers
+LispObject *add(LispObject *arg)
+{
+  assert_or_error(LispObject_list_size(arg) == 2, "add", "Function takes 2 arguments.");
+  
+  LispObject *l = arg;
+  LispObject *r = arg->list_next;
+
+  assert_or_error( 
+      (l->type == LISPOBJECT_INT || l->type == LISPOBJECT_FLOAT) && 
+      (r->type == LISPOBJECT_INT || r->type == LISPOBJECT_FLOAT),
+      "add", 
+      "Function expects numerical arguments, ");
+
+  if (l->type == LISPOBJECT_FLOAT || r->type == LISPOBJECT_FLOAT) {
+    double l_operand = l->type == LISPOBJECT_FLOAT ? l->value_float : (double)l->value_int;
+    double r_operand = r->type == LISPOBJECT_FLOAT ? r->value_float : (double)r->value_int;
+    LispObject *rv = new_float_object(l_operand + r_operand);
+    return rv;
   }
 
-  char *rv = calloc(100, sizeof(char));
-  snprintf(rv, 99, "%f", val);
-  return rv;
-}
-
-char *multiply(int argc, char **args)
-{
-  double val = atoi(args[0]);
-
-  for (int i = 1; i < argc; i++) {
-    double d = atoi(args[i]);
-    val *= d;
-  }
-
-  char *rv = calloc(100, sizeof(char));
-  snprintf(rv, 99, "%f", val);
-  return rv;
-}
-
-char *divide(int argc, char **args)
-{
-  double val = atoi(args[0]);
-
-  for (int i = 1; i < argc; i++) {
-    double d = atoi(args[i]);
-    val /= d;
-  }
-
-  char *rv = calloc(100, sizeof(char));
-  snprintf(rv, 99, "%f", val);
+  int l_operand = l->type == LISPOBJECT_FLOAT ? (int)l->value_float : l->value_int;
+  int r_operand = r->type == LISPOBJECT_FLOAT ? (int)r->value_float : r->value_int;
+  LispObject *rv = new_int_object(l_operand + r_operand);
   return rv;
 }
 
 
-struct func_name_pair functions[] = {
-  {"add", "+", add},
-  {"subtract", "-", subtract},
-  {"multiply", "*", multiply},
-  {"divide", "/", divide},
-  {NULL}
+
+
+// Subtract a number from another
+LispObject *subtract(LispObject *arg)
+{
+  // TODO
+  return arg;
+}
+
+
+
+
+// 
+LispObject *multiply(LispObject *arg)
+{
+  // TODO
+  return arg;
+}
+
+
+
+// 
+LispObject *divide(LispObject *arg)
+{
+  // TODO
+  return arg;
+}
+
+
+
+
+// 
+LispObject *quote(LispObject *arg)
+{
+  return arg;
+}
+
+
+
+// 
+struct function_table_entry functions[] = {
+  { "add", "+", add},
+  { "subtract", "-", subtract},
+  { "multiply", "*", multiply},
+  { "divide", "/", divide},
+  { "quote", "quote", quote},
+  { NULL }
 };
 
 
-lispfunc get_func(char *name)
+
+
+// Get function from the function table
+LispBuiltin get_function(char *name)
 {
   int i = 0;
   while (1) {
