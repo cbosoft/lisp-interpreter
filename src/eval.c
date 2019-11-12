@@ -108,57 +108,27 @@ lispfunc get_func(char *name)
 }
 
 
-void *eval(struct ast_node *ast)
+
+
+LispObject *eval(LispObject *root)
 {
-  struct ast_node *current = ast;
   char *fname = NULL;
-  char **params = NULL;
-  int nparams = 0;
 
-  while (1) {
-    //fprintf(stderr, "%d %s \n", nparams, current->value);
+  // TODO change to assert_or_error
+  // TODO allow eval of list
+  assert(root->type == LISPOBJECT_STRING); // string name of func or syntax error
+  fname = root->value_string;
+  LispObject *value = get_function(fname)(root->list_next);
 
-    if (current->child != NULL) {
-      //fprintf(stderr, "  eval child\n");
-      current->value = eval(current->child);
-      //fprintf(stderr, "  child evaluted to: %s \n", (char*)current->value);
-    }
+  // if arg is a list:
+  //  eval all elements in the list
+  // return last element in the list
 
-    if (current->value == NULL) {
-      //fprintf(stderr, "  val is null\n");
-      goto next;
-    }
+  if (root->list_next)
+    return eval(root->list_next);
+  else
+    return value;
 
-    if (fname == NULL)  {
-      fname = current->value;
-      //fprintf(stderr, "fname = %s\n", fname);
-    }
-    else {
-      ADD_PARAM(current->value);
-    }
-
-next:
-    if (current && current->next) {
-      current = current->next;
-    }
-    else
-      break;
-    //fprintf(stderr, "NEXT\n");
-
-  }
-
-  if (fname == NULL) {
-    //fprintf(stderr, "NO FUNCTION NAMED\n");
-    return ast->child->value;
-  }
-
-  lispfunc f = get_func(fname);
-
-  if (f == NULL) {
-    //fprintf(stderr, "FUNCTION NOT KNOWN\n");
-    return ast->next->value; // TODO: is this the best way of doing this?
-  }
-
-  char *rv = f(nparams, params);
-  return rv;
+  // evaluation will de-ref objects; they should be free'd
+  // TODO figure out how to do this
 }
