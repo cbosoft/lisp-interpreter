@@ -2,9 +2,9 @@
 #include <stdio.h>
 
 #include "tokenise.h"
-#include "ast.h"
 #include "parse.h"
 #include "eval.h"
+#include "object.h"
 
 int main(int argc, char **argv)
 {
@@ -18,16 +18,15 @@ int main(int argc, char **argv)
     tokenise("(+ (+ 1 1 1) 1)", &tokens, &n_tokens);
   }
 
-  struct ast_node *ast = get_ast(tokens, n_tokens);
+  LispObject *root = parse(tokens, n_tokens);
   for (int i = 0; i < n_tokens; i++) {
     free(tokens[i]);
   }
 
-  char *result = eval(ast);
+  LispObject *result = eval(root);
 
-  fprintf(stderr, "RESULT: %s\n", result);
-  
-  free_ast(ast);
+  LispObject_print(result);
+  LispObject_free(root);
 
   return 0;
 }
