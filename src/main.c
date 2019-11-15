@@ -11,6 +11,13 @@ int main(int argc, char **argv)
   char **tokens;
   int n_tokens = 0;
 
+  // TODO argument processing.
+  // no args = REPL
+  // -f --file      execute commands in file
+  // -c --command   execute command
+  // -v --version   print interpreter version
+  // -h --help      print help screen
+
   if (argc > 1) {
     tokenise(argv[1], &tokens, &n_tokens);
   }
