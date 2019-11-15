@@ -9,6 +9,9 @@
 #include "exception.h"
 #include "environment.h"
 #include "function.h"
+#include "debug.h"
+
+
 
 
 
@@ -19,6 +22,8 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
   LispEnvironment *subenv = NULL;
   int nargs;
 
+  debug_message("IN EVAL\n");
+
   // TODO move builtins into environment
   assert_or_error(env != NULL, "eval", "eval without env: symbols not available");
 
@@ -27,6 +32,7 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
   // finished with.  The variables and definitions in a (sub) environment should
   // be free'd after use.
 
+  debug_message("EVAL %s\n", LispObject_type(root));
   switch (root->type) {
 
   case LISPOBJECT_SYMBOL:
@@ -35,6 +41,7 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
 
   case LISPOBJECT_LIST:
     fn = root->list_child;
+    debug_message("LIST CHILD IS %s\n", LispObject_type(fn));
     
     if (fn == NULL)
       return NULL;
@@ -42,9 +49,9 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
     if (fn->type == LISPOBJECT_LIST) {
       obj_i = fn;
       if (obj_i->list_next) {
-        fprintf(stderr, "  eval things in list\n");
+        debug_message("EVALUATE LIST CONTENTS IN TURN\n");
         while (obj_i->list_next != NULL) {
-          fprintf(stderr, "  type: %s\n", LispObject_type(obj_i));
+          debug_message(" ITEM TYPE: %s\n", LispObject_type(obj_i));
           eval(obj_i, env);
           obj_i = obj_i->list_next;
         }
@@ -60,6 +67,7 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
     struct function_table_entry *tentry = get_function(fname);
     
     if (tentry->lisp_function != NULL) {
+      debug_message("SYMBOL %s IS LISP FUNCTION", fn->symbol_name);
       
       assert_or_error(nargs == tentry->lisp_function->number_required_args, "eval", "number of arguments does not match required (got %d, need %d).", nargs, tentry->lisp_function->number_required_args);
       LispEnvironment *sub_env = LispEnvironment_new_environment(env);
@@ -76,6 +84,7 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
       
     }
     else if (tentry->builtin_function != NULL) {
+      debug_message("SYMBOL %s IS BUILTIN\n", fn->symbol_name);
 
       LispObject *evaluated_args = NULL, *ev_args_i = NULL;;
 
@@ -86,6 +95,7 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
       if (args != NULL) {
         
         // evaluate first arg
+        debug_message("EVALUATING FIRST ARGUMENT %s\n", LispObject_type(args));
         obj_i = args;
         evaluated_args = eval(args, env);
         ev_args_i = evaluated_args;
@@ -93,6 +103,7 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
 
         // evaluate subsequent args
         while (obj_i != NULL) {
+          debug_message("EVALUATING SUBSEQUENT ARGUMENT\n");
           ev_args_i->list_next = eval(obj_i, env);
           ev_args_i = ev_args_i->list_next;
           obj_i = obj_i->list_next;

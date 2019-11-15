@@ -6,6 +6,7 @@
 #include "object.h"
 #include "builtins.h"
 #include "exception.h"
+#include "debug.h"
 
 
 
@@ -93,26 +94,40 @@ LispObject *LispObject_new_list()
 LispObject *LispObject_new_guess_type(char *s) {
   int len = strlen(s), i, ch;
 
+  debug_message("GUESSING %s\n", s);
+  
   int not_number=0, not_integer=0;
 
   if (strstr(s, "\"") != NULL || strstr(s, "'") != NULL) {
+    debug_message("GUESSING %s is STRING\n", s);
     return LispObject_new_string(s);
   }
 
   struct function_table_entry *tentry = get_function(s);
   if (tentry != NULL) {
+    debug_message("GUESSING %s is SYMBOL\n", s);
     return LispObject_new_symbol(s);
   }
+  else {
+    debug_message("EXCEPTION RESET\n");
+  }
 
-  if (strcmp(s, "(") == 0)
+  if (strcmp(s, "(") == 0) {
+    debug_message("GUESSING %s is LIST\n", s);
     return LispObject_new_list();
+  }
 
-  if (strcmp(s, "false") == 0)
+  if (strcmp(s, "false") == 0) {
+    debug_message("GUESSING %s is BOOL\n", s);
     return LispObject_new_bool(0);
+  }
 
-  if (strcmp(s, "true") == 0)
+  if (strcmp(s, "true") == 0) {
+    debug_message("GUESSING %s is BOOL\n", s);
     return LispObject_new_bool(1);
+  }
 
+  debug_message("GUESSING %s is PROBABLY NUMBER\n", s);
   for (i = 0, ch=(int)s[0]; i < len; i++, ch=(int)s[i]) {
     if ((ch >= (int)'0') || (ch <= (int)'9')) {
       if ( (ch == (int)'.') || (ch == (int)'e') || (ch == (int)'+') || (ch == (int)'-') ) {
@@ -127,9 +142,12 @@ LispObject *LispObject_new_guess_type(char *s) {
 
   assert_or_error(!not_number, "LispObject_new_guess_type", "name not found and not string: %s", s);
 
-  if (not_integer)
+  if (not_integer) {
+    debug_message("GUESSING %s is FLOAT\n", s);
     return LispObject_new_float(atof(s));
+  }
 
+  debug_message("GUESSING %s is INT\n", s);
   return LispObject_new_int(atoi(s));
 }
 

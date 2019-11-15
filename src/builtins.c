@@ -5,6 +5,7 @@
 #include "builtins.h"
 #include "exception.h"
 #include "environment.h"
+#include "debug.h"
 
 
 
@@ -12,6 +13,8 @@
 // Add two numbers
 LispObject *add(LispObject *arg, LispEnvironment *env)
 {
+  debug_message("BUILTIN FUNCTION ADD");
+
   int nargs = LispObject_list_size(arg);
   assert_or_error(nargs == 2, "add", "Function takes 2 arguments (got %d).", nargs);
   
@@ -43,6 +46,8 @@ LispObject *add(LispObject *arg, LispEnvironment *env)
 // Subtract a number from another
 LispObject *subtract(LispObject *arg, LispEnvironment *env)
 {
+  debug_message("BUILTIN FUNCTION SUBTRACT");
+
   int nargs = LispObject_list_size(arg);
   assert_or_error(nargs == 2, "subtract", "Function takes 2 arguments (got %d).", nargs);
   
@@ -74,6 +79,8 @@ LispObject *subtract(LispObject *arg, LispEnvironment *env)
 // 
 LispObject *multiply(LispObject *arg, LispEnvironment *env)
 {
+  debug_message("BUILTIN FUNCTION MULTIPLY");
+
   int nargs = LispObject_list_size(arg);
   assert_or_error(nargs == 2, "multiply", "Function takes 2 arguments (got %d).", nargs);
   
@@ -104,6 +111,8 @@ LispObject *multiply(LispObject *arg, LispEnvironment *env)
 // 
 LispObject *divide(LispObject *arg, LispEnvironment *env)
 {
+  debug_message("BUILTIN FUNCTION DIVIDE");
+
   int nargs = LispObject_list_size(arg);
   assert_or_error(nargs == 2, "divide", "Function takes 2 arguments (got %d).", nargs);
   
@@ -136,6 +145,8 @@ LispObject *divide(LispObject *arg, LispEnvironment *env)
 // TODO remove this as is implemented at lower level
 LispObject *quote(LispObject *arg, LispEnvironment *env)
 {
+  debug_message("BUILTIN FUNCTION QUOTE");
+
   return arg;
 }
 
