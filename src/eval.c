@@ -19,6 +19,11 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
   LispEnvironment *subenv = NULL;
   int nargs;
 
+  // TODO garbage collect, or otherwise free up used memory.  Program structure,
+  // a series of lisp objects, should stay in memory and not be altered until
+  // finished with.  The variables and definitions in a (sub) environment should
+  // be free'd after use.
+
   switch (root->type) {
 
   case LISPOBJECT_SYMBOL:
@@ -62,7 +67,9 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
 	      obj_i = obj_i->list_next;
       }
 
-      return eval(tentry->lisp_function->body, subenv);
+      LispObject *rv = eval(tentry->lisp_function->body, subenv);
+      // TODO free subenv
+      return rv;
       
     }
     else if (tentry->builtin_function != NULL) {

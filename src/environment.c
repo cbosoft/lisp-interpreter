@@ -18,6 +18,15 @@ LispEnvironment *LispEnvironment_new_environment(LispEnvironment *parent)
 
 
 
+// Delete environement and free object from memory
+void LispEnvironment_free(LispEnvironment *env)
+{
+  free(env);
+}
+
+
+
+
 // Add an object $value to the environment.
 void LispEnvironment_add_symbol(LispEnvironment *env, LispObject *value)
 {
