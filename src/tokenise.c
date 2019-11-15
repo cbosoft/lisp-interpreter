@@ -19,16 +19,8 @@
 void tokenise(char *input, char ***tokens, int *n_tokens)
 {
 
-  fprintf(stderr, "PARSING STRING: %s\n", input);
   char **_tokens = NULL;
   int _n_tokens = 0;
-  /*
-   * A LISP token can be one of:
-   *  - an atom
-   *  - a list
-   *  - a name
-   *  - keyword
-   */
 
   char *kw_or_name = NULL;
   int kw_or_name_len = 0;
