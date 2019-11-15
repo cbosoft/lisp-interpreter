@@ -29,8 +29,9 @@ int main(int argc, char **argv)
   for (int i = 0; i < n_tokens; i++) {
     free(tokens[i]);
   }
-
-  LispObject *result = eval(root, NULL);
+  
+  LispEnvironment *env = LispEnvironment_new_environment(NULL); // TODO = LispEnvironment_new_global_environment(); where builtin func defs are within the environment
+  LispObject *result = eval(root, env);
 
   LispObject_print(result);
   LispObject_free(root);

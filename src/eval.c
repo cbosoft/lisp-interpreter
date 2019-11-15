@@ -19,6 +19,9 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
   LispEnvironment *subenv = NULL;
   int nargs;
 
+  // TODO move builtins into environment
+  assert_or_error(env != NULL, "eval", "eval without env: symbols not available");
+
   // TODO garbage collect, or otherwise free up used memory.  Program structure,
   // a series of lisp objects, should stay in memory and not be altered until
   // finished with.  The variables and definitions in a (sub) environment should
