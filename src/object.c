@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <assert.h>
 #include <string.h>
 
 #include "object.h"
+#include "exception.h"
 
 
 
@@ -258,4 +258,49 @@ void LispObject_assign_value(LispObject *dest, LispObject *source)
   }
 
   dest->type = source->type;
+}
+
+
+
+
+// Create a copy of an object $o, including children and next items in lists.
+LispObject *LispObject_deepcopy(LispObject *o)
+{
+  LispObject *rv = malloc(sizeof(LispObject));
+
+  assert_or_error(rv != NULL, "LispObject_deepcopy", "memory allocation failed; are you out of memory?");
+
+  LispObject_assign_value(rv, o);
+
+  if (o->list_child != NULL) {
+    rv->list_child = LispObject_deepcopy(o->list_child);
+  }
+  
+  if (o->list_next != NULL) {
+    rv->list_next = LispObject_deepcopy(o->list_next);
+  }
+
+  return rv;
+}
+
+
+
+
+// Create a copy of the object $o, not including references to next but
+// including references to children. i.e. doesn't return the cdr of the list,
+// but if the object IS a list, it will be copied. This is a recursive
+// operation, be careful copying lists!
+LispObject *LispObject_copy(LispObject *o)
+{
+  LispObject *rv = malloc(sizeof(LispObject));
+
+  assert_or_error(rv != NULL, "LispObject_copy", "memory allocation failed; are you out of memory?");
+
+  LispObject_assign_value(rv, o);
+
+  if (o->list_child != NULL) {
+    rv->list_child = LispObject_deepcopy(o->list_child);
+  }
+
+  return rv;
 }

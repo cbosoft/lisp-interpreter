@@ -6,6 +6,7 @@ enum LISPOBJECT_TYPE {
   LISPOBJECT_FLOAT,
   LISPOBJECT_BOOL,
   LISPOBJECT_LIST,
+  LISPOBJECT_SYMBOL
 };
 
 typedef struct LispObject LispObject;
@@ -18,7 +19,7 @@ struct LispObject {
   int type;
 
   char *symbol_name;
-  LispObject *symbol_value;
+  LispObject *value_symbol;
 
   LispObject *list_next;
   LispObject *list_child;
@@ -37,3 +38,5 @@ LispObject *pop_index(LispObject *list, int index);
 void LispObject_assign_value(LispObject *dest, LispObject *source);
 void LispObject_print(LispObject *o);
 void LispObject_free(LispObject *root);
+LispObject *LispObject_deepcopy(LispObject *o);
+LispObject *LispObject_copy(LispObject *o);
