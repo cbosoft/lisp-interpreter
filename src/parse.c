@@ -5,6 +5,7 @@
 #include "parse.h"
 #include "ast.h"
 #include "object.h"
+#include "exception.h"
 #include "debug.h"
 
 
@@ -24,12 +25,14 @@ LispObject *parse(char **tokens, int n_tokens)
 
     if (strcmp(tokens[i], "(") == 0) {
       new = LispObject_new_list();
+      ERROR_CHECK;
       nparents ++;
 
       parents = realloc(parents, nparents*sizeof(LispObject *));
 
       parents[nparents-1] = current;
       LispObject_add_object_to_list(current, new);
+      ERROR_CHECK;
 
       current = new;
     }
@@ -41,10 +44,13 @@ LispObject *parse(char **tokens, int n_tokens)
     else {
       debug_message("GUESS\n");
       new = LispObject_new_guess_type(tokens[i]);
+      ERROR_CHECK;
 
       debug_message("ADD TO LIST\n");
       LispObject_add_object_to_list(current, new);
+      ERROR_CHECK;
     }
+
   }
   
   return root;

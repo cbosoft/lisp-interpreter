@@ -26,6 +26,7 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
 
   // TODO move builtins into environment
   assert_or_error(env != NULL, "eval", "eval without env: symbols not available");
+  ERROR_CHECK;
 
   // TODO garbage collect, or otherwise free up used memory.  Program structure,
   // a series of lisp objects, should stay in memory and not be altered until
@@ -44,7 +45,7 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
     debug_message("LIST CHILD IS %s\n", LispObject_type(fn));
     
     if (fn == NULL)
-      return NULL;
+      return LispObject_new_bool(0);
 
     if (fn->type == LISPOBJECT_LIST) {
       obj_i = fn;
@@ -53,6 +54,7 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
         while (obj_i->list_next != NULL) {
           debug_message(" ITEM TYPE: %s\n", LispObject_type(obj_i));
           eval(obj_i, env);
+          ERROR_CHECK;
           obj_i = obj_i->list_next;
         }
       }
@@ -70,6 +72,7 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
       debug_message("SYMBOL %s IS LISP FUNCTION", fn->symbol_name);
       
       assert_or_error(nargs == tentry->lisp_function->number_required_args, "eval", "number of arguments does not match required (got %d, need %d).", nargs, tentry->lisp_function->number_required_args);
+      ERROR_CHECK;
       LispEnvironment *sub_env = LispEnvironment_new_environment(env);
       obj_i = args;
 
@@ -86,7 +89,7 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
     else if (tentry->builtin_function != NULL) {
       debug_message("SYMBOL %s IS BUILTIN\n", fn->symbol_name);
 
-      LispObject *evaluated_args = NULL, *ev_args_i = NULL;;
+      LispObject *evaluated_args = NULL, *ev_args_i = NULL;
 
       if (strcmp(tentry->name, "quote") == 0) {
         return args;
@@ -98,6 +101,8 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
         debug_message("EVALUATING FIRST ARGUMENT %s\n", LispObject_type(args));
         obj_i = args;
         evaluated_args = eval(args, env);
+        ERROR_CHECK;
+
         ev_args_i = evaluated_args;
         obj_i = obj_i->list_next;
 
@@ -105,6 +110,8 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
         while (obj_i != NULL) {
           debug_message("EVALUATING SUBSEQUENT ARGUMENT\n");
           ev_args_i->list_next = eval(obj_i, env);
+          ERROR_CHECK;
+
           ev_args_i = ev_args_i->list_next;
           obj_i = obj_i->list_next;
         }
@@ -115,6 +122,7 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
     }
     else {
       assert_or_error(0, "eval", "malformed function definition found: name with no function.");
+      ERROR_CHECK;
     }
     
     break;

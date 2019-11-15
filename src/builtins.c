@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "object.h"
@@ -17,6 +18,7 @@ LispObject *add(LispObject *arg, LispEnvironment *env)
 
   int nargs = LispObject_list_size(arg);
   assert_or_error(nargs == 2, "add", "Function takes 2 arguments (got %d).", nargs);
+  ERROR_CHECK;
   
   LispObject *l = arg;
   LispObject *r = arg->list_next;
@@ -26,6 +28,8 @@ LispObject *add(LispObject *arg, LispEnvironment *env)
       (r->type == LISPOBJECT_INT || r->type == LISPOBJECT_FLOAT),
       "add", 
       "Function expects numerical arguments, got %s and %s.", LispObject_type(l), LispObject_type(r));
+  ERROR_CHECK;
+
 
   if (l->type == LISPOBJECT_FLOAT || r->type == LISPOBJECT_FLOAT) {
     double l_operand = l->type == LISPOBJECT_FLOAT ? l->value_float : (double)l->value_int;
@@ -50,6 +54,7 @@ LispObject *subtract(LispObject *arg, LispEnvironment *env)
 
   int nargs = LispObject_list_size(arg);
   assert_or_error(nargs == 2, "subtract", "Function takes 2 arguments (got %d).", nargs);
+  ERROR_CHECK;
   
   LispObject *l = arg;
   LispObject *r = arg->list_next;
@@ -59,6 +64,7 @@ LispObject *subtract(LispObject *arg, LispEnvironment *env)
       (r->type == LISPOBJECT_INT || r->type == LISPOBJECT_FLOAT),
       "subtract", 
       "Function expects numerical arguments, got %s and %s.", LispObject_type(l), LispObject_type(r));
+  ERROR_CHECK;
 
   if (l->type == LISPOBJECT_FLOAT || r->type == LISPOBJECT_FLOAT) {
     double l_operand = l->type == LISPOBJECT_FLOAT ? l->value_float : (double)l->value_int;
@@ -83,6 +89,7 @@ LispObject *multiply(LispObject *arg, LispEnvironment *env)
 
   int nargs = LispObject_list_size(arg);
   assert_or_error(nargs == 2, "multiply", "Function takes 2 arguments (got %d).", nargs);
+  ERROR_CHECK;
   
   LispObject *l = arg;
   LispObject *r = arg->list_next;
@@ -92,6 +99,7 @@ LispObject *multiply(LispObject *arg, LispEnvironment *env)
       (r->type == LISPOBJECT_INT || r->type == LISPOBJECT_FLOAT),
       "multiply", 
       "Function expects numerical arguments, got %s and %s.", LispObject_type(l), LispObject_type(r));
+  ERROR_CHECK;
 
   if (l->type == LISPOBJECT_FLOAT || r->type == LISPOBJECT_FLOAT) {
     double l_operand = l->type == LISPOBJECT_FLOAT ? l->value_float : (double)l->value_int;
@@ -115,6 +123,7 @@ LispObject *divide(LispObject *arg, LispEnvironment *env)
 
   int nargs = LispObject_list_size(arg);
   assert_or_error(nargs == 2, "divide", "Function takes 2 arguments (got %d).", nargs);
+  ERROR_CHECK;
   
   LispObject *l = arg;
   LispObject *r = arg->list_next;
@@ -124,6 +133,7 @@ LispObject *divide(LispObject *arg, LispEnvironment *env)
       (r->type == LISPOBJECT_INT || r->type == LISPOBJECT_FLOAT),
       "divide", 
       "Function expects numerical arguments, got %s and %s.", LispObject_type(l), LispObject_type(r));
+  ERROR_CHECK;
 
   if (l->type == LISPOBJECT_FLOAT || r->type == LISPOBJECT_FLOAT) {
     double l_operand = l->type == LISPOBJECT_FLOAT ? l->value_float : (double)l->value_int;
@@ -189,5 +199,7 @@ struct function_table_entry *get_function(char *name)
 
     i++;
   }
+
+  assert_or_error(0, "get_function", "Function \"%s\" not found.", name);
   return NULL;
 }

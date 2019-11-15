@@ -1,3 +1,4 @@
+#define _POSIX_C_SOURCE 200809L
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -9,6 +10,73 @@
 
 #define ERRLEN 256
 
+enum EXCEPTION_STATUS {
+  EXCEPTION_NONE,
+  EXCEPTION_ERROR
+};
+
+static int exception_condition = EXCEPTION_NONE;
+static char *exception_message = NULL;
+static char *exception_traceback = NULL;
+
+
+
+
+// Raise an exception
+void Exception_raise (const char *message, const char *traceback)
+{
+  exception_message = strdup(message);
+
+  if (traceback != NULL)
+    exception_traceback = strdup(traceback);
+  else
+    exception_traceback = NULL;
+
+  exception_condition = EXCEPTION_ERROR;
+}
+
+
+
+
+// Check if an exception is waiting to be shown
+int Exception_check()
+{
+  return exception_condition == EXCEPTION_ERROR;
+}
+
+
+
+
+// Reset exception
+void Exception_reset()
+{
+  exception_condition = EXCEPTION_NONE;
+  exception_message = NULL;
+  exception_traceback = NULL;
+}
+
+
+
+
+// print out current exception, and clear it.
+void Exception_print()
+{
+
+  if (!Exception_check())
+    return;
+
+  fprintf(stderr, BG_RED"Exception"RESET": %s\n", exception_message);
+
+  if (exception_traceback != NULL)
+    fprintf(stderr, "in: "FG_BLUE"%s"RESET"\n", exception_traceback);
+
+  Exception_reset();
+}
+
+
+
+
+// assert a condition is true, otherwise raise an exception.
 void assert_or_error(int condition, const char *source, const char *fmt, ...)
 {
   if (condition)
@@ -22,7 +90,6 @@ void assert_or_error(int condition, const char *source, const char *fmt, ...)
   vsnprintf(message, ERRLEN-1, fmt, ap);
   va_end(ap);
 
-  fprintf(stderr, BG_RED"Error"RESET" in "FG_BLUE"%s"RESET": %s\n", source, message);
-  
-  exit(1);
+  Exception_raise((const char *)message, source);
+
 }

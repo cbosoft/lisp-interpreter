@@ -110,6 +110,7 @@ LispObject *LispObject_new_guess_type(char *s) {
   }
   else {
     debug_message("EXCEPTION RESET\n");
+    Exception_reset();
   }
 
   if (strcmp(s, "(") == 0) {
@@ -141,6 +142,7 @@ LispObject *LispObject_new_guess_type(char *s) {
   }
 
   assert_or_error(!not_number, "LispObject_new_guess_type", "name not found and not string: %s", s);
+  ERROR_CHECK;
 
   if (not_integer) {
     debug_message("GUESSING %s is FLOAT\n", s);
