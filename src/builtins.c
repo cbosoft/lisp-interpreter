@@ -4,12 +4,13 @@
 #include "object.h"
 #include "builtins.h"
 #include "exception.h"
+#include "environment.h"
 
 
 
 
 // Add two numbers
-LispObject *add(LispObject *arg)
+LispObject *add(LispObject *arg, LispEnvironment *env)
 {
   int nargs = LispObject_list_size(arg);
   assert_or_error(nargs == 2, "add", "Function takes 2 arguments (got %d).", nargs);
@@ -26,13 +27,13 @@ LispObject *add(LispObject *arg)
   if (l->type == LISPOBJECT_FLOAT || r->type == LISPOBJECT_FLOAT) {
     double l_operand = l->type == LISPOBJECT_FLOAT ? l->value_float : (double)l->value_int;
     double r_operand = r->type == LISPOBJECT_FLOAT ? r->value_float : (double)r->value_int;
-    LispObject *rv = new_float_object(l_operand + r_operand);
+    LispObject *rv = LispObject_new_float(l_operand + r_operand);
     return rv;
   }
 
   int l_operand = l->type == LISPOBJECT_FLOAT ? (int)l->value_float : l->value_int;
   int r_operand = r->type == LISPOBJECT_FLOAT ? (int)r->value_float : r->value_int;
-  LispObject *rv = new_int_object(l_operand + r_operand);
+  LispObject *rv = LispObject_new_int(l_operand + r_operand);
   return rv;
 }
 
@@ -40,7 +41,7 @@ LispObject *add(LispObject *arg)
 
 
 // Subtract a number from another
-LispObject *subtract(LispObject *arg)
+LispObject *subtract(LispObject *arg, LispEnvironment *env)
 {
   int nargs = LispObject_list_size(arg);
   assert_or_error(nargs == 2, "subtract", "Function takes 2 arguments (got %d).", nargs);
@@ -57,13 +58,13 @@ LispObject *subtract(LispObject *arg)
   if (l->type == LISPOBJECT_FLOAT || r->type == LISPOBJECT_FLOAT) {
     double l_operand = l->type == LISPOBJECT_FLOAT ? l->value_float : (double)l->value_int;
     double r_operand = r->type == LISPOBJECT_FLOAT ? r->value_float : (double)r->value_int;
-    LispObject *rv = new_float_object(l_operand - r_operand);
+    LispObject *rv = LispObject_new_float(l_operand - r_operand);
     return rv;
   }
 
   int l_operand = l->type == LISPOBJECT_FLOAT ? (int)l->value_float : l->value_int;
   int r_operand = r->type == LISPOBJECT_FLOAT ? (int)r->value_float : r->value_int;
-  LispObject *rv = new_int_object(l_operand - r_operand);
+  LispObject *rv = LispObject_new_int(l_operand - r_operand);
   return rv;
 }
 
@@ -71,7 +72,7 @@ LispObject *subtract(LispObject *arg)
 
 
 // 
-LispObject *multiply(LispObject *arg)
+LispObject *multiply(LispObject *arg, LispEnvironment *env)
 {
   int nargs = LispObject_list_size(arg);
   assert_or_error(nargs == 2, "multiply", "Function takes 2 arguments (got %d).", nargs);
@@ -88,20 +89,20 @@ LispObject *multiply(LispObject *arg)
   if (l->type == LISPOBJECT_FLOAT || r->type == LISPOBJECT_FLOAT) {
     double l_operand = l->type == LISPOBJECT_FLOAT ? l->value_float : (double)l->value_int;
     double r_operand = r->type == LISPOBJECT_FLOAT ? r->value_float : (double)r->value_int;
-    LispObject *rv = new_float_object(l_operand * r_operand);
+    LispObject *rv = LispObject_new_float(l_operand * r_operand);
     return rv;
   }
 
   int l_operand = l->type == LISPOBJECT_FLOAT ? (int)l->value_float : l->value_int;
   int r_operand = r->type == LISPOBJECT_FLOAT ? (int)r->value_float : r->value_int;
-  LispObject *rv = new_int_object(l_operand * r_operand);
+  LispObject *rv = LispObject_new_int(l_operand * r_operand);
   return rv;
 }
 
 
 
 // 
-LispObject *divide(LispObject *arg)
+LispObject *divide(LispObject *arg, LispEnvironment *env)
 {
   int nargs = LispObject_list_size(arg);
   assert_or_error(nargs == 2, "divide", "Function takes 2 arguments (got %d).", nargs);
@@ -118,26 +119,37 @@ LispObject *divide(LispObject *arg)
   if (l->type == LISPOBJECT_FLOAT || r->type == LISPOBJECT_FLOAT) {
     double l_operand = l->type == LISPOBJECT_FLOAT ? l->value_float : (double)l->value_int;
     double r_operand = r->type == LISPOBJECT_FLOAT ? r->value_float : (double)r->value_int;
-    LispObject *rv = new_float_object(l_operand / r_operand);
+    LispObject *rv = LispObject_new_float(l_operand / r_operand);
     return rv;
   }
 
   int l_operand = l->type == LISPOBJECT_FLOAT ? (int)l->value_float : l->value_int;
   int r_operand = r->type == LISPOBJECT_FLOAT ? (int)r->value_float : r->value_int;
-  LispObject *rv = new_int_object(l_operand / r_operand);
+  LispObject *rv = LispObject_new_int(l_operand / r_operand);
   return rv;
 }
 
 
 
 
-// 
-LispObject *quote(LispObject *arg)
+// Returns args as output without change
+// TODO remove this as is implemented at lower level
+LispObject *quote(LispObject *arg, LispEnvironment *env)
 {
   return arg;
 }
 
 
+
+
+// Create an entry in the local environment's function table
+LispObject *define(LispObject *arg, LispEnvironment *env)
+{
+}
+
+
+
+// TODO move this into a (global) environment?
 
 // 
 struct function_table_entry functions[] = {

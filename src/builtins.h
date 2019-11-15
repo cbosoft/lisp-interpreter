@@ -1,9 +1,10 @@
 #pragma once
 #include "object.h"
 #include "function.h"
+#include "environment.h"
 
 
-typedef LispObject * (*LispBuiltin)(LispObject *);
+typedef LispObject * (*LispBuiltin)(LispObject *, LispEnvironment *);
 
 struct function_table_entry {
   char *name;
