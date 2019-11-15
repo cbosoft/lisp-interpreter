@@ -7,6 +7,7 @@
 #include "object.h"
 #include "exception.h"
 #include "environment.h"
+#include "function.h"
 
 
 typedef LispObject * (*LispBuiltin)(LispObject *);
@@ -14,8 +15,10 @@ typedef LispObject * (*LispBuiltin)(LispObject *);
 struct function_table_entry {
   char *name;
   char *shorthand;
-  LispBuiltin function;
+  LispBuiltin builtin_function;
+  LispFunction *lisp_function;
 };
+
 
 
 
@@ -98,27 +101,27 @@ LispObject *quote(LispObject *arg)
 
 // 
 struct function_table_entry functions[] = {
-  { "add", "+", add},
-  { "subtract", "-", subtract},
-  { "multiply", "*", multiply},
-  { "divide", "/", divide},
-  { "quote", "quote", quote},
-  { NULL }
+					   { "add", "+", add, NULL},
+					   { "subtract", "-", subtract, NULL},
+					   { "multiply", "*", multiply, NULL},
+					   { "divide", "/", divide, NULL},
+					   { "quote", "quote", quote, NULL},
+					   { NULL, NULL, NULL, NULL }
 };
 
 
 
 
 // Get function from the function table
-LispBuiltin get_function(char *name)
+struct function_table_entry *get_function(char *name)
 {
   int i = 0;
   while (1) {
-    if (functions[i].function == NULL) {
+    if (functions[i].name == NULL) {
       break;
     }
     else if ((strcmp(name, functions[i].name) == 0) || (strcmp(name, functions[i].shorthand) == 0)) {
-      return functions[i].function;
+      return &functions[i];
     }
 
     i++;
@@ -132,13 +135,58 @@ LispBuiltin get_function(char *name)
 LispObject *eval(LispObject *root, LispEnvironment *env)
 {
   char *fname = NULL;
+  LispObject *args = NULL, *fn = NULL, *obj_i = NULL;
   LispEnvironment *subenv = NULL;
+  int nargs;
 
   // TODO change to assert_or_error
-  // TODO allow eval of list
-  assert(root->type == LISPOBJECT_STRING); // string name of func or syntax error
+
+  switch (root->type) {
+  case LISPOBJECT_SYMBOL:
+    return eval(root->value_symbol, env);
+    break;
+  case LISPOBJECT_LIST:
+    fn = root->list_next;
+    
+    if (fn == NULL)
+      return NULL;
+	
+    args = fn->list_next;
+    nargs = LispObject_list_size(args);
+
+    fname = fn->symbol_name != NULL ? fn->symbol_name : fn->value_string;
+    assert_or_error(fname != NULL, "eval", "Cannot evalutate function with null name");
+    struct function_table_entry *tentry = get_function(fname);
+    
+    if (tentry->lisp_function != NULL) {
+      
+      assert_or_error(nargs == tentry->lisp_function->number_required_args, "eval", "number of arguments does not match required (got %d, need %d).", nargs, tentry->lisp_function->number_required_args);
+      LispEnvironment *sub_env = environment_new_environment(env);
+      obj_i = args;
+      for (int i = 0; i < nargs; i++) {
+	environment_add_symbol(sub_env, obj_i);
+	obj_i = obj_i->list_next;
+      }
+
+      return eval(tentry->lisp_function->body, subenv);
+      
+    }
+    else if (tentry->builtin_function != NULL) {
+
+      return tentry->builtin_function(args);
+      
+    }
+    else {
+      assert_or_error(0, "eval", "malformed function definition found: name with no function.");
+    }
+    
+    break;
+  default:
+    return root;
+  }
+  
   fname = root->value_string;
-  LispObject *value = get_function(fname)(root->list_next);
+  struct function_table_entry *value = get_function(fname);
 
   // if arg is a list:
   //  eval all elements in the list
