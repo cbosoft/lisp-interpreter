@@ -60,6 +60,18 @@ LispObject *new_bool_object(int value)
 
 
 
+// Create new symbol.
+LispObject *new_symbol_object(char *name)
+{
+  LispObject *rv = calloc(1, sizeof(LispObject));
+  rv->type = LISPOBJECT_SYMBOL;
+  rv->symbol_name = strdup(name);
+  return rv;
+}
+
+
+
+
 // Create new list object.
 // A blank list can have objects added to it using add_object_to_list(LispObject *obj).
 LispObject *new_list_object()
