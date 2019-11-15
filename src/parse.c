@@ -10,7 +10,7 @@
 
 LispObject *parse(char **tokens, int n_tokens)
 {
-  LispObject *root = new_list_object();
+  LispObject *root = LispObject_new_list();
   LispObject *current = root, *new;
 
   LispObject **parents = NULL;
@@ -19,13 +19,13 @@ LispObject *parse(char **tokens, int n_tokens)
   for (int i = 0; i < n_tokens; i++) {
 
     if (strcmp(tokens[i], "(") == 0) {
-      new = new_list_object();
+      new = LispObject_new_list();
       nparents ++;
 
       parents = realloc(parents, nparents*sizeof(LispObject *));
 
       parents[nparents-1] = current;
-      add_object_to_list(current, new);
+      LispObject_add_object_to_list(current, new);
 
       current = new;
     }
@@ -35,8 +35,8 @@ LispObject *parse(char **tokens, int n_tokens)
       parents = realloc(parents, nparents*sizeof(LispObject *));
     }
     else {
-      new = new_object_guess_type(tokens[i]);
-      add_object_to_list(current, new);
+      new = LispObject_new_guess_type(tokens[i]);
+      LispObject_add_object_to_list(current, new);
     }
   }
   

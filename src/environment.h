@@ -7,6 +7,7 @@ struct LispEnvironment {
   LispEnvironment *parent;
 };
 
-LispEnvironment *environment_new_environment(LispEnvironment *parent);
-void environment_add_symbol(LispEnvironment *env, LispObject *value);
-LispObject *environment_get_symbol(LispEnvironment *env, char *name);
+LispEnvironment *LispEnvironment_new_environment(LispEnvironment *parent);
+void LispEnvironment_add_symbol(LispEnvironment *env, LispObject *value);
+void LispEnvironment_free(LispEnvironment *env);
+LispObject *LispEnvironment_get_symbol(LispEnvironment *env, char *name);

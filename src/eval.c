@@ -54,11 +54,11 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
     if (tentry->lisp_function != NULL) {
       
       assert_or_error(nargs == tentry->lisp_function->number_required_args, "eval", "number of arguments does not match required (got %d, need %d).", nargs, tentry->lisp_function->number_required_args);
-      LispEnvironment *sub_env = environment_new_environment(env);
+      LispEnvironment *sub_env = LispEnvironment_new_environment(env);
       obj_i = args;
 
       for (int i = 0; i < nargs; i++) {
-	      environment_add_symbol(sub_env, obj_i);
+	      LispEnvironment_add_symbol(sub_env, obj_i);
 	      obj_i = obj_i->list_next;
       }
 
@@ -89,7 +89,6 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
         }
       }
       
-      return tentry->builtin_function(evaluated_args);
       
     }
     else {

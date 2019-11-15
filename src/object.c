@@ -11,7 +11,7 @@
 
 
 // Create new string object.
-LispObject *new_string_object(char *value)
+LispObject *LispObject_new_string(char *value)
 {
   LispObject *rv = calloc(1, sizeof(LispObject));
 
@@ -27,7 +27,7 @@ LispObject *new_string_object(char *value)
 
 
 // Create new integer.
-LispObject *new_int_object(int value)
+LispObject *LispObject_new_int(int value)
 {
   LispObject *rv = calloc(1, sizeof(LispObject));
   rv->type = LISPOBJECT_INT;
@@ -39,7 +39,7 @@ LispObject *new_int_object(int value)
 
 
 // Create new float.
-LispObject *new_float_object(double value)
+LispObject *LispObject_new_float(double value)
 {
   LispObject *rv = calloc(1, sizeof(LispObject));
   rv->type = LISPOBJECT_FLOAT;
@@ -51,7 +51,7 @@ LispObject *new_float_object(double value)
 
 
 // Create new boolean.
-LispObject *new_bool_object(int value)
+LispObject *LispObject_new_bool(int value)
 {
   LispObject *rv = calloc(1, sizeof(LispObject));
   rv->type = LISPOBJECT_BOOL;
@@ -63,7 +63,7 @@ LispObject *new_bool_object(int value)
 
 
 // Create new symbol.
-LispObject *new_symbol_object(char *name)
+LispObject *LispObject_new_symbol(char *name)
 {
   LispObject *rv = calloc(1, sizeof(LispObject));
   rv->type = LISPOBJECT_SYMBOL;
@@ -75,8 +75,8 @@ LispObject *new_symbol_object(char *name)
 
 
 // Create new list object.
-// A blank list can have objects added to it using add_object_to_list(LispObject *obj).
-LispObject *new_list_object()
+// A blank list can have objects added to it using LispObject_add_object_to_list(LispObject *obj).
+LispObject *LispObject_new_list()
 {
   LispObject *rv = calloc(1, sizeof(LispObject));
   rv->type = LISPOBJECT_LIST;
@@ -90,28 +90,28 @@ LispObject *new_list_object()
 // if it contains only digits 0 to 9, its an integer. If it also contains 'e',
 // '.', '+' or '-' then its a float. If its a left parens '(' then its a list.
 // If its 'false' or 'true', then its a bool. Otherwise, its a string.
-LispObject *new_object_guess_type(char *s) {
+LispObject *LispObject_new_guess_type(char *s) {
   int len = strlen(s), i, ch;
 
   int not_number=0, not_integer=0;
 
   if (strstr(s, "\"") != NULL || strstr(s, "'") != NULL) {
-    return new_string_object(s);
+    return LispObject_new_string(s);
   }
 
   struct function_table_entry *tentry = get_function(s);
   if (tentry != NULL) {
-    return new_symbol_object(s);
+    return LispObject_new_symbol(s);
   }
 
   if (strcmp(s, "(") == 0)
-    return new_list_object();
+    return LispObject_new_list();
 
   if (strcmp(s, "false") == 0)
-    return new_bool_object(0);
+    return LispObject_new_bool(0);
 
   if (strcmp(s, "true") == 0)
-    return new_bool_object(1);
+    return LispObject_new_bool(1);
 
   for (i = 0, ch=(int)s[0]; i < len; i++, ch=(int)s[i]) {
     if ((ch >= (int)'0') || (ch <= (int)'9')) {
@@ -125,12 +125,12 @@ LispObject *new_object_guess_type(char *s) {
     }
   }
 
-  assert_or_error(!not_number, "new_object_guess_type", "name not found and not string: %s", s);
+  assert_or_error(!not_number, "LispObject_new_guess_type", "name not found and not string: %s", s);
 
   if (not_integer)
-    return new_float_object(atof(s));
+    return LispObject_new_float(atof(s));
 
-  return new_int_object(atoi(s));
+  return LispObject_new_int(atoi(s));
 }
 
 
@@ -138,7 +138,7 @@ LispObject *new_object_guess_type(char *s) {
 
 // Add object $toadd to list $list.
 // $list must be a list.
-void add_object_to_list(LispObject *list, LispObject *toadd)
+void LispObject_add_object_to_list(LispObject *list, LispObject *toadd)
 {
   assert_or_error(list->type == LISPOBJECT_LIST, "add_object_to_list", "Cannot add to non-list object.");
 

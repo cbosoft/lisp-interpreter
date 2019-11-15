@@ -25,16 +25,13 @@ struct LispObject {
   LispObject *list_child;
 };
 
-LispObject *new_string_object(char *value);
-LispObject *new_int_object(int value);
-LispObject *new_float_object(double value);
-LispObject *new_bool_object(int value);
-LispObject *new_list_object();
-LispObject *new_object_guess_type(char *s);
-
-void add_object_to_list(LispObject *list, LispObject *toadd);
-LispObject *pop(LispObject *list);
-LispObject *pop_index(LispObject *list, int index);
+LispObject *LispObject_new_string(char *value);
+LispObject *LispObject_new_int(int value);
+LispObject *LispObject_new_float(double value);
+LispObject *LispObject_new_bool(int value);
+LispObject *LispObject_new_list();
+LispObject *LispObject_new_guess_type(char *s);
+void LispObject_add_object_to_list(LispObject *list, LispObject *toadd);
 void LispObject_assign_value(LispObject *dest, LispObject *source);
 void LispObject_print(LispObject *o);
 void LispObject_free(LispObject *root);

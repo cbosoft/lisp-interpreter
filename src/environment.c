@@ -8,7 +8,7 @@
 
 // Create an environment (a collection of symbols), with optional parent
 // environment $parent. If there is no parent, this should be set to NULL.
-LispEnvironment *environment_new_environment(LispEnvironment *parent)
+LispEnvironment *LispEnvironment_new_environment(LispEnvironment *parent)
 {
   LispEnvironment *rv = calloc(1, sizeof(LispEnvironment));
   rv->parent = parent;
@@ -19,7 +19,7 @@ LispEnvironment *environment_new_environment(LispEnvironment *parent)
 
 
 // Add an object $value to the environment.
-void environment_add_symbol(LispEnvironment *env, LispObject *value)
+void LispEnvironment_add_symbol(LispEnvironment *env, LispObject *value)
 {
   LispObject *i, *v;
   v = value; //LispObject_copy(value);
@@ -39,7 +39,7 @@ void environment_add_symbol(LispEnvironment *env, LispObject *value)
 
 
 // Given the name of a symbol, get its value from the environment
-LispObject *environment_get_symbol(LispEnvironment *env, char *name)
+LispObject *LispEnvironment_get_symbol(LispEnvironment *env, char *name)
 {
   LispObject *i;
   
@@ -47,7 +47,7 @@ LispObject *environment_get_symbol(LispEnvironment *env, char *name)
     return NULL;
 
   if (env->symbols == NULL)
-    return environment_get_symbol(env->parent, name);
+    return LispEnvironment_get_symbol(env->parent, name);
 
   i = env->symbols;
   while (i->list_next != NULL) {
@@ -56,5 +56,5 @@ LispObject *environment_get_symbol(LispEnvironment *env, char *name)
     }
   }
 
-  return environment_get_symbol(env->parent, name);
+  return LispEnvironment_get_symbol(env->parent, name);
 }
