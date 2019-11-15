@@ -22,7 +22,7 @@ void assert_or_error(int condition, const char *source, const char *fmt, ...)
   vsnprintf(message, ERRLEN-1, fmt, ap);
   va_end(ap);
 
-  fprintf(stderr, BG_RED"Error"RESET" in "FG_BLUE"%s"RESET": %s", source, message);
+  fprintf(stderr, BG_RED"Error"RESET" in "FG_BLUE"%s"RESET": %s\n", source, message);
   
   exit(1);
 }
