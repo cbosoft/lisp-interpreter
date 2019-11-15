@@ -159,31 +159,6 @@ void LispObject_add_object_to_list(LispObject *list, LispObject *toadd)
 
 
 
-// Remove and return last entry from the list.
-// Return value is the only reference to the object in the list, and must be
-// free'd after use.
-// $list must be a list.
-LispObject *pop(LispObject *list)
-{
-  assert_or_error(list->type == LISPOBJECT_LIST, "pop", "Cannot pop from non-list.");
-
-  LispObject *i = list->list_child, *p, *rv;
-
-  while (i->list_next != NULL) {
-    p = i;
-    i = i->list_next;
-  }
-  // now i has the last item in the linked list, and
-  // p has the next-to-last.
-  
-  rv = i;
-  p->list_next = NULL;
-  return rv;
-}
-
-
-
-
 // Print the value of $o, recursively Note: does not print a newline at end, so
 // user should call "LispObject_print" (no trailing underscore) which calls this
 // function, and adds the required newline.
