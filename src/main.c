@@ -23,7 +23,7 @@ int main(int argc, char **argv)
     free(tokens[i]);
   }
 
-  LispObject *result = eval(root);
+  LispObject *result = eval(root, NULL);
 
   LispObject_print(result);
   LispObject_free(root);
