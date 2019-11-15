@@ -40,3 +40,6 @@ void LispObject_print(LispObject *o);
 void LispObject_free(LispObject *root);
 LispObject *LispObject_deepcopy(LispObject *o);
 LispObject *LispObject_copy(LispObject *o);
+char *LispObject_type(LispObject *o);
+int LispObject_list_size(LispObject *o);
+char *LispObject_repr(LispObject *o);
