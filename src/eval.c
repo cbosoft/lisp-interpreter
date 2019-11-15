@@ -6,6 +6,7 @@
 #include "eval.h"
 #include "object.h"
 #include "exception.h"
+#include "environment.h"
 
 
 typedef LispObject * (*LispBuiltin)(LispObject *);
@@ -128,9 +129,10 @@ LispBuiltin get_function(char *name)
 
 
 
-LispObject *eval(LispObject *root)
+LispObject *eval(LispObject *root, LispEnvironment *env)
 {
   char *fname = NULL;
+  LispEnvironment *subenv = NULL;
 
   // TODO change to assert_or_error
   // TODO allow eval of list
