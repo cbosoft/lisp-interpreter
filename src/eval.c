@@ -96,6 +96,7 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
         }
       }
       
+      return tentry->builtin_function(evaluated_args, env);
       
     }
     else {
