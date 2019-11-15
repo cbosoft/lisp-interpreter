@@ -18,6 +18,21 @@ LispEnvironment *LispEnvironment_new_environment(LispEnvironment *parent)
 
 
 
+// Create a new global environment. This environment has no parent (it is set to
+// NULL), and contains the standard library of builtin functions and any
+// constants.
+LispEnvironment *LispEnvironment_new_global_environment()
+{
+  LispEnvironment *rv = calloc(1, sizeof(LispEnvironment));
+
+  // TODO add symbols, functions to global environment.
+
+  return rv;
+}
+
+
+
+
 // Delete environement and free object from memory
 void LispEnvironment_free(LispEnvironment *env)
 {
