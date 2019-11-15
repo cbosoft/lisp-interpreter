@@ -1,8 +1,10 @@
+#define _POSIX_C_SOURCE 200809L
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
 #include "object.h"
+#include "builtins.h"
 #include "exception.h"
 
 
@@ -93,6 +95,15 @@ LispObject *new_object_guess_type(char *s) {
 
   int not_number=0, not_integer=0;
 
+  if (strstr(s, "\"") != NULL || strstr(s, "'") != NULL) {
+    return new_string_object(s);
+  }
+
+  struct function_table_entry *tentry = get_function(s);
+  if (tentry != NULL) {
+    return new_symbol_object(s);
+  }
+
   if (strcmp(s, "(") == 0)
     return new_list_object();
 
@@ -103,8 +114,8 @@ LispObject *new_object_guess_type(char *s) {
     return new_bool_object(1);
 
   for (i = 0, ch=(int)s[0]; i < len; i++, ch=(int)s[i]) {
-    if ((ch < (int)'0' || ch > (int)'9')) {
-      if (ch != (int)'.' && ch != (int)'e' && ch != (int)'+' && ch != (int)'-') {
+    if ((ch >= (int)'0') || (ch <= (int)'9')) {
+      if ( (ch == (int)'.') || (ch == (int)'e') || (ch == (int)'+') || (ch == (int)'-') ) {
         not_integer = 1;
       }
     }
@@ -114,8 +125,7 @@ LispObject *new_object_guess_type(char *s) {
     }
   }
 
-  if (not_number)
-    return new_string_object(s);
+  assert_or_error(!not_number, "new_object_guess_type", "name not found and not string: %s", s);
 
   if (not_integer)
     return new_float_object(atof(s));
@@ -130,15 +140,20 @@ LispObject *new_object_guess_type(char *s) {
 // $list must be a list.
 void add_object_to_list(LispObject *list, LispObject *toadd)
 {
-  assert(list->type == LISPOBJECT_LIST);
+  assert_or_error(list->type == LISPOBJECT_LIST, "add_object_to_list", "Cannot add to non-list object.");
 
-  LispObject *i = list->list_child;
+  if (list->list_child == NULL)
+    list->list_child = toadd;
+  else {
 
-  while (i->list_next != NULL) i = i->list_next;
-  // now i has the last item in the linked list
-  
-  i->list_next = toadd;
+    LispObject *i = list->list_child;
 
+    while (i->list_next != NULL) i = i->list_next;
+    // now i has the last item in the linked list
+    
+    i->list_next = toadd;
+
+  }
 }
 
 
@@ -150,7 +165,7 @@ void add_object_to_list(LispObject *list, LispObject *toadd)
 // $list must be a list.
 LispObject *pop(LispObject *list)
 {
-  assert(list->type == LISPOBJECT_LIST);
+  assert_or_error(list->type == LISPOBJECT_LIST, "pop", "Cannot pop from non-list.");
 
   LispObject *i = list->list_child, *p, *rv;
 
@@ -169,16 +184,22 @@ LispObject *pop(LispObject *list)
 
 
 
-// Print the value of $o
-void LispObject_print(LispObject *o)
-{
-  LispObject *i = NULL;
+// Print the value of $o, recursively Note: does not print a newline at end, so
+// user should call "LispObject_print" (no trailing underscore) which calls this
+// function, and adds the required newline.
+void LispObject_print_(LispObject *o) { 
+
+  LispObject *i = NULL; 
   FILE *fp = stdout;
 
   switch (o->type) {
 
     case LISPOBJECT_STRING:
       fprintf(fp, "%s", o->value_string);
+      break;
+
+    case LISPOBJECT_SYMBOL:
+      fprintf(fp, "%s", o->symbol_name);
       break;
 
     case LISPOBJECT_INT:
@@ -194,17 +215,28 @@ void LispObject_print(LispObject *o)
       break;
 
     case LISPOBJECT_LIST:
+      
       i = o->list_child;
-      fprintf(fp, " (");
-      while (i->list_next != NULL) {
-        LispObject_print(i);
-        fprintf(fp, " ");
+      fprintf(fp, " ( ");
+
+      while (i != NULL) {
+        LispObject_print_(i);
         i = i->list_next;
+
+        if (i != NULL)
+          fprintf(fp, " ");
       }
-      fprintf(stdout, ") ");
+
+      fprintf(stdout, " ) ");
       break;
 
   }
+}
+
+void LispObject_print(LispObject *o)
+{
+  LispObject_print_(o);
+  fprintf(stdout, "\n");
 }
 
 
@@ -313,6 +345,51 @@ LispObject *LispObject_copy(LispObject *o)
   if (o->list_child != NULL) {
     rv->list_child = LispObject_deepcopy(o->list_child);
   }
+
+  return rv;
+}
+
+
+
+
+// Get string representation of type of object $o
+char *LispObject_type(LispObject *o)
+{
+  switch (o->type)
+  {
+    case LISPOBJECT_SYMBOL:
+      return "Symbol";
+    case LISPOBJECT_INT:
+      return "Integer";
+    case LISPOBJECT_FLOAT:
+      return "Float";
+    case LISPOBJECT_BOOL:
+      return "Boolean";
+    case LISPOBJECT_STRING:
+      return "String";
+  }
+
+  return "List";
+}
+
+
+
+
+// Recursively get length of list
+int LispObject_list_size(LispObject *o)
+{
+  return o->list_next ? 1 + LispObject_list_size(o->list_next) : 1;
+}
+
+
+
+
+// Represent object as a string
+char *LispObject_repr(LispObject *o)
+{
+  char *rv = calloc(100, sizeof(char));
+
+  // TODO 
 
   return rv;
 }
