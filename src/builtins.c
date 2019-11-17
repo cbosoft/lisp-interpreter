@@ -7,6 +7,7 @@
 #include "exception.h"
 #include "environment.h"
 #include "debug.h"
+#include "types.h"
 
 
 

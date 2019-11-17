@@ -1,29 +1,6 @@
 #pragma once
 
-enum LISPOBJECT_TYPE {
-  LISPOBJECT_STRING,
-  LISPOBJECT_INT,
-  LISPOBJECT_FLOAT,
-  LISPOBJECT_BOOL,
-  LISPOBJECT_LIST,
-  LISPOBJECT_SYMBOL
-};
-
-typedef struct LispObject LispObject;
-struct LispObject {
-  char *value_string;
-  int value_int;
-  double value_float;
-  int value_bool;
-
-  int type;
-
-  char *symbol_name;
-  LispObject *value_symbol;
-
-  LispObject *list_next;
-  LispObject *list_child;
-};
+#include "types.h"
 
 LispObject *LispObject_new_string(char *value);
 LispObject *LispObject_new_int(int value);

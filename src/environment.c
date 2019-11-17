@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "environment.h"
+#include "types.h"
 
 
 
