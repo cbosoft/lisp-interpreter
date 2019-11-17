@@ -104,7 +104,7 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
         return args;
       }
 
-      if (args != NULL) {
+      if (args != NULL && strcmp(fname, "define") != 0) {
         
         // evaluate first arg
         debug_message("EVALUATING FIRST ARGUMENT %s\n", LispObject_type(args));

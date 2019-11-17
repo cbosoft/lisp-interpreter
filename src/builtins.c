@@ -8,6 +8,7 @@
 #include "environment.h"
 #include "debug.h"
 #include "types.h"
+#include "function.h"
 
 
 #define TOUCH(LE) if (LE!=NULL) {};
@@ -176,9 +177,48 @@ LispObject *quote(LispObject *arg, LispEnvironment *env)
 
 
 
-// Create an entry in the local environment's function table
+// Create an entry in the local environment's function table.
+// Usage: (define name arglist body)
+// Arguments:
+//   name            string or symbol name of the function
+//   arglist         list of string or symbol names of the function arguments,
+//   body            list of things to exectue when called.
 LispObject *define(LispObject *arg, LispEnvironment *env)
 {
+  debug_message("BUILTIN FUNCTION DEFINE\n");
+
+  TOUCH(env);
+  int nargs = LispObject_list_size(arg); // TODO error in here somehow?
+  assert_or_error(nargs == 3, "define", "Function takes 3 arguments: name, arglist, body (got %d).", nargs);
+  ERROR_CHECK;
+  debug_message("AFTER NARGS CHECK\n");
+  
+  LispObject *name = arg;
+  assert_or_error(name->type == LISPOBJECT_SYMBOL, "define", "Argument has wrong type: name should be a Symbol, not %s", LispObject_type(name));
+  ERROR_CHECK;
+  debug_message("AFTER NAME CHECK\n");
+
+  LispObject *arglist = arg->list_next;
+  assert_or_error(arglist->type == LISPOBJECT_LIST, "define", "Argument has wrong type: arglist should be a List, not %s", LispObject_type(arglist));
+  ERROR_CHECK;
+  debug_message("AFTER ARGLIST CHECK\n");
+
+  LispObject *i;
+  for (i = arglist->list_child; i != NULL; i = i->list_next) {
+    assert_or_error(i->type == LISPOBJECT_SYMBOL, "define", "Argument has wrong type: arglist items should be Symbols, not %s", LispObject_type(i));
+    ERROR_CHECK;
+  }
+  debug_message("AFTER ARGLIST_ITEMS CHECK\n");
+
+  LispObject *body = arg->list_next->list_next;
+  assert_or_error(body->type == LISPOBJECT_LIST, "define", "Argument has wrong type: body should be a List, not %s", LispObject_type(body));
+  ERROR_CHECK;
+
+  LispFunction *lfunc = LispFunction_new(arglist, body);
+
+  LispEnvironment_add_variable(env, name->symbol_name, lfunc, NULL, NULL);
+
+  return name;
 }
 
 
@@ -189,6 +229,7 @@ struct environment_var builtin_functions[] = {
 	{ "subtract", "-", NULL, &subtract, NULL, NULL },
 	{ "multiply", "*", NULL, &multiply, NULL, NULL },
 	{ "divide", "/", NULL, &divide, NULL, NULL },
-	{ "quote", "quote", NULL, &quote, NULL, NULL },
+	{ "quote", NULL, NULL, &quote, NULL, NULL },
+	{ "define", NULL, NULL, &define, NULL, NULL },
   { NULL, NULL, NULL, NULL, NULL, NULL }
 };
