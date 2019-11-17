@@ -122,12 +122,14 @@ LispObject *LispObject_new_guess_type(char *s) {
   debug_message("GUESSING %s is PROBABLY NUMBER OR SYMBOL\n", s);
   for (i = 0, ch=(int)s[0]; i < len; i++, ch=(int)s[i]) {
 
+    // if char is not number 0-9...
     if ((ch < (int)'0') || (ch > (int)'9')) {
 
+      // if is period '.', then is probably float
       if (ch == (int)'.'){
         not_integer = 1;
       }
-      if (ch == (int)'e') {
+      else if (ch == (int)'e') {
 
         if (len > 1)
           not_integer = 1;
@@ -157,8 +159,6 @@ LispObject *LispObject_new_guess_type(char *s) {
 
       }
 
-      type = LISPOBJECT_SYMBOL;
-      goto end;
     }
 
   }
