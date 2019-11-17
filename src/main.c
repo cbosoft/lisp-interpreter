@@ -64,7 +64,7 @@ int main(int argc, char **argv)
   }
   debug_message("after parse\n");
   
-  LispEnvironment *env = LispEnvironment_new_environment(NULL); // TODO = LispEnvironment_new_global_environment(); where builtin func defs are within the environment
+  LispEnvironment *env = LispEnvironment_new_global_environment();
   LispObject *result = eval(root, env);
   if (result == NULL) {
     if (!Exception_check()) {

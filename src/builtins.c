@@ -171,36 +171,12 @@ LispObject *define(LispObject *arg, LispEnvironment *env)
 
 
 
-// TODO move this into a (global) environment?
-
-// 
-struct function_table_entry functions[] = {
-					   { "add", "+", add, NULL},
-					   { "subtract", "-", subtract, NULL},
-					   { "multiply", "*", multiply, NULL},
-					   { "divide", "/", divide, NULL},
-					   { "quote", "quote", quote, NULL},
-					   { NULL, NULL, NULL, NULL }
+// builtins are enumerated here, and referred to in the global env setup
+struct environment_var builtin_functions[] = {
+  { "add", "+", NULL, &add, NULL, NULL},
+	{ "subtract", "-", NULL, &subtract, NULL, NULL },
+	{ "multiply", "*", NULL, &multiply, NULL, NULL },
+	{ "divide", "/", NULL, &divide, NULL, NULL },
+	{ "quote", "quote", NULL, &quote, NULL, NULL },
+  { NULL, NULL, NULL, NULL, NULL, NULL }
 };
-
-
-
-
-// Get function from the function table
-struct function_table_entry *get_function(char *name)
-{
-  int i = 0;
-  while (1) {
-    if (functions[i].name == NULL) {
-      break;
-    }
-    else if ((strcmp(name, functions[i].name) == 0) || (strcmp(name, functions[i].shorthand) == 0)) {
-      return &functions[i];
-    }
-
-    i++;
-  }
-
-  assert_or_error(0, "get_function", "Function \"%s\" not found.", name);
-  return NULL;
-}

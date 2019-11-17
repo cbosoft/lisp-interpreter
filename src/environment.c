@@ -4,6 +4,7 @@
 #include "environment.h"
 #include "types.h"
 
+extern struct environment_var builtin_functions[];
 
 
 
@@ -26,7 +27,12 @@ LispEnvironment *LispEnvironment_new_global_environment()
 {
   LispEnvironment *rv = calloc(1, sizeof(LispEnvironment));
 
-  // TODO add symbols, functions to global environment.
+  struct environment_var row = builtin_functions[0];
+  int i;
+  for (i = 0, row = builtin_functions[0]; row.name != NULL; i++, row = builtin_functions[i]) {
+    debug_message("ADDED SYMBOL (%s, %s) TO GLOBAL ENV\n", row.name, row.alias);
+    LispEnvironment_add_variable_with_alias(rv, row.name, row.alias, row.lisp_function, row.lisp_builtin, row.value);
+  }
 
   return rv;
 }
