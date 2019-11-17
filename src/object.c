@@ -97,21 +97,11 @@ LispObject *LispObject_new_guess_type(char *s) {
 
   debug_message("GUESSING %s\n", s);
   
-  int not_number=0, not_integer=0;
+  int not_integer = 0, type = -1;
 
   if (strstr(s, "\"") != NULL || strstr(s, "'") != NULL) {
     debug_message("GUESSING %s is STRING\n", s);
     return LispObject_new_string(s);
-  }
-
-  struct function_table_entry *tentry = get_function(s);
-  if (tentry != NULL) {
-    debug_message("GUESSING %s is SYMBOL\n", s);
-    return LispObject_new_symbol(s);
-  }
-  else {
-    debug_message("EXCEPTION RESET\n");
-    Exception_reset();
   }
 
   if (strcmp(s, "(") == 0) {
@@ -129,29 +119,84 @@ LispObject *LispObject_new_guess_type(char *s) {
     return LispObject_new_bool(1);
   }
 
-  debug_message("GUESSING %s is PROBABLY NUMBER\n", s);
+  debug_message("GUESSING %s is PROBABLY NUMBER OR SYMBOL\n", s);
   for (i = 0, ch=(int)s[0]; i < len; i++, ch=(int)s[i]) {
-    if ((ch >= (int)'0') || (ch <= (int)'9')) {
-      if ( (ch == (int)'.') || (ch == (int)'e') || (ch == (int)'+') || (ch == (int)'-') ) {
+
+    if ((ch < (int)'0') || (ch > (int)'9')) {
+
+      if (ch == (int)'.'){
         not_integer = 1;
       }
+      if (ch == (int)'e') {
+
+        if (len > 1)
+          not_integer = 1;
+        else {
+
+          type = LISPOBJECT_SYMBOL;
+          goto end;
+
+        }
+
+      }
+      else if ((ch == (int)'+') || (ch == (int)'-') ) {
+
+        not_integer = 1;
+        if (len == 1) {
+
+          type = LISPOBJECT_SYMBOL;
+          goto end;
+
+        }
+
+      }
+      else {
+
+        type = LISPOBJECT_SYMBOL;
+        goto end;
+
+      }
+
+      type = LISPOBJECT_SYMBOL;
+      goto end;
     }
-    else {
-      not_number = 1;
-      break;
-    }
+
   }
 
-  assert_or_error(!not_number, "LispObject_new_guess_type", "name not found and not string: %s", s);
+  if (not_integer)
+    type = LISPOBJECT_FLOAT;
+  else
+    type = LISPOBJECT_INT;
+
+end:
+
+  assert_or_error(type >= 0, "LispObject_new_guess_type", "could not guess object type for %s", s);
   ERROR_CHECK;
 
-  if (not_integer) {
-    debug_message("GUESSING %s is FLOAT\n", s);
-    return LispObject_new_float(atof(s));
+  switch (type) {
+
+    case LISPOBJECT_INT:
+      debug_message("Guessing %s is Int\n", s);
+      return LispObject_new_int(atoi(s));
+
+    case LISPOBJECT_FLOAT:
+      debug_message("Guessing %s is Float\n", s);
+      return LispObject_new_float(atof(s));
+
+    case LISPOBJECT_BOOL:
+      debug_message("Guessing %s is Bool\n", s);
+      return LispObject_new_bool(strcmp(s, "true") == 0);
+
+    case LISPOBJECT_STRING:
+      debug_message("Guessing %s is String\n", s);
+      return LispObject_new_symbol(s);
+
+    case LISPOBJECT_SYMBOL:
+      debug_message("Guessing %s is SYMBOL\n", s);
+      return LispObject_new_symbol(s);
   }
 
-  debug_message("GUESSING %s is INT\n", s);
-  return LispObject_new_int(atoi(s));
+  return NULL;
 }
 
 
@@ -162,6 +207,7 @@ LispObject *LispObject_new_guess_type(char *s) {
 void LispObject_add_object_to_list(LispObject *list, LispObject *toadd)
 {
   assert_or_error(list->type == LISPOBJECT_LIST, "add_object_to_list", "Cannot add to non-list object.");
+  if (Exception_check()) return;
 
   if (list->list_child == NULL)
     list->list_child = toadd;
@@ -383,9 +429,31 @@ int LispObject_list_size(LispObject *o)
 // Represent object as a string
 char *LispObject_repr(LispObject *o)
 {
-  char *rv = calloc(100, sizeof(char));
+  char *rv;
+  if (o->type == LISPOBJECT_STRING) {
+    rv = calloc(strlen(o->value_string)+3, sizeof(char));
+    sprintf(rv, "'%s'", o->value_string);
+  }
+  if (o->type == LISPOBJECT_SYMBOL) {
+    rv = strdup(o->symbol_name);
+  }
+  else {
+  
+  rv = calloc(100, sizeof(char));
 
-  // TODO 
+    switch (o->type)
+    {
+      case LISPOBJECT_INT:
+        snprintf(rv, 100, "%d", o->value_int);
+        break;
+      case LISPOBJECT_FLOAT:
+        snprintf(rv, 100, "%f", o->value_float);
+        break;
+      case LISPOBJECT_BOOL:
+        snprintf(rv, 100, "%s", o->value_bool ? "true" : "false");
+        break;
+    }
+  }
 
   return rv;
 }
