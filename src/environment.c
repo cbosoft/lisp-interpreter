@@ -1,8 +1,11 @@
+#define _POSIX_C_SOURCE 200809L
 #include <stdlib.h>
 #include <string.h>
 
 #include "environment.h"
+#include "exception.h"
 #include "types.h"
+#include "debug.h"
 
 extern struct environment_var builtin_functions[];
 
@@ -49,43 +52,141 @@ void LispEnvironment_free(LispEnvironment *env)
 
 
 
-// Add an object $value to the environment.
-void LispEnvironment_add_symbol(LispEnvironment *env, LispObject *value)
+// Addd a new variable to the environment, with value $value, name $name, alias
+// $alias or...
+void LispEnvironment_add_variable(LispEnvironment *env, char *name, LispFunction *lfunc, LispBuiltin *bfunc, LispObject *value)
 {
-  LispObject *i, *v;
-  v = value; //LispObject_copy(value);
-  
-  if (env->symbols == NULL) {
-    env->symbols = v;
+  LispEnvironment_add_variable_with_alias(env, name, NULL, lfunc, bfunc, value);
+}
+
+
+
+
+// Add a new variable to the environment, with value $value, lfunc $lfunc, or
+// bfunc $bfunc.
+void LispEnvironment_add_variable_with_alias(LispEnvironment *env, char *name, char *alias, LispFunction *lfunc, LispBuiltin *bfunc, LispObject *value)
+{
+
+  // "conditional jump or move depends on uninitialised value" // somewhere in
+  // this function...
+  //
+  struct environment_var 
+    *var = calloc(1, sizeof(struct environment_var)), 
+    *i = NULL;
+
+  // TODO error check on malloc
+
+  var->name = strdup(name);
+
+  if (alias != NULL)
+    var->alias = strdup(alias);
+  else
+    var->alias = NULL;
+
+  var->lisp_function = lfunc;
+  var->lisp_builtin = bfunc;
+  var->value = value;
+
+  if (env->variables == NULL) {
+    env->variables = var;
   }
   else {
-    i = env->symbols;
-    while (i->list_next != NULL) i = i->list_next;
+    i = env->variables;
+    while (i->next != NULL) i = i->next;
 
-    i->list_next = v;
+    i->next = var;
   }
 }
 
 
 
 
-// Given the name of a symbol, get its value from the environment
-LispObject *LispEnvironment_get_symbol(LispEnvironment *env, char *name)
+// Given the name of a variable, get its value and return 0. If no value is found, return 1.
+int LispEnvironment_get(LispEnvironment *env, char *name, LispFunction **lfunc, LispBuiltin **bfunc, LispObject **lobj)
 {
-  LispObject *i;
+  struct environment_var *i;
   
-  if (env == NULL)
-    return NULL;
+  if (env == NULL) // no environment, nothing to check.
+    return 1; // TODO should this be an error?
 
-  if (env->symbols == NULL)
-    return LispEnvironment_get_symbol(env->parent, name);
+  debug_message("LOOKING FOR VARIABLE %s IN ENV\n", name);
 
-  i = env->symbols;
-  while (i->list_next != NULL) {
-    if (strcmp(i->symbol_name, name) == 0) {
-      return i;
+  if (env->variables != NULL) {
+    i = env->variables;
+    while (i != NULL) {
+      debug_message("CHECKING %s IS %s?\n", name, i->name);
+
+      if ((strcmp(i->name, name) == 0) || ( (i->alias != NULL) && (strcmp(i->alias, name) == 0))) {
+
+        debug_message("FOUND %s IN ENV AS %s\n", name, i->name);
+        
+        if (lfunc != NULL)
+          (*lfunc) = i->lisp_function;
+        
+        if (bfunc != NULL)
+          (*bfunc) = i->lisp_builtin;
+        
+        if (lobj != NULL)
+          (*lobj) = i->value;
+
+        return 0;
+      }
+
+      i = i->next;
     }
   }
 
-  return LispEnvironment_get_symbol(env->parent, name);
+  debug_message("Variable not found in local env, trying parent.\n");
+  return LispEnvironment_get(env->parent, name, lfunc, bfunc, lobj);
+}
+
+
+
+
+// Get value of variable in environment. Raise exception if value is not found, or
+// if value found is of wrong type.
+LispObject *LispEnvironment_get_variable(LispEnvironment *env, char *name)
+{
+  LispObject *rv = NULL;
+  assert_or_error(!LispEnvironment_get(env, name, NULL, NULL, &rv), "LispEnvironment_get_variable", "Object with name \"%s\" not found.", name);
+  ERROR_CHECK;
+  
+  assert_or_error(rv != NULL, "LispEnvironment_get_variable", "Object \"%s\" has no value as variable.");
+  ERROR_CHECK;
+
+  return rv;
+}
+
+
+
+
+// Get value of lispfunction in environment. Raise exception if value is not found, or
+// if value found is of wrong type.
+LispFunction *LispEnvironment_get_lispfunction(LispEnvironment *env, char *name)
+{
+  LispFunction *rv = NULL;
+  assert_or_error(!LispEnvironment_get(env, name, &rv, NULL, NULL), "LispEnvironment_get_lispfunction", "Object with name \"%s\" not found.", name);
+  ERROR_CHECK;
+  
+  assert_or_error(rv != NULL, "LispEnvironment_get_lispfunction", "Object \"%s\" has no value as function.");
+  ERROR_CHECK;
+
+  return rv;
+}
+
+
+
+
+// Get value of lispfunction in environment. Raise exception if value is not found, or
+// if value found is of wrong type.
+LispBuiltin *LispEnvironment_get_builtinfunction(LispEnvironment *env, char *name)
+{
+  LispBuiltin *rv = NULL;
+  assert_or_error(!LispEnvironment_get(env, name, NULL, &rv, NULL), "LispEnvironment_get_builtinfunction", "Object with name \"%s\" not found.", name);
+  ERROR_CHECK;
+  
+  assert_or_error(rv != NULL, "LispEnvironment_get_builtinfunction", "Object \"%s\" has no value as function.");
+  ERROR_CHECK;
+
+  return rv;
 }
