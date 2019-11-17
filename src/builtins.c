@@ -10,12 +10,17 @@
 #include "types.h"
 
 
+#define TOUCH(LE) if (LE!=NULL) {};
+
+
 
 
 // Add two numbers
 LispObject *add(LispObject *arg, LispEnvironment *env)
 {
   debug_message("BUILTIN FUNCTION ADD\n");
+
+  TOUCH(env);
 
   int nargs = LispObject_list_size(arg);
   assert_or_error(nargs == 2, "add", "Function takes 2 arguments (got %d).", nargs);
@@ -53,6 +58,8 @@ LispObject *subtract(LispObject *arg, LispEnvironment *env)
 {
   debug_message("BUILTIN FUNCTION SUBTRACT\n");
 
+  TOUCH(env);
+
   int nargs = LispObject_list_size(arg);
   assert_or_error(nargs == 2, "subtract", "Function takes 2 arguments (got %d).", nargs);
   ERROR_CHECK;
@@ -88,6 +95,8 @@ LispObject *multiply(LispObject *arg, LispEnvironment *env)
 {
   debug_message("BUILTIN FUNCTION MULTIPLY\n");
 
+  TOUCH(env);
+
   int nargs = LispObject_list_size(arg);
   assert_or_error(nargs == 2, "multiply", "Function takes 2 arguments (got %d).", nargs);
   ERROR_CHECK;
@@ -121,6 +130,8 @@ LispObject *multiply(LispObject *arg, LispEnvironment *env)
 LispObject *divide(LispObject *arg, LispEnvironment *env)
 {
   debug_message("BUILTIN FUNCTION DIVIDE\n");
+
+  TOUCH(env);
 
   int nargs = LispObject_list_size(arg);
   assert_or_error(nargs == 2, "divide", "Function takes 2 arguments (got %d).", nargs);
@@ -158,6 +169,7 @@ LispObject *quote(LispObject *arg, LispEnvironment *env)
 {
   debug_message("BUILTIN FUNCTION QUOTE\n");
 
+  TOUCH(env);
   return arg;
 }
 
