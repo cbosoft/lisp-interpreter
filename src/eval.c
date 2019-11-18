@@ -11,6 +11,8 @@
 #include "function.h"
 #include "debug.h"
 #include "list.h"
+#include "tokenise.h"
+#include "parse.h"
 
 
 
@@ -154,4 +156,35 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
   
   // default: root is atom (float, int, string, bool...)
   return root;
+}
+
+
+
+
+// eval_string
+LispObject *eval_string(char *s, LispEnvironment *env)
+{
+
+  char **tokens;
+  int n_tokens = 0;
+
+  tokenise(s, &tokens, &n_tokens);
+
+  LispObject *root = parse(tokens, n_tokens);
+  for (int i = 0; i < n_tokens; i++) {
+    free(tokens[i]);
+  }
+
+  return eval(root, env); // Error check must be handled by caller.
+}
+
+
+
+
+// eval_file
+LispObject *eval_file(char *filename, LispEnvironment *env)
+{
+  // TODO
+
+  return NULL;
 }
