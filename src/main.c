@@ -11,15 +11,26 @@
 
 #define EITHER(S, A, B) ((strcmp(S, A) == 0) || (strcmp(S, B) == 0))
 
+#define RV_CHECK_AND_PRINT(RV,C) \
+  if ( (rv = RV) == NULL) {\
+    if (!Exception_check()) {\
+      Exception_raise("main", "eval returned NULL.");\
+    }\
+    Exception_print();\
+    return 1;\
+  }\
+  else if (C){\
+    LispObject_print(rv);\
+  }
+
+
 
 int DEBUG_MODE = 0;
+int INTERACTIVE_MODE = 0;
 
 
 int main(int argc, char **argv)
 {
-  char **tokens;
-  int n_tokens = 0;
-
   // TODO argument processing.
   // no args = REPL
   // -f --file         execute commands in file
@@ -30,14 +41,9 @@ int main(int argc, char **argv)
   // -d --debug        print more information
 
   for (int i = 0; i < argc; i++) {
-    if (EITHER(argv[i], "-f", "--file")) {
-      // next arg is file to read
-    }
-    else if (EITHER(argv[i], "-c", "--command")) {
-      // next arg is command to read
-    }
-    else if (EITHER(argv[i], "-i", "--interactive")) {
-      // just a flag: no argument
+
+    if (EITHER(argv[i], "-i", "--interactive")) {
+      INTERACTIVE_MODE = 1;
     }
     else if (EITHER(argv[i], "-h", "--help")) {
       // show help and exit
@@ -45,41 +51,31 @@ int main(int argc, char **argv)
     else if (EITHER(argv[i], "-d", "--debug")) {
       DEBUG_MODE = 1;
     }
-    else {
-      // unexpected argument
-    }
+
   }
 
-  if (argc > 1) {
-    tokenise(argv[1], &tokens, &n_tokens);
-  }
-  else {
-    tokenise("(+ (+ 1 1 1) 1)", &tokens, &n_tokens);
-  }
-
-  // for (int i = 0; i < n_tokens; i++) {
-  //   debug_message("%s ", tokens[i]);
-  // }
-  
-  debug_message("before parse\n");
-  LispObject *root = parse(tokens, n_tokens);
-  for (int i = 0; i < n_tokens; i++) {
-    free(tokens[i]);
-  }
-  debug_message("after parse\n");
 
   LispEnvironment *env = LispEnvironment_new_global_environment();
-  LispObject *result = eval(root, env);
-  if (result == NULL) {
-    if (!Exception_check()) {
-      Exception_raise("main", "eval returned NULL.");
+  LispObject *rv = NULL;
+
+  for (int i = 0; i < argc; i++) {
+
+    if (EITHER(argv[i], "-f", "--file")) {
+      RV_CHECK_AND_PRINT(eval_file(argv[++i], env), i >= argc - 1);
     }
-    Exception_print();
+    else if (EITHER(argv[i], "-c", "--command")) {
+      RV_CHECK_AND_PRINT(eval_string(argv[++i], env), i >= argc - 1);
+    }
+
   }
-  else {
-    LispObject_print(result);
-  }
-  LispObject_free(root);
+
+  if (!INTERACTIVE_MODE) return 0;
+  
+  // TODO REPL
+  // READ
+  // EVAL
+  // PRINT
+  // LOOP
 
   return 0;
 }
