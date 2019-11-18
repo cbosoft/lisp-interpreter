@@ -10,6 +10,7 @@ enum LISPOBJECT_TYPE {
 
 
 typedef struct LispObject LispObject;
+typedef struct LispListElement LispListElement;
 struct LispObject {
   char *value_string;
   int value_int;
@@ -19,10 +20,12 @@ struct LispObject {
   int type;
 
   char *symbol_name;
-  LispObject *value_symbol;
+  LispListElement *value_list;
+};
 
-  LispObject *list_next;
-  LispObject *list_child;
+struct LispListElement {
+  LispListElement *next;
+  LispObject *value;
 };
 
 
@@ -40,7 +43,17 @@ struct LispEnvironment {
   LispEnvironment *parent;
 };
 
-typedef LispObject *(LispBuiltin)(LispObject *, LispEnvironment *);
+typedef LispObject *(LispBuiltinFunction)(LispListElement *, LispEnvironment *);
+typedef struct LispBuiltin LispBuiltin;
+struct LispBuiltin {
+  LispBuiltinFunction *f;
+  int type;
+};
+
+enum LISPBUILTIN_TYPE {
+  LISPBUILTIN_LAZY, // no evaluation of arguments
+  LISPBUILTIN_GREEDY // all arguments must be evaluated
+};
 
 struct environment_var {
   char *name;
@@ -49,10 +62,4 @@ struct environment_var {
   LispBuiltin *lisp_builtin;
   LispObject *value;
   struct environment_var *next;
-};
-
-struct builtin_table_row {
-  char *name;
-  char *alias;
-  LispBuiltin *function;
 };

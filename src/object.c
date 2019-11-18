@@ -8,6 +8,7 @@
 #include "exception.h"
 #include "debug.h"
 #include "types.h"
+#include "list.h"
 
 
 
@@ -82,6 +83,7 @@ LispObject *LispObject_new_list()
 {
   LispObject *rv = calloc(1, sizeof(LispObject));
   rv->type = LISPOBJECT_LIST;
+  rv->value_list = LispList_new_element();
   return rv;
 }
 
@@ -202,36 +204,12 @@ end:
 
 
 
-// Add object $toadd to list $list.
-// $list must be a list.
-void LispObject_add_object_to_list(LispObject *list, LispObject *toadd)
-{
-  assert_or_error(list->type == LISPOBJECT_LIST, "add_object_to_list", "Cannot add to non-list object.");
-  if (Exception_check()) return;
-
-  if (list->list_child == NULL)
-    list->list_child = toadd;
-  else {
-
-    LispObject *i = list->list_child;
-
-    while (i->list_next != NULL) i = i->list_next;
-    // now i has the last item in the linked list
-    
-    i->list_next = toadd;
-
-  }
-}
-
-
-
-
 // Print the value of $o, recursively Note: does not print a newline at end, so
 // user should call "LispObject_print" (no trailing underscore) which calls this
 // function, and adds the required newline.
 void LispObject_print_(LispObject *o) { 
 
-  LispObject *i = NULL; 
+  LispListElement *list_iter = NULL; 
   FILE *fp = stdout;
 
   switch (o->type) {
@@ -258,18 +236,15 @@ void LispObject_print_(LispObject *o) {
 
     case LISPOBJECT_LIST:
       
-      i = o->list_child;
-      fprintf(fp, " ( ");
+      fprintf(fp, "(");
+      for(list_iter = o->value_list; list_iter->value != NULL; list_iter = list_iter->next) {
+        LispObject_print_(list_iter->value);
 
-      while (i != NULL) {
-        LispObject_print_(i);
-        i = i->list_next;
-
-        if (i != NULL)
+        if (list_iter->next->value != NULL)
           fprintf(fp, " ");
       }
 
-      fprintf(stdout, " ) ");
+      fprintf(stdout, ")");
       break;
 
   }
@@ -287,11 +262,32 @@ void LispObject_print(LispObject *o)
 // Recursively free object $o
 void LispObject_free(LispObject *o)
 {
-  if (o->list_next)
-    LispObject_free(o->list_next);
+  LispListElement *i = NULL, *n = NULL;
 
-  if (o->list_child)
-    LispObject_free(o->list_child);
+  switch (o->type) {
+
+    case LISPOBJECT_LIST:
+      i = o->value_list;
+      while (i->next != NULL) {
+        n = i->next;
+        
+        if (i->value != NULL)
+          LispObject_free(i->value);
+
+        free(i);
+        i = n;
+      }
+      break;
+
+    case LISPOBJECT_STRING:
+      free(o->value_string);
+      break;
+
+    case LISPOBJECT_SYMBOL:
+      free(o->symbol_name);
+      break;
+
+  }
 
   free(o);
 }
@@ -308,7 +304,7 @@ void LispObject_make_nil(LispObject *o)
   o->value_int = 0;
   o->value_float = 0.0;
   o->value_bool = 0;
-  o->list_child = NULL;
+  o->value_list = NULL;
 
 }
 
@@ -339,7 +335,7 @@ void LispObject_assign_value(LispObject *dest, LispObject *source)
       break;
 
     case LISPOBJECT_LIST:
-      dest->list_child = source->list_child;
+      dest->value_list = source->value_list;
       break;
   }
 
@@ -349,54 +345,12 @@ void LispObject_assign_value(LispObject *dest, LispObject *source)
 
 
 
-// Create a copy of an object $o, including children and next items in lists.
-LispObject *LispObject_deepcopy(LispObject *o)
-{
-  LispObject *rv = malloc(sizeof(LispObject));
-
-  assert_or_error(rv != NULL, "LispObject_deepcopy", "memory allocation failed; are you out of memory?");
-
-  LispObject_assign_value(rv, o);
-
-  if (o->list_child != NULL) {
-    rv->list_child = LispObject_deepcopy(o->list_child);
-  }
-  
-  if (o->list_next != NULL) {
-    rv->list_next = LispObject_deepcopy(o->list_next);
-  }
-
-  return rv;
-}
-
-
-
-
-// Create a copy of the object $o, not including references to next but
-// including references to children. i.e. doesn't return the cdr of the list,
-// but if the object IS a list, it will be copied. This is a recursive
-// operation, be careful copying lists!
-LispObject *LispObject_copy(LispObject *o)
-{
-  LispObject *rv = malloc(sizeof(LispObject));
-
-  assert_or_error(rv != NULL, "LispObject_copy", "memory allocation failed; are you out of memory?");
-
-  LispObject_assign_value(rv, o);
-
-  if (o->list_child != NULL) {
-    rv->list_child = LispObject_deepcopy(o->list_child);
-  }
-
-  return rv;
-}
-
-
-
-
 // Get string representation of type of object $o
 char *LispObject_type(LispObject *o)
 {
+  assert_or_error(o != NULL, "LispObject_type", "Can't get type of NULL object");
+  ERROR_CHECK;
+
   switch (o->type)
   {
     case LISPOBJECT_SYMBOL:
@@ -417,15 +371,6 @@ char *LispObject_type(LispObject *o)
 
 
 
-// Recursively get length of list
-int LispObject_list_size(LispObject *o)
-{
-  return o->list_next ? 1 + LispObject_list_size(o->list_next) : 1;
-}
-
-
-
-
 // Represent object as a string
 char *LispObject_repr(LispObject *o)
 {
@@ -434,8 +379,12 @@ char *LispObject_repr(LispObject *o)
     rv = calloc(strlen(o->value_string)+3, sizeof(char));
     sprintf(rv, "'%s'", o->value_string);
   }
-  if (o->type == LISPOBJECT_SYMBOL) {
+  else if (o->type == LISPOBJECT_SYMBOL) {
     rv = strdup(o->symbol_name);
+  }
+  else if (o->type == LISPOBJECT_LIST) {
+    //TODO
+    rv = "(LIST REPR NOT IMPLEMENTED)";
   }
   else {
   

@@ -56,6 +56,10 @@ int main(int argc, char **argv)
   else {
     tokenise("(+ (+ 1 1 1) 1)", &tokens, &n_tokens);
   }
+
+  // for (int i = 0; i < n_tokens; i++) {
+  //   debug_message("%s ", tokens[i]);
+  // }
   
   debug_message("before parse\n");
   LispObject *root = parse(tokens, n_tokens);
@@ -63,6 +67,8 @@ int main(int argc, char **argv)
     free(tokens[i]);
   }
   debug_message("after parse\n");
+
+  LispObject_print(root);
   
   LispEnvironment *env = LispEnvironment_new_global_environment();
   LispObject *result = eval(root, env);

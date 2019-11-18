@@ -10,6 +10,7 @@
 #include "environment.h"
 #include "function.h"
 #include "debug.h"
+#include "list.h"
 
 
 
@@ -18,8 +19,9 @@
 LispObject *eval(LispObject *root, LispEnvironment *env)
 {
   char *fname = NULL;
-  LispObject *args = NULL, *fn = NULL, *obj_i = NULL, *var_obj = NULL;
-  LispEnvironment *subenv = NULL;
+  LispObject *fn = NULL, *obj_i = NULL, *var_obj = NULL;
+  LispListElement *list_elem = NULL, *list_iter = NULL, *list_args;
+  LispEnvironment *sub_env = NULL;
   int nargs;
   LispFunction *var_lfunc = NULL;
   LispBuiltin *var_bfunc = NULL;
@@ -45,31 +47,39 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
     return var_obj;
 
   case LISPOBJECT_LIST:
-    fn = root->list_child;
-    debug_message("LIST CHILD IS %s\n", LispObject_type(fn));
+    list_elem = root->value_list;
     
-    if (fn == NULL)
-      return LispObject_new_bool(0);
+    if (list_elem->value == NULL)
+      return LispObject_new_bool(0); // empty list is also boolean false
+
+    debug_message("LIST CHILD IS %s\n", LispObject_type(list_elem->value));
+
+    fn = list_elem->value;
 
     if (fn->type == LISPOBJECT_LIST) {
-      obj_i = fn;
-      if (obj_i->list_next) {
-        debug_message("EVALUATE LIST CONTENTS IN TURN\n");
-        while (obj_i->list_next != NULL) {
-          debug_message(" ITEM TYPE: %s\n", LispObject_type(obj_i));
-          eval(obj_i, env);
-          ERROR_CHECK;
-          obj_i = obj_i->list_next;
-        }
-      }
-      return eval(obj_i, env);
-    }
-	
-    args = fn->list_next;
-    nargs = LispObject_list_size(args);
 
+      list_iter = root->value_list;
+      if (list_iter->next) {
+
+        debug_message("EVALUATE LIST CONTENTS IN TURN\n");
+        while (list_iter->next->value != NULL) {
+          debug_message(" ITEM TYPE: %s\n", LispObject_type(list_iter->value));
+          eval(list_iter->value, env);
+          ERROR_CHECK;
+
+          list_iter = list_iter->next;
+        }
+
+      }
+      return eval(list_iter->value, env);
+    }
+    // otherwise, list is not list of lists, is function call
+	
+    list_args = list_elem->next;
+    nargs = LispList_count(list_args);
+
+    assert_or_error(fn->type == LISPOBJECT_SYMBOL, "eval", "Cannot evaluate function: %s (%s)", LispObject_repr(fn), LispObject_type(fn));
     fname = fn->symbol_name;
-    assert_or_error(fname != NULL, "eval", "Cannot evaluate function: %s", LispObject_repr(fn));
     ERROR_CHECK;
 
     assert_or_error(!LispEnvironment_get(env, fname, &var_lfunc, &var_bfunc, &var_obj), "eval", "Object with name \"%s\" not found in environment.", fname);
@@ -78,55 +88,60 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
 
     
     if (var_lfunc != NULL) {
-      debug_message("SYMBOL %s IS LISP FUNCTION", fn->symbol_name);
+      debug_message("SYMBOL %s IS LISP FUNCTION\n", fn->symbol_name);
       
       assert_or_error(nargs == var_lfunc->number_required_args, "eval", "number of arguments does not match required (got %d, need %d).", nargs, var_lfunc->number_required_args);
       ERROR_CHECK;
-      LispEnvironment *sub_env = LispEnvironment_new_environment(env);
-      obj_i = args;
+      sub_env = LispEnvironment_new_environment(env);
 
-      for (int i = 0; i < nargs; i++) {
-	      LispEnvironment_add_variable(sub_env, var_lfunc->arg_names[i], NULL, NULL, obj_i);
-	      obj_i = obj_i->list_next;
+      list_iter = list_args;
+      for (int i = 0; i < nargs; i++, list_iter = list_iter->next) {
+	      LispEnvironment_add_variable(sub_env, var_lfunc->arg_names[i], NULL, NULL, list_iter->value);
       }
 
-      LispObject *rv = eval(var_lfunc->body, subenv);
-      // TODO free subenv
+      LispObject_print(var_lfunc->body);
+
+      LispObject *rv = eval(var_lfunc->body, sub_env);
+      // TODO free subenv (?)
       return rv;
       
     }
     else if (var_bfunc != NULL) {
       debug_message("SYMBOL %s IS BUILTIN\n", fn->symbol_name);
 
-      LispObject *evaluated_args = NULL, *ev_args_i = NULL;
+      LispListElement *list_args_evaluated = NULL;
 
-      if (strcmp(fname, "quote") == 0) {
-        return args;
-      }
-
-      if (args != NULL && strcmp(fname, "define") != 0) {
+      debug_message("BFUNC %s GREEDY\n", var_bfunc->type != LISPBUILTIN_GREEDY ? "is not" : "is");
+      if (list_args->value != NULL && var_bfunc->type == LISPBUILTIN_GREEDY) {
         
         // evaluate first arg
-        debug_message("EVALUATING FIRST ARGUMENT %s\n", LispObject_type(args));
-        obj_i = args;
-        evaluated_args = eval(args, env);
+        debug_message("EVALUATING FIRST ARGUMENT %s\n", LispObject_type(list_args->value));
+        list_iter = list_args;
+
+        obj_i = eval(list_args->value, env);
         ERROR_CHECK;
 
-        ev_args_i = evaluated_args;
-        obj_i = obj_i->list_next;
+        list_args_evaluated = LispList_new_element();
+        LispList_add_object_to_list(list_args_evaluated, obj_i);
+
+        list_iter = list_iter->next;
 
         // evaluate subsequent args
-        while (obj_i != NULL) {
+        while (list_iter->value != NULL) { // NULL value indicates end of list
           debug_message("EVALUATING SUBSEQUENT ARGUMENT\n");
-          ev_args_i->list_next = eval(obj_i, env);
+          obj_i = eval(list_iter->value, env);
           ERROR_CHECK;
 
-          ev_args_i = ev_args_i->list_next;
-          obj_i = obj_i->list_next;
+          LispList_add_object_to_list(list_args_evaluated, obj_i);
+          
+          list_iter = list_iter->next;
         }
       }
+      else {
+        list_args_evaluated = list_args;
+      }
       
-      return (*var_bfunc)(evaluated_args, env);
+      return (*var_bfunc->f)(list_args_evaluated, env);
       
     }
     else {

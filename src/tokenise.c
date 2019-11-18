@@ -7,7 +7,7 @@
 #define ADD_TO_ROOT(R, N, V) \
   N++; \
   if (R == NULL) \
-    R = malloc(N*sizeof(char*)); \
+    R = calloc(N, sizeof(char*)); \
   else \
     R = realloc(R, N*sizeof(char*)); \
   R[N-1] = calloc((strlen(V)+1), sizeof(char)); \
@@ -66,7 +66,11 @@ void tokenise(char *input, char ***tokens, int *n_tokens)
         kw_or_name = calloc(kw_or_name_len + 1, sizeof(char));
       }
       else{
-        kw_or_name = realloc(kw_or_name, (kw_or_name_len + 1)*sizeof(char));
+        char *tmp = calloc(kw_or_name_len + 1, sizeof(char));
+        strcat(tmp, kw_or_name);
+        free(kw_or_name);
+        kw_or_name = tmp;
+        //kw_or_name = realloc(kw_or_name, (kw_or_name_len + 1)*sizeof(char));
       }
 
       kw_or_name[kw_or_name_len-1] = input[i];
