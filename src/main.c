@@ -68,8 +68,6 @@ int main(int argc, char **argv)
   }
   debug_message("after parse\n");
 
-  LispObject_print(root);
-  
   LispEnvironment *env = LispEnvironment_new_global_environment();
   LispObject *result = eval(root, env);
   if (result == NULL) {

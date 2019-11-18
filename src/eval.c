@@ -96,10 +96,10 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
 
       list_iter = list_args;
       for (int i = 0; i < nargs; i++, list_iter = list_iter->next) {
-	      LispEnvironment_add_variable(sub_env, var_lfunc->arg_names[i], NULL, NULL, list_iter->value);
+        obj_i = eval(list_iter->value, env);
+        ERROR_CHECK;
+	      LispEnvironment_add_variable(sub_env, var_lfunc->arg_names[i], NULL, NULL, obj_i);
       }
-
-      LispObject_print(var_lfunc->body);
 
       LispObject *rv = eval(var_lfunc->body, sub_env);
       // TODO free subenv (?)
