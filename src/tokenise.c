@@ -25,13 +25,18 @@ void tokenise(char *input, char ***tokens, int *n_tokens)
   char *kw_or_name = NULL;
   int kw_or_name_len = 0;
   int n_open_parens = 0, line=1, col=1;
+  int input_len = strlen(input);
 
-  for (size_t i = 0; i < strlen(input); i++) {
+  for (int i = 0; i < input_len; i++) {
     col ++;
 
     if (input[i] == '(') {
       ADD_TO_ROOT(_tokens, _n_tokens, "(");
       n_open_parens ++;
+    if (input[i] == ';') {
+      for (;input[i] != '\n' && i < input_len; i++);
+      col = 0;
+      line++;
     }
     else if ((input[i] == ' ') || (input[i] == '\n') || (input[i] == ')')) {
 
