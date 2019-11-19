@@ -2,12 +2,16 @@
 #include <string.h>
 #include <stdio.h>
 
+#include <editline/readline.h>
+
 #include "tokenise.h"
 #include "exception.h"
 #include "parse.h"
 #include "eval.h"
 #include "object.h"
 #include "debug.h"
+#include "util.h"
+
 
 #define EITHER(S, A, B) ((strcmp(S, A) == 0) || (strcmp(S, B) == 0))
 
@@ -70,12 +74,39 @@ int main(int argc, char **argv)
   }
 
   if (!INTERACTIVE_MODE) return 0;
+  stifle_history(7);
   
-  // TODO REPL
-  // READ
-  // EVAL
-  // PRINT
-  // LOOP
+  while (1) {
+    // READ
+    char *input = readline("> ");
+
+    if (input != NULL) {
+      char *stripped_input = strip_whitespace(input);
+
+      if (*stripped_input) {
+
+        char *expanded;
+        int result;
+
+        result = history_expand(stripped_input, &expanded);
+
+        if (result < 0 || result == 2) {
+        }
+        else {
+          add_history(expanded);
+
+          // EVAL, PRINT
+          RV_CHECK_AND_PRINT(eval_string(expanded, env), 1);
+        }
+      }
+
+      // LOOP
+      free(input);
+    }
+    else {
+      fprintf(stderr, "\n");
+    }
+  }
 
   return 0;
 }
