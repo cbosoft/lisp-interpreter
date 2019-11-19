@@ -184,7 +184,51 @@ LispObject *eval_string(char *s, LispEnvironment *env)
 // eval_file
 LispObject *eval_file(char *filename, LispEnvironment *env)
 {
-  // TODO
+  FILE *fp = fopen(filename, "r");
 
-  return NULL;
+  assert_or_error(fp != NULL, "eval_file", "Could not open file.");
+  ERROR_CHECK;
+
+  int rv = 0;
+
+  rv = fseek(fp, 0, SEEK_END);
+  assert_or_error(rv == 0, "eval_file", "Failed to get size of file.");
+  if (Exception_check()) {
+    fclose(fp);
+    return NULL;
+  }
+
+
+  long length = ftell(fp);
+  rv = fseek(fp, 0, SEEK_SET);
+  assert_or_error(rv == 0, "eval_file", "Failed to return to start of file.");
+  if (Exception_check()) {
+    fclose(fp);
+    return NULL;
+  }
+
+  char *contents = malloc((length+1)*sizeof(char));
+  assert_or_error(contents != NULL, "eval_file", "Failed to allocate memory to hold file contents.");
+  if (Exception_check()) {
+    fclose(fp);
+    return NULL;
+  }
+
+  rv = fread(contents, 1, length, fp);
+  assert_or_error(rv != -1, "eval_file", "Failed to read file into memory.");
+  if (Exception_check()) {
+    free(contents);
+    fclose(fp);
+    return NULL;
+  }
+
+  contents[length] = '\0';
+
+  fclose(fp);
+
+  LispObject *object_to_return = eval_string(contents, env);
+
+  free(contents);
+
+  return object_to_return;
 }
