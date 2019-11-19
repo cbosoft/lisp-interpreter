@@ -13,3 +13,4 @@ void LispObject_print(LispObject *o);
 void LispObject_free(LispObject *root);
 char *LispObject_type(LispObject *o);
 char *LispObject_repr(LispObject *o);
+int LispObject_is_truthy(LispObject *o);

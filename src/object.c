@@ -406,3 +406,39 @@ char *LispObject_repr(LispObject *o)
 
   return rv;
 }
+
+
+
+
+// Check if the object is "truthy": if it is an empty list, or zero then it is
+// false. Otherwise, it is true.
+int LispObject_is_truthy(LispObject *o)
+{
+  int rv = -1;
+
+  switch (o->type) {
+
+    case LISPOBJECT_INT:
+      rv = o->value_int != 0;
+      break;
+
+    case LISPOBJECT_FLOAT:
+      debug_message("(interpreting float as bool)\n");
+      rv = o->value_float != 0.0;
+      break;
+
+    case LISPOBJECT_BOOL:
+      rv = o->value_bool;
+      break;
+
+    case LISPOBJECT_STRING:
+      rv = o->value_string != NULL;
+      break;
+
+    case LISPOBJECT_SYMBOL:
+      Exception_raise("LispObject_is_truthy", "Cannot discern \"truthy-ness\" of symbol");
+      break;
+  }
+
+  return rv;
+}
