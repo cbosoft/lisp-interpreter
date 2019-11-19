@@ -220,12 +220,14 @@ LispObject *define(LispListElement *arg, LispEnvironment *env)
   debug_message("AFTER ARGLIST_ITEMS CHECK\n");
 
   LispObject *body = arg->next->next->value;
-  assert_or_error(body->type == LISPOBJECT_LIST, "define", "Argument has wrong type: body should be a List, not %s", LispObject_type(body));
-  ERROR_CHECK;
+  if (arg->next->next->value->type == LISPOBJECT_LIST) {
+    LispFunction *lfunc = LispFunction_new(arglist->value_list, body);
+    LispEnvironment_add_variable(env, name->symbol_name, lfunc, NULL, NULL);
+  }
+  else {
+    LispEnvironment_add_variable(env, name->symbol_name, NULL, NULL, body);
+  }
 
-  LispFunction *lfunc = LispFunction_new(arglist->value_list, body);
-
-  LispEnvironment_add_variable(env, name->symbol_name, lfunc, NULL, NULL);
 
   return name;
 }
