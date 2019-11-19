@@ -30,54 +30,54 @@ void tokenise(char *input, char ***tokens, int *n_tokens)
   for (int i = 0; i < input_len; i++) {
     col ++;
 
-    if (input[i] == '(') {
-      ADD_TO_ROOT(_tokens, _n_tokens, "(");
-      n_open_parens ++;
     if (input[i] == ';') {
       for (;input[i] != '\n' && i < input_len; i++);
       col = 0;
       line++;
     }
-    else if ((input[i] == ' ') || (input[i] == '\n') || (input[i] == ')')) {
+    
+    // if breaking char: space, newline, or parens
+    if ((input[i] == ' ') || (input[i] == '\n') || (input[i] == ')') || (input[i] == '(')) {
 
-      if (kw_or_name == NULL) {
-        // random whitespace
-      }
-      else {
+      // finish reading keyword or name
+      if (kw_or_name != NULL) {
+        kw_or_name[kw_or_name_len] = '\0';
         ADD_TO_ROOT(_tokens, _n_tokens, kw_or_name);
         free(kw_or_name);
         kw_or_name = NULL;
         kw_or_name_len = 0;
       }
 
-      if (input[i] == '\n') {
-        col = 1;
-        line ++;
-      }
-      else if (input[i] == ')') {
+      // action needed on breaking char?
+      switch (input[i]) {
+
+        case '(':
+        // new list
+        ADD_TO_ROOT(_tokens, _n_tokens, "(");
+        n_open_parens ++;
+        break;
+
+      case ')':
+        // close list
         if (!n_open_parens) {
           fprintf(stderr, "Unmatched ')'.\n");
         }
         ADD_TO_ROOT(_tokens, _n_tokens, ")");
         n_open_parens --;
+        break;
+
+      case '\n':
+        col = 1;
+        line ++;
+        break;
+
       }
 
     }
     else {
 
       kw_or_name_len++;
-
-      if (kw_or_name == NULL) {
-        kw_or_name = calloc(kw_or_name_len + 1, sizeof(char));
-      }
-      else{
-        char *tmp = calloc(kw_or_name_len + 1, sizeof(char));
-        strcat(tmp, kw_or_name);
-        free(kw_or_name);
-        kw_or_name = tmp;
-        //kw_or_name = realloc(kw_or_name, (kw_or_name_len + 1)*sizeof(char));
-      }
-
+      kw_or_name = realloc(kw_or_name, (kw_or_name_len + 1)*sizeof(char));
       kw_or_name[kw_or_name_len-1] = input[i];
 
     }
