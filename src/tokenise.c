@@ -73,12 +73,14 @@ void tokenise(char *input, char ***tokens, int *n_tokens)
 
       }
 
-    }
+    } // TODO quote syntactic sugar
     else {
 
       kw_or_name_len++;
       kw_or_name = realloc(kw_or_name, (kw_or_name_len + 1)*sizeof(char));
       kw_or_name[kw_or_name_len-1] = input[i];
+
+
 
     }
 
