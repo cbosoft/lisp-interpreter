@@ -174,12 +174,13 @@ LispBuiltin divide_obj = {&divide, LISPBUILTIN_GREEDY};
 LispObject *quote(LispListElement *arg, LispEnvironment *env)
 {
   debug_message("BUILTIN FUNCTION QUOTE\n");
-  
-  LispObject *rv = LispObject_new_list();
-  rv->value_list = arg;
+
+  int nargs = LispList_count(arg);
+  assert_or_error(nargs == 1, "quote", "Function takes 1 argument (got %d).", nargs);
+  ERROR_CHECK;
 
   TOUCH(env);
-  return rv;
+  return arg->value;
 }
 LispBuiltin quote_obj = {&quote, LISPBUILTIN_LAZY};
 
