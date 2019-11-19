@@ -196,7 +196,7 @@ LispObject *define(LispListElement *arg, LispEnvironment *env)
   debug_message("BUILTIN FUNCTION DEFINE\n");
 
   TOUCH(env);
-  int nargs = LispList_count(arg); // TODO error in here somehow?
+  int nargs = LispList_count(arg);
   assert_or_error(nargs == 3, "define", "Function takes 3 arguments: name, arglist, body (got %d).", nargs);
   ERROR_CHECK;
   debug_message("AFTER NARGS CHECK\n");
