@@ -298,6 +298,34 @@ LispBuiltin lisp_if_obj = {&lisp_if, LISPBUILTIN_LAZY};
 
 
 
+
+// compare: using the object comparison funcs
+#define COMPARE(OPNAME) \
+  debug_message("BUILTIN FUNCTION lisp_comparison");\
+  TOUCH(env);\
+  int nargs = LispList_count(arg);\
+  assert_or_error(nargs == 2, "lisp_comparison", "Function takes 2 arguments: left, right (got %d).", nargs);\
+  ERROR_CHECK;\
+  LispObject \
+    *left = arg->value, \
+    *right = arg->next->value;\
+  int rv_value = OPNAME(left, right);\
+  ERROR_CHECK;\
+  return LispObject_new_bool(rv_value);\
+
+LispObject *lisp_gt(LispListElement *arg, LispEnvironment *env) {COMPARE(LispObject_gt)}
+LispObject *lisp_ge(LispListElement *arg, LispEnvironment *env) {COMPARE(LispObject_ge)}
+LispObject *lisp_lt(LispListElement *arg, LispEnvironment *env) {COMPARE(LispObject_lt)}
+LispObject *lisp_le(LispListElement *arg, LispEnvironment *env) {COMPARE(LispObject_le)}
+LispObject *lisp_eq(LispListElement *arg, LispEnvironment *env) {COMPARE(LispObject_eq)}
+LispBuiltin lisp_gt_obj = {&lisp_gt, LISPBUILTIN_GREEDY};
+LispBuiltin lisp_ge_obj = {&lisp_ge, LISPBUILTIN_GREEDY};
+LispBuiltin lisp_lt_obj = {&lisp_lt, LISPBUILTIN_GREEDY};
+LispBuiltin lisp_le_obj = {&lisp_le, LISPBUILTIN_GREEDY};
+LispBuiltin lisp_eq_obj = {&lisp_eq, LISPBUILTIN_GREEDY};
+
+
+
 // builtins are enumerated here, and referred to in the global env setup
 struct environment_var builtin_functions[] = {
   { "add", "+", NULL, &add_obj, NULL, NULL},
@@ -308,5 +336,10 @@ struct environment_var builtin_functions[] = {
 	{ "define", NULL, NULL, &define_obj, NULL, NULL },
 	{ "count", NULL, NULL, &count_obj, NULL, NULL },
 	{ "if", NULL, NULL, &lisp_if_obj, NULL, NULL },
+	{ "gt", NULL, NULL, &lisp_gt_obj, NULL, NULL },
+	{ "ge", NULL, NULL, &lisp_ge_obj, NULL, NULL },
+	{ "lt", NULL, NULL, &lisp_lt_obj, NULL, NULL },
+	{ "le", NULL, NULL, &lisp_le_obj, NULL, NULL },
+	{ "eq", NULL, NULL, &lisp_eq_obj, NULL, NULL },
   { NULL, NULL, NULL, NULL, NULL, NULL }
 };

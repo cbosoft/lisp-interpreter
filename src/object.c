@@ -442,3 +442,61 @@ int LispObject_is_truthy(LispObject *o)
 
   return rv;
 }
+
+
+
+
+// Compare objects
+// Two objects' numerical values are compared. Implemented as a macro so all 
+// five can be quickly defined. TODO: compare non-numerical values. Compare 
+// lists? Compare strings?
+#define NUMERICAL_COMPARE(L,R,OPERATOR) \
+  assert_or_error(\
+      (left->type == LISPOBJECT_FLOAT || left->type == LISPOBJECT_INT) &&\
+      (right->type == LISPOBJECT_FLOAT || right->type == LISPOBJECT_INT),\
+      "LispObject_numerical_compare", "numerical comparison not defined for non-numerical values.");\
+  if (Exception_check()) return -1;\
+  if (L->type == R->type) {\
+    if (L->type == LISPOBJECT_INT) {\
+      return L->value_int OPERATOR R->value_int;\
+    }\
+    else {\
+      debug_message("(comparing floats)");\
+      return L->value_float OPERATOR R->value_float;\
+    }\
+  }\
+  else {\
+    debug_message("(comparing floats)");\
+    if (L->type == LISPOBJECT_FLOAT) {\
+      return L->value_float OPERATOR ((float)R->value_int);\
+    }\
+    else {\
+      return ((float)L->value_int) OPERATOR R->value_float;\
+    }\
+  }
+int LispObject_gt(LispObject *left, LispObject *right){ NUMERICAL_COMPARE(left, right, >); }
+int LispObject_ge(LispObject *left, LispObject *right){ NUMERICAL_COMPARE(left, right, >=); }
+int LispObject_lt(LispObject *left, LispObject *right){ NUMERICAL_COMPARE(left, right, <); }
+int LispObject_le(LispObject *left, LispObject *right){ NUMERICAL_COMPARE(left, right, <=); }
+int LispObject_eq(LispObject *left, LispObject *right)
+{
+  assert_or_error( 
+      (left->type == right->type) ||
+      ((left->type == LISPOBJECT_FLOAT) && (right->type == LISPOBJECT_INT)) ||
+      ((right->type == LISPOBJECT_FLOAT) && (left->type == LISPOBJECT_INT)),
+      "LispObject_equal", "comparison operands must both be the same type, or at least both numbers.");
+
+  switch (left->type) {
+    case LISPOBJECT_BOOL:
+      return left->value_bool == right->value_bool;
+
+    case LISPOBJECT_STRING:
+      return strcmp(left->value_string, right->value_string) == 0;
+
+    case LISPOBJECT_SYMBOL:
+      return strcmp(left->symbol_name, right->symbol_name) == 0;
+  }
+
+  // must be numbers
+  NUMERICAL_COMPARE(left, right, ==);
+}
