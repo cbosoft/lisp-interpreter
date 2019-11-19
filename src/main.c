@@ -11,6 +11,7 @@
 #include "object.h"
 #include "debug.h"
 #include "util.h"
+#include "help.h"
 
 
 #define EITHER(S, A, B) ((strcmp(S, A) == 0) || (strcmp(S, B) == 0))
@@ -31,18 +32,11 @@
 
 int DEBUG_MODE = 0;
 int INTERACTIVE_MODE = 0;
+int EXECUTED_FILE_OR_CLI_STRING = 0;
 
 
 int main(int argc, char **argv)
 {
-  // TODO argument processing.
-  // no args = REPL
-  // -f --file         execute commands in file
-  // -c --command      execute command
-  // -v --version      print interpreter version
-  // -i --interactive  drop to REPL after executing $commands or $file
-  // -h --help         print help screen
-  // -d --debug        print more information
 
   for (int i = 0; i < argc; i++) {
 
@@ -50,7 +44,8 @@ int main(int argc, char **argv)
       INTERACTIVE_MODE = 1;
     }
     else if (EITHER(argv[i], "-h", "--help")) {
-      // show help and exit
+      display_help();
+      exit(0);
     }
     else if (EITHER(argv[i], "-d", "--debug")) {
       DEBUG_MODE = 1;
@@ -66,14 +61,19 @@ int main(int argc, char **argv)
 
     if (EITHER(argv[i], "-f", "--file")) {
       RV_CHECK_AND_PRINT(eval_file(argv[++i], env), i >= argc - 1);
+      EXECUTED_FILE_OR_CLI_STRING = 1;
     }
     else if (EITHER(argv[i], "-c", "--command")) {
       RV_CHECK_AND_PRINT(eval_string(argv[++i], env), i >= argc - 1);
+      EXECUTED_FILE_OR_CLI_STRING = 1;
     }
 
   }
 
-  if (!INTERACTIVE_MODE) return 0;
+  if (EXECUTED_FILE_OR_CLI_STRING && !INTERACTIVE_MODE) return 0;
+
+  display_splash();
+
   stifle_history(7);
   
   while (1) {
