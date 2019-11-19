@@ -96,8 +96,17 @@ int main(int argc, char **argv)
           add_history(expanded);
 
           // EVAL, PRINT
-          RV_CHECK_AND_PRINT(eval_string(expanded, env), 1);
+          if ( (rv = eval_string(expanded, env)) == NULL) {
+            if (!Exception_check()) {
+              Exception_raise("main", "eval returned NULL.");
+            }
+            Exception_print();
+          }
+          else {
+            LispObject_print(rv);
+          }
         }
+
       }
 
       // LOOP
