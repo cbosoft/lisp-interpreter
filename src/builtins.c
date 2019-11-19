@@ -10,6 +10,7 @@
 #include "types.h"
 #include "function.h"
 #include "list.h"
+#include "eval.h"
 
 
 #define TOUCH(LE) if (LE!=NULL) {};
@@ -261,6 +262,42 @@ LispBuiltin count_obj = {&count, LISPBUILTIN_LAZY};
 
 
 
+
+// If $condition, return eval($thing), else return eval(otherthing)
+LispObject *lisp_if(LispListElement *arg, LispEnvironment *env)
+{
+  debug_message("BUILTIN FUNCTION lisp_if");
+
+  int nargs = LispList_count(arg);
+  assert_or_error(nargs == 3, "lisp_if", "Function takes 3 arguments: condition, result-if-true, result-else (got %d).", nargs);
+  ERROR_CHECK;
+  debug_message("AFTER NARGS CHECK\n");
+  
+  LispObject *condition = eval(arg->value, env);
+  ERROR_CHECK;
+  int condition_value = LispObject_is_truthy(condition);
+  ERROR_CHECK;
+  debug_message("AFTER CONDITION EVAL\n");
+
+  LispObject *rv = NULL;
+
+  if (condition_value) {
+    LispObject *value_if_true = arg->next->value;
+    rv = eval(value_if_true, env);
+    ERROR_CHECK;
+  }
+  else {
+    LispObject *value_else = arg->next->next->value;
+    rv = eval(value_else, env);
+    ERROR_CHECK;
+  }
+
+  return rv;
+}
+LispBuiltin lisp_if_obj = {&lisp_if, LISPBUILTIN_LAZY};
+
+
+
 // builtins are enumerated here, and referred to in the global env setup
 struct environment_var builtin_functions[] = {
   { "add", "+", NULL, &add_obj, NULL, NULL},
@@ -270,5 +307,6 @@ struct environment_var builtin_functions[] = {
 	{ "quote", NULL, NULL, &quote_obj, NULL, NULL },
 	{ "define", NULL, NULL, &define_obj, NULL, NULL },
 	{ "count", NULL, NULL, &count_obj, NULL, NULL },
+	{ "if", NULL, NULL, &lisp_if_obj, NULL, NULL },
   { NULL, NULL, NULL, NULL, NULL, NULL }
 };
