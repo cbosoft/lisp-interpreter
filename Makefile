@@ -13,6 +13,7 @@ OBJ = \
 			obj/function.o \
 			obj/list.o \
 			obj/util.o \
+			obj/singletons.o \
 			obj/help.o
 LINK = -ledit -lncurses
 
