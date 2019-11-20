@@ -13,6 +13,7 @@
 
 LispObject *parse(char **tokens, int n_tokens)
 {
+  // TODO: root should, instead of a list object, be just a linked list (no object).
   LispObject *root = LispObject_new_list();
   LispObject *current = root, *new;
 

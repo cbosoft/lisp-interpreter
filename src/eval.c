@@ -170,6 +170,8 @@ LispObject *eval_string(char *s, LispEnvironment *env)
 
   tokenise(s, &tokens, &n_tokens);
 
+  // TODO parse to return a linked list (LispListElement)
+  // call eval on each var in element in turn
   LispObject *root = parse(tokens, n_tokens);
   for (int i = 0; i < n_tokens; i++) {
     free(tokens[i]);
