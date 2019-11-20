@@ -11,16 +11,15 @@
 
 
 
-LispObject *parse(char **tokens, int n_tokens)
+LispListElement *parse(char **tokens, int n_tokens)
 {
   // TODO: root should, instead of a list object, be just a linked list (no object).
-  LispObject *root = LispObject_new_list();
-  LispObject *current = root, *new;
+  LispListElement *root = LispList_new_element();
+  LispObject *current_list = NULL, *new = NULL, **open_lists= NULL;
 
   debug_message("IN PARSE\n");
 
-  LispObject **parents = NULL;
-  int nparents = 0;
+  int n_open_lists = 0;
 
   for (int i = 0; i < n_tokens; i++) {
     debug_message("TOKEN: %s\n", tokens[i]);
@@ -29,20 +28,31 @@ LispObject *parse(char **tokens, int n_tokens)
       new = LispObject_new_list();
       ERROR_CHECK;
 
-      nparents ++;
-      parents = realloc(parents, nparents*sizeof(LispObject *));
+      if (current_list != NULL) {
+        open_lists = realloc(open_lists, (++n_open_lists)*sizeof(LispObject *));
+        open_lists[n_open_lists-1] = current_list;
+        LispList_add_object_to_list(current_list->value_list, new);
+        ERROR_CHECK;
+      }
+      else {
+        LispList_add_object_to_list(root, new);
+        ERROR_CHECK;
+      }
 
-      parents[nparents-1] = current;
-      LispList_add_object_to_list(current->value_list, new);
-      ERROR_CHECK;
-
-      current = new;
+      current_list = new;
     }
     else if (strcmp(tokens[i], ")") == 0) {
       debug_message("CLOSING LIST\n");
-      current = parents[nparents-1];
-      nparents --;
-      parents = realloc(parents, nparents*sizeof(LispObject *));
+
+      if (n_open_lists) {
+        current_list = open_lists[(--n_open_lists)];
+        open_lists = realloc(open_lists, n_open_lists*sizeof(LispObject *));
+      }
+      else {
+        current_list = NULL;
+        open_lists = NULL;
+      }
+
     }
     else {
       debug_message("GUESS\n");
@@ -51,13 +61,20 @@ LispObject *parse(char **tokens, int n_tokens)
 
       debug_message("NEW OBJECT %s (%s)\n", LispObject_repr(new), LispObject_type(new));
 
-      debug_message("ADD TO LIST\n");
-      LispList_add_object_to_list(current->value_list, new);
-      ERROR_CHECK;
+      if (current_list != NULL) {
+        debug_message("ADD TO LIST\n");
+        LispList_add_object_to_list(current_list->value_list, new);
+        ERROR_CHECK;
+      }
+      else {
+        debug_message("ADD TO ROOT\n");
+        LispList_add_object_to_list(root, new);
+        ERROR_CHECK;
+      }
     }
 
   }
 
-  free(parents);
+  free(open_lists);
   return root;
 }

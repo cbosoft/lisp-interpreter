@@ -174,12 +174,20 @@ LispObject *eval_string(char *s, LispEnvironment *env)
 
   // TODO parse to return a linked list (LispListElement)
   // call eval on each var in element in turn
-  LispObject *root = parse(tokens, n_tokens);
+  LispListElement 
+    *parsed_objects = parse(tokens, n_tokens), 
+    *obj_iter = NULL;
+
   for (int i = 0; i < n_tokens; i++) {
     free(tokens[i]);
   }
 
-  return eval(root, env); // Error check must be handled by caller.
+  for (obj_iter = parsed_objects; obj_iter->next->value != NULL; obj_iter = obj_iter->next) {
+    eval(obj_iter->value, env);
+    ERROR_CHECK;
+  }
+
+  return eval(obj_iter->value, env); // Error check must be handled by caller.
 }
 
 
