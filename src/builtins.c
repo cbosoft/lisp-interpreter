@@ -334,7 +334,7 @@ LispBuiltin lisp_eq_obj = {&lisp_eq, LISPBUILTIN_GREEDY};
 
 
 
-// pop (cdr): return first object in a list
+// pop (car): return first object in a list
 LispObject *pop(LispListElement *arg, LispEnvironment *env)
 {
   debug_message("BUILTIN FUNCTION POP/CDR\n");
@@ -360,6 +360,64 @@ LispObject *pop(LispListElement *arg, LispEnvironment *env)
 }
 LispBuiltin pop_obj = {&pop, LISPBUILTIN_GREEDY};
 
+
+
+
+// rest (AKA cdr): return the list elements after the first i.e. !pop
+LispObject *rest(LispListElement *arg, LispEnvironment *env)
+{
+  debug_message("BUILTIN FUNCTION REST/CAR");
+
+  TOUCH(env);
+
+  int nargs = LispList_count(arg);
+  assert_or_error(nargs == 1, "rest", "Function takes 1 arguments: list (got %d).", nargs);
+  ERROR_CHECK;
+  debug_message("AFTER NARGS CHECK\n");
+
+  LispObject *list = arg->value;
+  assert_or_error(list->type == LISPOBJECT_LIST, "rest", "list must be a List, not %s", LispObject_type(list));
+  ERROR_CHECK;
+  debug_message("AFTER TYPE CHECK\n");
+
+  int list_len = LispList_count(list->value_list);
+  assert_or_error(list_len > 0, "rest", "rest called on a list with no elements.");
+  ERROR_CHECK;
+  debug_message("AFTER LIST LEN CHECK\n");
+
+  LispObject *rest = calloc(1, sizeof(LispObject));
+  rest->type = LISPOBJECT_LIST;
+  rest->value_list = list->value_list->next;
+  
+  return rest;
+}
+LispBuiltin rest_obj = {&rest, LISPBUILTIN_GREEDY};
+
+
+
+
+// print: print a string representation of an object
+LispObject *print(LispListElement *arg, LispEnvironment *env)
+{
+  debug_message("BUILTIN FUNCTION PRINT");
+
+  TOUCH(env);
+
+  int nargs = LispList_count(arg);
+  assert_or_error(nargs == 1, "print", "Function takes 1 arguments: (got %d).", nargs);
+  ERROR_CHECK;
+  debug_message("AFTER NARGS CHECK\n");
+
+  LispObject *o = arg->value;
+
+  LispObject_print(o);
+
+  return NULL;
+}
+LispBuiltin print_obj = {&print, LISPBUILTIN_GREEDY};
+
+
+
 // builtins are enumerated here, and referred to in the global env setup
 struct environment_var builtin_functions[] = {
   { "add", "+", NULL, &add_obj, NULL, NULL},
@@ -375,5 +433,8 @@ struct environment_var builtin_functions[] = {
 	{ "lt", NULL, NULL, &lisp_lt_obj, NULL, NULL },
 	{ "le", NULL, NULL, &lisp_le_obj, NULL, NULL },
 	{ "eq", NULL, NULL, &lisp_eq_obj, NULL, NULL },
+	{ "pop", "car", NULL, &pop_obj, NULL, NULL },
+	{ "rest", "cdr", NULL, &rest_obj, NULL, NULL },
+	{ "print", NULL, NULL, &print_obj, NULL, NULL },
   { NULL, NULL, NULL, NULL, NULL, NULL }
 };
