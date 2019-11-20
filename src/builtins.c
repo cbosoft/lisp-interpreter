@@ -205,6 +205,10 @@ LispObject *define(LispListElement *arg, LispEnvironment *env)
   LispObject *name = arg->value;
   assert_or_error(name->type == LISPOBJECT_SYMBOL, "define", "Argument has wrong type: name should be a Symbol, not %s", LispObject_type(name));
   ERROR_CHECK;
+  debug_message("AFTER NAME TYPE CHECK\n");
+
+  assert_or_error(LispEnvironment_get(env, name->symbol_name, NULL, NULL, NULL), "define", "an object with name %s already exists in environment.", name->symbol_name);
+  ERROR_CHECK;
   debug_message("AFTER NAME CHECK\n");
 
   assert_or_error(arg->next->value->type == LISPOBJECT_LIST, "define", "Argument has wrong type: arglist should be a List, not %s", LispObject_type(arg->next->value));
