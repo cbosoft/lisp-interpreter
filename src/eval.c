@@ -198,7 +198,7 @@ LispObject *eval_file(char *filename, LispEnvironment *env)
 {
   FILE *fp = fopen(filename, "r");
 
-  assert_or_error(fp != NULL, "eval_file", "Could not open file.");
+  assert_or_error(fp != NULL, "eval_file", "Could not open file '%s'.", filename);
   ERROR_CHECK;
 
   int rv = 0;
