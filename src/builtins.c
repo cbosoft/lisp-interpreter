@@ -12,6 +12,8 @@
 #include "list.h"
 #include "eval.h"
 
+extern LispObject nil;
+
 
 #define TOUCH(LE) if (LE!=NULL) {};
 
@@ -418,6 +420,31 @@ LispBuiltin print_obj = {&print, LISPBUILTIN_GREEDY};
 
 
 
+
+// Load a file
+LispObject *load_file(LispListElement *arg, LispEnvironment *env)
+{
+  debug_message("BUILTIN FUNCTION LOAD-FILE");
+
+  int nargs = LispList_count(arg);
+  assert_or_error(nargs == 1, "load-file", "Function takes 1 arguments: (got %d).", nargs);
+  ERROR_CHECK;
+  debug_message("AFTER NARGS CHECK\n");
+
+  LispObject *filename_obj = arg->value;
+  assert_or_error(filename_obj->type == LISPOBJECT_STRING, "load-file", "filename must be a String, not %s", LispObject_type(filename_obj));
+  ERROR_CHECK;
+  debug_message("AFTER TYPE CHECK\n");
+
+  eval_file(filename_obj->value_string, env);
+  ERROR_CHECK;
+
+  return &nil;
+}
+LispBuiltin load_file_obj = {&load_file, LISPBUILTIN_GREEDY};
+
+
+
 // builtins are enumerated here, and referred to in the global env setup
 struct environment_var builtin_functions[] = {
   { "add", "+", NULL, &add_obj, NULL, NULL},
@@ -436,5 +463,6 @@ struct environment_var builtin_functions[] = {
 	{ "pop", "car", NULL, &pop_obj, NULL, NULL },
 	{ "rest", "cdr", NULL, &rest_obj, NULL, NULL },
 	{ "print", NULL, NULL, &print_obj, NULL, NULL },
+	{ "load-file", NULL, NULL, &load_file_obj, NULL, NULL },
   { NULL, NULL, NULL, NULL, NULL, NULL }
 };
