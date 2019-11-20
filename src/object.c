@@ -355,12 +355,16 @@ char *LispObject_type(LispObject *o)
   {
     case LISPOBJECT_SYMBOL:
       return "Symbol";
+
     case LISPOBJECT_INT:
       return "Integer";
+
     case LISPOBJECT_FLOAT:
       return "Float";
+
     case LISPOBJECT_BOOL:
       return "Boolean";
+
     case LISPOBJECT_STRING:
       return "String";
   }
@@ -387,20 +391,23 @@ char *LispObject_repr(LispObject *o)
     rv = "(LIST REPR NOT IMPLEMENTED)";
   }
   else {
-  
-  rv = calloc(100, sizeof(char));
 
-    switch (o->type)
-    {
+    rv = calloc(100, sizeof(char));
+
+    switch (o->type) {
+
       case LISPOBJECT_INT:
         snprintf(rv, 100, "%d", o->value_int);
         break;
+
       case LISPOBJECT_FLOAT:
         snprintf(rv, 100, "%f", o->value_float);
         break;
+
       case LISPOBJECT_BOOL:
         snprintf(rv, 100, "%s", o->value_bool ? "true" : "false");
         break;
+
     }
   }
 
