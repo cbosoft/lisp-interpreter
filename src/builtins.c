@@ -333,6 +333,33 @@ LispBuiltin lisp_eq_obj = {&lisp_eq, LISPBUILTIN_GREEDY};
 
 
 
+
+// pop (cdr): return first object in a list
+LispObject *pop(LispListElement *arg, LispEnvironment *env)
+{
+  debug_message("BUILTIN FUNCTION POP/CDR\n");
+
+  TOUCH(env);
+
+  int nargs = LispList_count(arg);
+  assert_or_error(nargs == 1, "pop", "Function takes 1 arguments: list (got %d).", nargs);
+  ERROR_CHECK;
+  debug_message("AFTER NARGS CHECK\n");
+
+  LispObject *list = arg->value;
+  assert_or_error(list->type == LISPOBJECT_LIST, "pop", "list must be a List, not %s", LispObject_type(list));
+  ERROR_CHECK;
+  debug_message("AFTER TYPE CHECK\n");
+
+  int list_len = LispList_count(list->value_list);
+  assert_or_error(list_len > 0, "pop", "pop called on a list with no elements.");
+  ERROR_CHECK;
+  debug_message("AFTER LIST LEN CHECK\n");
+
+  return list->value_list->value;
+}
+LispBuiltin pop_obj = {&pop, LISPBUILTIN_GREEDY};
+
 // builtins are enumerated here, and referred to in the global env setup
 struct environment_var builtin_functions[] = {
   { "add", "+", NULL, &add_obj, NULL, NULL},
