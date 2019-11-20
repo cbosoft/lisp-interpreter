@@ -51,8 +51,10 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
   case LISPOBJECT_LIST:
     list_elem = root->value_list;
     
-    if (list_elem->value == NULL)
+    if (list_elem->value == NULL) {
+      debug_message("(empty list evals to false)\n");
       return LispObject_new_bool(0); // empty list is also boolean false
+    }
 
     debug_message("LIST CHILD IS %s\n", LispObject_type(list_elem->value));
 
