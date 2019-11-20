@@ -86,6 +86,14 @@ void tokenise(char *input, char ***tokens, int *n_tokens)
 
   }
 
+  if (kw_or_name != NULL) {
+    kw_or_name[kw_or_name_len] = '\0';
+    ADD_TO_ROOT(_tokens, _n_tokens, kw_or_name);
+    free(kw_or_name);
+    kw_or_name = NULL;
+    kw_or_name_len = 0;
+  }
+
   (*tokens) = _tokens;
   (*n_tokens) = _n_tokens;
 
