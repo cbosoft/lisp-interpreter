@@ -14,9 +14,23 @@
 
 
 // Create new string object.
-LispObject *LispObject_new_string(char *value)
+LispObject *LispObject_new_nil()
 {
   LispObject *rv = calloc(1, sizeof(LispObject));
+
+  assert_or_error(rv != NULL, "LispObject_new", "Error allocating memory for new object");
+
+  return rv;
+}
+
+
+
+
+// Create new string object.
+LispObject *LispObject_new_string(char *value)
+{
+  LispObject *rv = LispObject_new_nil();
+  ERROR_CHECK;
 
   rv->type = LISPOBJECT_STRING;
 
@@ -32,7 +46,8 @@ LispObject *LispObject_new_string(char *value)
 // Create new integer.
 LispObject *LispObject_new_int(int value)
 {
-  LispObject *rv = calloc(1, sizeof(LispObject));
+  LispObject *rv = LispObject_new_nil();
+  ERROR_CHECK;
   rv->type = LISPOBJECT_INT;
   rv->value_int = value;
   return rv;
@@ -44,7 +59,8 @@ LispObject *LispObject_new_int(int value)
 // Create new float.
 LispObject *LispObject_new_float(double value)
 {
-  LispObject *rv = calloc(1, sizeof(LispObject));
+  LispObject *rv = LispObject_new_nil();
+  ERROR_CHECK;
   rv->type = LISPOBJECT_FLOAT;
   rv->value_float = value;
   return rv;
@@ -56,7 +72,8 @@ LispObject *LispObject_new_float(double value)
 // Create new boolean.
 LispObject *LispObject_new_bool(int value)
 {
-  LispObject *rv = calloc(1, sizeof(LispObject));
+  LispObject *rv = LispObject_new_nil();
+  ERROR_CHECK;
   rv->type = LISPOBJECT_BOOL;
   rv->value_bool = value;
   return rv;
@@ -68,7 +85,8 @@ LispObject *LispObject_new_bool(int value)
 // Create new symbol.
 LispObject *LispObject_new_symbol(char *name)
 {
-  LispObject *rv = calloc(1, sizeof(LispObject));
+  LispObject *rv = LispObject_new_nil();
+  ERROR_CHECK;
   rv->type = LISPOBJECT_SYMBOL;
   rv->symbol_name = strdup(name);
   return rv;
@@ -81,7 +99,8 @@ LispObject *LispObject_new_symbol(char *name)
 // A blank list can have objects added to it using LispObject_add_object_to_list(LispObject *obj).
 LispObject *LispObject_new_list()
 {
-  LispObject *rv = calloc(1, sizeof(LispObject));
+  LispObject *rv = LispObject_new_nil();
+  ERROR_CHECK;
   rv->type = LISPOBJECT_LIST;
   rv->value_list = LispList_new_element();
   return rv;
@@ -101,8 +120,11 @@ LispObject *LispObject_new_guess_type(char *s) {
   
   int not_integer = 0, type = -1;
 
-  if (strstr(s, "\"") != NULL || strstr(s, "'") != NULL) {
+  if ((s[0] == '"' && s[len-1] == '"') ||
+      (s[0] == '\'' && s[len-1] == '\'')) {
     debug_message("GUESSING %s is STRING\n", s);
+    s[len-1] = '\0';
+    s++;
     return LispObject_new_string(s);
   }
 
