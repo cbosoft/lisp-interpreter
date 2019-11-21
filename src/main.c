@@ -110,7 +110,6 @@ int main(int argc, char **argv)
       }
 
       // LOOP
-      free(input);
     }
     else {
       fprintf(stderr, "\n");

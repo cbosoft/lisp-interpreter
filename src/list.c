@@ -2,6 +2,7 @@
 
 #include "list.h"
 #include "types.h"
+#include "gc.h"
 
 
 

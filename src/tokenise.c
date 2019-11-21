@@ -3,17 +3,13 @@
 #include <string.h>
 
 #include "tokenise.h"
+#include "gc.h"
 
 #define ADD_TO_ROOT(R, N, V) \
   N++; \
-  if (R == NULL) \
-    R = calloc(N, sizeof(char*)); \
-  else \
-    R = realloc(R, N*sizeof(char*)); \
+  R = realloc(R, N*sizeof(char*)); \
   R[N-1] = calloc((strlen(V)+1), sizeof(char)); \
   strcpy( R[N-1], V ); // why does strncpy complain here?
-
-#define INTERRUPT_KW
 
 
 void tokenise(char *input, char ***tokens, int *n_tokens)
@@ -43,7 +39,6 @@ void tokenise(char *input, char ***tokens, int *n_tokens)
       if (kw_or_name != NULL) {
         kw_or_name[kw_or_name_len] = '\0';
         ADD_TO_ROOT(_tokens, _n_tokens, kw_or_name);
-        free(kw_or_name);
         kw_or_name = NULL;
         kw_or_name_len = 0;
       }
@@ -89,7 +84,6 @@ void tokenise(char *input, char ***tokens, int *n_tokens)
   if (kw_or_name != NULL) {
     kw_or_name[kw_or_name_len] = '\0';
     ADD_TO_ROOT(_tokens, _n_tokens, kw_or_name);
-    free(kw_or_name);
     kw_or_name = NULL;
     kw_or_name_len = 0;
   }

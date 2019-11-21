@@ -6,6 +6,7 @@
 #include "object.h"
 #include "debug.h"
 #include "list.h"
+#include "gc.h"
 
 
 LispFunction *LispFunction_new(LispListElement *list_args, LispObject *body)

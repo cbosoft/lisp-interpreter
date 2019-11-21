@@ -9,7 +9,8 @@ operation.
 
 Uses editline (libedit, BSD) for the REPL, but I like the look of replxx
 ([syntax highlighting!](https://github.com/AmokHuginnsson/replxx/blob/master/examples/c-api.c))
-so may move to that in the future.
+so may move to that in the future. Garbage collection brought to you by:
+[Boehm-GC](https://www.hboehm.info/gc/)! 
 
 # Features:
 
@@ -31,3 +32,4 @@ so may move to that in the future.
     Run with no args, or with the `--interactive` flag in combination with a
     `--file` or `--command` to see the Read-Eval-Print-Loop in all its readline-y
     glory.
+

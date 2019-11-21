@@ -13,6 +13,7 @@
 #include "list.h"
 #include "tokenise.h"
 #include "parse.h"
+#include "gc.h"
 
 
 
@@ -106,7 +107,6 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
       }
 
       LispObject *rv = eval(var_lfunc->body, sub_env);
-      // TODO free subenv (?)
       return rv;
       
     }
@@ -178,10 +178,6 @@ LispObject *eval_string(char *s, LispEnvironment *env)
     *parsed_objects = parse(tokens, n_tokens), 
     *obj_iter = NULL;
 
-  for (int i = 0; i < n_tokens; i++) {
-    free(tokens[i]);
-  }
-
   for (obj_iter = parsed_objects; obj_iter->next->value != NULL; obj_iter = obj_iter->next) {
     eval(obj_iter->value, env);
     ERROR_CHECK;
@@ -229,7 +225,6 @@ LispObject *eval_file(char *filename, LispEnvironment *env)
   rv = fread(contents, 1, length, fp);
   assert_or_error(rv != -1, "eval_file", "Failed to read file into memory.");
   if (Exception_check()) {
-    free(contents);
     fclose(fp);
     return NULL;
   }
@@ -239,8 +234,6 @@ LispObject *eval_file(char *filename, LispEnvironment *env)
   fclose(fp);
 
   LispObject *object_to_return = eval_string(contents, env);
-
-  free(contents);
 
   return object_to_return;
 }

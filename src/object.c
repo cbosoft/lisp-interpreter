@@ -9,6 +9,7 @@
 #include "debug.h"
 #include "types.h"
 #include "list.h"
+#include "gc.h"
 
 
 
@@ -281,41 +282,7 @@ void LispObject_print(LispObject *o)
 
 
 
-// Recursively free object $o
-void LispObject_free(LispObject *o)
-{
-  LispListElement *i = NULL, *n = NULL;
-
-  switch (o->type) {
-
-    case LISPOBJECT_LIST:
-      i = o->value_list;
-      while (i->next != NULL) {
-        n = i->next;
-        
-        if (i->value != NULL)
-          LispObject_free(i->value);
-
-        free(i);
-        i = n;
-      }
-      break;
-
-    case LISPOBJECT_STRING:
-      free(o->value_string);
-      break;
-
-    case LISPOBJECT_SYMBOL:
-      free(o->symbol_name);
-      break;
-
-  }
-
-  free(o);
-}
-
-
-
+// make "nil" (zero-value) object
 void LispObject_make_nil(LispObject *o)
 {
   if (o->value_string != NULL) {

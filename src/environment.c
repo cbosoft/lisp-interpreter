@@ -6,6 +6,7 @@
 #include "exception.h"
 #include "types.h"
 #include "debug.h"
+#include "gc.h"
 
 extern struct environment_var builtin_functions[];
 
@@ -38,15 +39,6 @@ LispEnvironment *LispEnvironment_new_global_environment()
   }
 
   return rv;
-}
-
-
-
-
-// Delete environement and free object from memory
-void LispEnvironment_free(LispEnvironment *env)
-{
-  free(env);
 }
 
 

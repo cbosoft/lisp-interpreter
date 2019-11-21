@@ -75,6 +75,5 @@ LispListElement *parse(char **tokens, int n_tokens)
 
   }
 
-  free(open_lists);
   return root;
 }

@@ -11,6 +11,7 @@
 #include "function.h"
 #include "list.h"
 #include "eval.h"
+#include "gc.h"
 
 extern LispObject nil;
 
