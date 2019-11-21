@@ -10,3 +10,4 @@ int LispEnvironment_get(LispEnvironment *env, char *name, LispFunction **lfunc, 
 LispObject *LispEnvironment_get_variable(LispEnvironment *env, char *name);
 LispFunction *LispEnvironment_get_lispfunction(LispEnvironment *env, char *name);
 LispBuiltin *LispEnvironment_get_builtinfunction(LispEnvironment *env, char *name);
+void LispEnvironment_del_variable(LispEnvironment *env, char *name);

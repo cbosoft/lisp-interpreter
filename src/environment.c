@@ -54,6 +54,38 @@ void LispEnvironment_add_variable(LispEnvironment *env, char *name, LispFunction
 
 
 
+// Addd a new variable to the environment, with value $value, name $name, alias
+// $alias or...
+void LispEnvironment_del_variable(LispEnvironment *env, char *name)
+{
+  struct environment_var *i = NULL, *p = NULL;
+
+  if (env->variables != NULL) {
+    for (i = env->variables; i != NULL; p = i, i = i->next){
+      debug_message("CHECKING %s IS %s?\n", name, i->name);
+
+      if ((strcmp(i->name, name) == 0) || ( (i->alias != NULL) && (strcmp(i->alias, name) == 0))) {
+
+        debug_message("FOUND %s IN ENV AS %s\n", name, i->name);
+        debug_message("DELETING FROM ENVIRONMENT\n");
+
+        p->next = i->next;
+        // i is now unreachable, GC will take care of it.
+
+        return;
+
+      }
+
+    }
+  }
+
+  assert_or_error(0, "LispEnvironment_del_variable", "Variable with name or alias %s not found in environment.", name);
+
+}
+
+
+
+
 // Add a new variable to the environment, with value $value, lfunc $lfunc, or
 // bfunc $bfunc.
 void LispEnvironment_add_variable_with_alias(LispEnvironment *env, char *name, char *alias, LispFunction *lfunc, LispBuiltin *bfunc, LispObject *value)
