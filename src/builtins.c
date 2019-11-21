@@ -447,6 +447,34 @@ LispBuiltin load_file_obj = {&load_file, LISPBUILTIN_GREEDY};
 
 
 
+
+// exit (n): exit with error code $n.
+LispObject *lisp_exit(LispListElement *arg, LispEnvironment *env)
+{
+  debug_message("BUILTIN FUNCTION EXIT");
+
+  TOUCH(env);
+  int nargs = LispList_count(arg);
+  assert_or_error(nargs < 2, "exit", "Function takes at most 1 argument: (got %d).", nargs);
+  ERROR_CHECK;
+  debug_message("AFTER NARGS CHECK\n");
+
+  int rv = 0;
+
+  if (nargs) {
+    LispObject *rv_obj = arg->value;
+    assert_or_error(rv_obj->type == LISPOBJECT_INT, "exit", "filename must be an Integer, not %s", LispObject_type(rv_obj));
+    ERROR_CHECK;
+    debug_message("AFTER TYPE CHECK\n");
+    rv = rv_obj->value_int;
+  }
+
+  exit(rv);
+}
+LispBuiltin exit_obj = {&lisp_exit, LISPBUILTIN_GREEDY};
+
+
+
 // builtins are enumerated here, and referred to in the global env setup
 struct environment_var builtin_functions[] = {
   { "add", "+", NULL, &add_obj, NULL, NULL},
@@ -466,5 +494,6 @@ struct environment_var builtin_functions[] = {
 	{ "rest", "cdr", NULL, &rest_obj, NULL, NULL },
 	{ "print", NULL, NULL, &print_obj, NULL, NULL },
 	{ "load-file", NULL, NULL, &load_file_obj, NULL, NULL },
+	{ "exit", NULL, NULL, &exit_obj, NULL, NULL },
   { NULL, NULL, NULL, NULL, NULL, NULL }
 };
