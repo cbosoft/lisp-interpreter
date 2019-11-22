@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #include "object.h"
 #include "builtins.h"
@@ -509,6 +511,63 @@ LispBuiltin exit_obj = {&lisp_exit, LISPBUILTIN_GREEDY};
 
 
 
+
+// Open file and return the file descriptor (Int) for it.
+// Usage:
+//   (open-file path [mode])
+// Arguments:
+//   path    Path to file to open
+//   mode    String indicating mode to open file. Defaults to "r".
+//           Values can be: read only ("r"), write ("w"), and append "a".
+LispObject *open_file(LispListElement *arg, LispEnvironment *env)
+{
+  debug_message("BUILTIN FUNCTION OPEN_FILE");
+
+  TOUCH(env);
+  int nargs = LispList_count(arg);
+  assert_or_error((nargs == 2) || (nargs == 1), "open-file", "Function takes 1 or 2 arguments (path[ mode]): (got %d).", nargs);
+  ERROR_CHECK;
+  debug_message("AFTER NARGS CHECK\n");
+
+  LispObject *pathobj = arg->value;
+  assert_or_error(pathobj->type == LISPOBJECT_STRING, "open-file", "path argument must be a String, not %s", LispObject_type(pathobj));
+  ERROR_CHECK;
+  debug_message("AFTER PATH TYPE CHECK\n");
+
+  int flags = 0;
+  if (nargs == 2) {
+
+    LispObject *modeobj = arg->next->value;
+    assert_or_error(modeobj->type == LISPOBJECT_STRING, "open-file", "mode must be a String, not %s", LispObject_type(modeobj));
+    ERROR_CHECK;
+    debug_message("AFTER MODE TYPE CHECK\n");
+
+    if (strcmp(modeobj->value_string, "r")) {
+      flags = O_RDONLY;
+    }
+    else if (strcmp(modeobj->value_string, "w")) {
+      flags = O_WRONLY;
+    }
+    else if (strcmp(modeobj->value_string, "a")) {
+      flags = O_WRONLY | O_APPEND;
+    }
+
+  }
+  else {
+    flags = O_RDONLY;
+  }
+  
+
+  int fd = open(pathobj->value_string, flags);
+  assert_or_error_with_errno(fd != -1, "open-file", "Could not open file \'%s\'", pathobj->value_string);
+  ERROR_CHECK;
+
+  return LispObject_new_int(fd);
+}
+LispBuiltin open_file_obj = {&open_file, LISPBUILTIN_GREEDY};
+
+
+
 // builtins are enumerated here, and referred to in the global env setup
 struct environment_var builtin_functions[] = {
   { "add", "+", NULL, &add_obj, NULL, NULL},
@@ -530,5 +589,6 @@ struct environment_var builtin_functions[] = {
 	{ "print", NULL, NULL, &print_obj, NULL, NULL },
 	{ "load-file", NULL, NULL, &load_file_obj, NULL, NULL },
 	{ "exit", NULL, NULL, &exit_obj, NULL, NULL },
+	{ "open-file", NULL, NULL, &open_file_obj, NULL, NULL },
   { NULL, NULL, NULL, NULL, NULL, NULL }
 };
