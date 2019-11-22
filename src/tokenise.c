@@ -11,6 +11,27 @@
   strcpy( (*tokens)[(*n_tokens)-1], VALUE ); // why does strncpy complain here?
 
 
+int parenscheck(char *input)
+{
+  char ch;
+  int len = strlen(input), i, nopen = 0, nclosed = 0;
+
+  
+  for (i = 0, ch = input[0]; i < len; i++, ch = input[i]) {
+
+    // TODO: what if the parenthesis is in a string?
+    if (ch == '(') {
+      nopen++;
+    }
+    else if (ch == ')') {
+      nclosed++;
+    }
+
+  }
+
+  return nopen - nclosed;
+}
+
 void tokenise(char *input, char ***tokens, int *n_tokens)
 {
 
