@@ -75,10 +75,43 @@ int main(int argc, char **argv)
   display_splash();
 
   stifle_history(7);
+
   
   while (1) {
     // READ
-    char *input = readline("> ");
+    char *part_input = readline("> "), 
+         *input = NULL;
+    int input_length = strlen(part_input);
+
+    input = realloc(input, (input_length + 1)*sizeof(char));
+    input[0] = '\0';
+    strcat(input, part_input);
+
+    int parens_tally = parenscheck(part_input);
+    while (parens_tally > 0) {
+      input_length ++;
+      input = realloc(input, (input_length + 1)*sizeof(char));
+      strcat(input, " ");
+
+      char *prompt = malloc((  ((1 + parens_tally)*2) + 1   )*sizeof(char));
+      prompt[0] = '\0';
+      strcat(prompt, ": ");
+      for (int tallyi = 0; tallyi < parens_tally; tallyi++)
+        strcat(prompt, "  ");
+
+      do {
+        part_input = readline(prompt);
+      } while (part_input == NULL);
+
+      input_length += strlen(part_input);
+      input = realloc(input, (input_length + 1)*sizeof(char));
+      strcat(input, part_input);
+
+      parens_tally += parenscheck(part_input);
+      debug_message("PARENS TALLY = %d\n", parens_tally);
+    }
+
+    debug_message("INPUT %s\n", input);
 
     if (input != NULL) {
       char *stripped_input = strip_whitespace(input);
