@@ -244,6 +244,40 @@ LispBuiltin define_obj = {&define, LISPBUILTIN_LAZY};
 
 
 
+// Create an entry in the local environment's variable table.
+// Usage: (defvar name value)
+// Arguments:
+//   name            string or symbol name of the function
+//   value           value of the variable
+LispObject *defvar(LispListElement *arg, LispEnvironment *env)
+{
+  debug_message("BUILTIN FUNCTION DEFVAR\n");
+
+  int nargs = LispList_count(arg);
+  assert_or_error(nargs == 2, "defvar", "Function takes 2 arguments: name, value (got %d).", nargs);
+  ERROR_CHECK;
+  debug_message("AFTER NARGS CHECK\n");
+  
+  LispObject *name = arg->value;
+  assert_or_error(name->type == LISPOBJECT_SYMBOL, "defvar", "Argument has wrong type: name should be a Symbol, not %s", LispObject_type(name));
+  ERROR_CHECK;
+  debug_message("AFTER NAME TYPE CHECK\n");
+
+  if (!LispEnvironment_get(env, name->symbol_name, NULL, NULL, NULL)) {
+    LispEnvironment_del_variable(env, name->symbol_name);
+  }
+  Exception_reset();
+
+  LispObject *value = arg->next->value;
+  LispEnvironment_add_variable(env, name->symbol_name, NULL, NULL, value);
+
+  return value;
+}
+LispBuiltin defvar_obj = {&defvar, LISPBUILTIN_LAZY};
+
+
+
+
 // Get number of elements in a list
 // Usage:
 //   (count list)
@@ -483,6 +517,7 @@ struct environment_var builtin_functions[] = {
 	{ "divide", "/", NULL, &divide_obj, NULL, NULL },
 	{ "quote", NULL, NULL, &quote_obj, NULL, NULL },
 	{ "define", NULL, NULL, &define_obj, NULL, NULL },
+	{ "defvar", NULL, NULL, &defvar_obj, NULL, NULL },
 	{ "count", NULL, NULL, &count_obj, NULL, NULL },
 	{ "if", NULL, NULL, &lisp_if_obj, NULL, NULL },
 	{ "gt", NULL, NULL, &lisp_gt_obj, NULL, NULL },
