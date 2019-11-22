@@ -45,6 +45,8 @@ void tokenise(char *input, char ***tokens, int *n_tokens)
   (*tokens) = NULL;
   (*n_tokens) = 0;
 
+  int in_quote = 0;
+
   for (i = 0, ch= input[0]; i < input_len; i++, ch=input[i]) {
 
     if (input[i] == ';') {
@@ -53,7 +55,7 @@ void tokenise(char *input, char ***tokens, int *n_tokens)
     }
     
     // if breaking char: space, newline, or parens
-    if ((ch == ' ') || (ch == '\n') || (ch == ')') || (ch == '(') || (ch == '\t') ) {
+    if (((ch == ' ') || (ch == '\n') || (ch == ')') || (ch == '(') || (ch == '\t')) && !in_quote) {
 
       // finish reading keyword or name
       if (kw_or_name != NULL) {
@@ -68,11 +70,22 @@ void tokenise(char *input, char ***tokens, int *n_tokens)
         ADD_TO_TOKENS(ch == '(' ? "(" : ")");
       }
 
-    } // TODO quote syntactic sugar
+    }
     else {
 
+      if ((ch == '"') || (ch == '\''))  {
+
+        if (((in_quote == 2) && (ch == '"')) || ((in_quote == 1) && (ch == '\''))) {
+          in_quote = 0;
+        }
+        else {
+          in_quote = ch == '"' ? 2 : 1;
+        }
+
+      }
+
       kw_or_name = realloc(kw_or_name, ((++kw_or_name_len) + 1)*sizeof(char));
-      kw_or_name[kw_or_name_len-1] = input[i];
+      kw_or_name[kw_or_name_len-1] = ch;
 
     }
 
