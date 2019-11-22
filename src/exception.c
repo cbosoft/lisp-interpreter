@@ -18,20 +18,21 @@ enum EXCEPTION_STATUS {
 
 static int exception_condition = EXCEPTION_NONE;
 static char *exception_message = NULL;
-static char *exception_traceback = NULL;
+static char *exception_source = NULL;
+static int exception_errno_set = 0;
 
 
 
 
 // Raise an exception
-void Exception_raise (const char *message, const char *traceback)
+void Exception_raise (const char *message, const char *source)
 {
   exception_message = strdup(message);
 
-  if (traceback != NULL)
-    exception_traceback = strdup(traceback);
+  if (source != NULL)
+    exception_source = strdup(source);
   else
-    exception_traceback = NULL;
+    exception_source = NULL;
 
   exception_condition = EXCEPTION_ERROR;
 }
@@ -53,7 +54,7 @@ void Exception_reset()
 {
   exception_condition = EXCEPTION_NONE;
   exception_message = NULL;
-  exception_traceback = NULL;
+  exception_source = NULL;
 }
 
 
@@ -66,10 +67,13 @@ void Exception_print()
   if (!Exception_check())
     return;
 
-  fprintf(stderr, BG_RED"Exception"RESET": %s\n", exception_message);
+  fprintf(stderr, "Exception "FG_RED"%s"RESET" raised\n", exception_message);
 
-  if (exception_traceback != NULL)
-    fprintf(stderr, "in: "FG_BLUE"%s"RESET"\n", exception_traceback);
+  if (exception_source != NULL)
+    fprintf(stderr, "while running "FG_BLUE"%s"RESET"\n", exception_source);
+
+  if (exception_errno_set)
+    fprintf(stderr, "because "FG_YELLOW"(%d) %s"RESET"\n", errno, strerror(errno));
 
   Exception_reset();
 }
