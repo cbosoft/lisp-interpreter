@@ -200,7 +200,7 @@ LispObject *eval_file(char *filename, LispEnvironment *env)
   int rv = 0;
 
   rv = fseek(fp, 0, SEEK_END);
-  assert_or_error(rv == 0, "eval_file", "Failed to get size of file.");
+  assert_or_error_with_errno(rv == 0, "eval_file", "Failed to get size of file.");
   if (Exception_check()) {
     fclose(fp);
     return NULL;
@@ -209,21 +209,21 @@ LispObject *eval_file(char *filename, LispEnvironment *env)
 
   long length = ftell(fp);
   rv = fseek(fp, 0, SEEK_SET);
-  assert_or_error(rv == 0, "eval_file", "Failed to return to start of file.");
+  assert_or_error_with_errno(rv == 0, "eval_file", "Failed to return to start of file.");
   if (Exception_check()) {
     fclose(fp);
     return NULL;
   }
 
   char *contents = malloc((length+1)*sizeof(char));
-  assert_or_error(contents != NULL, "eval_file", "Failed to allocate memory to hold file contents.");
+  assert_or_error_with_errno(contents != NULL, "eval_file", "Failed to allocate memory to hold file contents.");
   if (Exception_check()) {
     fclose(fp);
     return NULL;
   }
 
   rv = fread(contents, 1, length, fp);
-  assert_or_error(rv != -1, "eval_file", "Failed to read file into memory.");
+  assert_or_error_with_errno(rv != -1, "eval_file", "Failed to read file into memory.");
   if (Exception_check()) {
     fclose(fp);
     return NULL;
