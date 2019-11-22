@@ -111,7 +111,12 @@ int main(int argc, char **argv)
       debug_message("PARENS TALLY = %d\n", parens_tally);
     }
 
-    debug_message("INPUT %s\n", input);
+    if (parens_tally < 0) {
+      assert_or_error(0, "main", "Unmatched ')' in input.");
+      Exception_print();
+      continue;
+    }
+
 
     if (input != NULL) {
       char *stripped_input = strip_whitespace(input);
