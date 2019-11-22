@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+#include <errno.h>
 
 #include "colour.h"
 #include "exception.h"
@@ -92,4 +93,25 @@ void assert_or_error(int condition, const char *source, const char *fmt, ...)
 
   Exception_raise((const char *)message, source);
 
+}
+
+
+
+
+// assert a condition is true, otherwise raise an exception, including information from errno
+void assert_or_error_with_errno(int condition, const char *source, const char *fmt, ...)
+{
+  if (condition)
+    return;
+
+  char message[ERRLEN] = {0};
+  
+  va_list ap;
+
+  va_start(ap, fmt);
+  vsnprintf(message, ERRLEN-1, fmt, ap);
+  va_end(ap);
+
+  exception_errno_set = 1;
+  Exception_raise((const char *)message, source);
 }
