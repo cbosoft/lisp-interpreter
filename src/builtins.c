@@ -574,11 +574,81 @@ LispObject *read_file(LispListElement *arg, LispEnvironment *env)
   return LispObject_new_string(contents);
 }
 LispBuiltin read_file_obj = {&read_file, LISPBUILTIN_GREEDY};
+
+
+
+
+// write-file
+LispObject *write_file(LispListElement *arg, LispEnvironment *env)
+{
+  debug_message("BUILTIN FUNCTION WRITE_FILE");
+
+  TOUCH(env);
+  int nargs = LispList_count(arg);
+  assert_or_error(nargs == 2, "write-file", "Function takes 2 arguments (path content): (got %d).", nargs);
+  ERROR_CHECK;
+  debug_message("AFTER NARGS CHECK\n");
+
+  LispObject *pathobj = arg->value;
+  assert_or_error(pathobj->type == LISPOBJECT_STRING, "write-file", "path argument must be a String, not %s", LispObject_type(pathobj));
+  ERROR_CHECK;
+  debug_message("AFTER PATH TYPE CHECK\n");
+
+  LispObject *contentobj = arg->next->value;
+  assert_or_error(contentobj->type == LISPOBJECT_STRING, "write-file", "content argument must be a String, not %s", LispObject_type(contentobj));
+  ERROR_CHECK;
+  debug_message("AFTER CONTENT TYPE CHECK\n");
+
+  FILE *fp = fopen(pathobj->value_string, "w");
+  assert_or_error_with_errno(fp != NULL, "write-file", "Could not open file '%s'", pathobj->value_string);
   ERROR_CHECK;
 
-  return LispObject_new_int(fd);
+  int rv = fprintf(fp, "%s", contentobj->value_string);
+  assert_or_error(rv > 0, "write-file", "Could not write file '%s'", pathobj->value_string);
+  ERROR_CHECK;
+  fclose(fp);
+
+  return LispObject_new_string(contentobj->value_string);
 }
-LispBuiltin open_file_obj = {&open_file, LISPBUILTIN_GREEDY};
+LispBuiltin write_file_obj = {&write_file, LISPBUILTIN_GREEDY};
+
+
+
+
+// append-file
+LispObject *append_file(LispListElement *arg, LispEnvironment *env)
+{
+  debug_message("BUILTIN FUNCTION WRITE_FILE");
+
+  TOUCH(env);
+  int nargs = LispList_count(arg);
+  assert_or_error(nargs == 2, "write-file", "Function takes 2 arguments (path content): (got %d).", nargs);
+  ERROR_CHECK;
+  debug_message("AFTER NARGS CHECK\n");
+
+  LispObject *pathobj = arg->value;
+  assert_or_error(pathobj->type == LISPOBJECT_STRING, "write-file", "path argument must be a String, not %s", LispObject_type(pathobj));
+  ERROR_CHECK;
+  debug_message("AFTER PATH TYPE CHECK\n");
+
+  LispObject *contentobj = arg->next->value;
+  assert_or_error(contentobj->type == LISPOBJECT_STRING, "write-file", "content argument must be a String, not %s", LispObject_type(contentobj));
+  ERROR_CHECK;
+  debug_message("AFTER CONTENT TYPE CHECK\n");
+
+  FILE *fp = fopen(pathobj->value_string, "a");
+  assert_or_error_with_errno(fp != NULL, "write-file", "Could not open file '%s'", pathobj->value_string);
+  ERROR_CHECK;
+
+  int rv = fprintf(fp, "%s", contentobj->value_string);
+  assert_or_error(rv > 0, "write-file", "Could not write file '%s'", pathobj->value_string);
+  ERROR_CHECK;
+  fclose(fp);
+
+  return LispObject_new_string(contentobj->value_string);
+}
+LispBuiltin append_file_obj = {&append_file, LISPBUILTIN_GREEDY};
+
 
 
 
@@ -604,5 +674,7 @@ struct environment_var builtin_functions[] = {
 	{ "load-file", NULL, NULL, &load_file_obj, NULL, NULL },
 	{ "exit", NULL, NULL, &exit_obj, NULL, NULL },
 	{ "read-file", NULL, NULL, &read_file_obj, NULL, NULL },
+	{ "write-file", NULL, NULL, &write_file_obj, NULL, NULL },
+	{ "append-file", NULL, NULL, &append_file_obj, NULL, NULL },
   { NULL, NULL, NULL, NULL, NULL, NULL }
 };
