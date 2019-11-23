@@ -167,16 +167,20 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
 LispObject *eval_string(char *s, LispEnvironment *env)
 {
 
-  char **tokens;
+  char **tokens = NULL;
   int n_tokens = 0;
 
   tokenise(s, &tokens, &n_tokens);
 
-  // TODO parse to return a linked list (LispListElement)
-  // call eval on each var in element in turn
+  debug_message("TOKENS:\n");
+  for (int i = 0; i < n_tokens; i++) {
+    debug_message("| %s\n", tokens[i]);
+  }
+
   LispListElement 
     *parsed_objects = parse(tokens, n_tokens), 
     *obj_iter = NULL;
+  ERROR_CHECK;
 
   for (obj_iter = parsed_objects; obj_iter->next->value != NULL; obj_iter = obj_iter->next) {
     eval(obj_iter->value, env);
