@@ -512,54 +512,68 @@ LispBuiltin exit_obj = {&lisp_exit, LISPBUILTIN_GREEDY};
 
 
 
-// Open file and return the file descriptor (Int) for it.
+// read contents of a file
 // Usage:
-//   (open-file path [mode])
+//   (read-file path [mode])
 // Arguments:
 //   path    Path to file to open
-//   mode    String indicating mode to open file. Defaults to "r".
-//           Values can be: read only ("r"), write ("w"), and append "a".
-LispObject *open_file(LispListElement *arg, LispEnvironment *env)
+LispObject *read_file(LispListElement *arg, LispEnvironment *env)
 {
-  debug_message("BUILTIN FUNCTION OPEN_FILE");
+  debug_message("BUILTIN FUNCTION READ_FILE");
 
   TOUCH(env);
   int nargs = LispList_count(arg);
-  assert_or_error((nargs == 2) || (nargs == 1), "open-file", "Function takes 1 or 2 arguments (path[ mode]): (got %d).", nargs);
+  assert_or_error(nargs == 1, "read-file", "Function takes 1 argument (path): (got %d).", nargs);
   ERROR_CHECK;
   debug_message("AFTER NARGS CHECK\n");
 
   LispObject *pathobj = arg->value;
-  assert_or_error(pathobj->type == LISPOBJECT_STRING, "open-file", "path argument must be a String, not %s", LispObject_type(pathobj));
+  assert_or_error(pathobj->type == LISPOBJECT_STRING, "read-file", "path argument must be a String, not %s", LispObject_type(pathobj));
   ERROR_CHECK;
   debug_message("AFTER PATH TYPE CHECK\n");
 
-  int flags = 0;
-  if (nargs == 2) {
+  FILE *fp = fopen(pathobj->value_string, "r");
+  assert_or_error_with_errno(fp != NULL, "read-file", "Could not open file '%s'", pathobj->value_string);
+  ERROR_CHECK;
 
-    LispObject *modeobj = arg->next->value;
-    assert_or_error(modeobj->type == LISPOBJECT_STRING, "open-file", "mode must be a String, not %s", LispObject_type(modeobj));
-    ERROR_CHECK;
-    debug_message("AFTER MODE TYPE CHECK\n");
 
-    if (strcmp(modeobj->value_string, "r")) {
-      flags = O_RDONLY;
-    }
-    else if (strcmp(modeobj->value_string, "w")) {
-      flags = O_WRONLY;
-    }
-    else if (strcmp(modeobj->value_string, "a")) {
-      flags = O_WRONLY | O_APPEND;
-    }
-
+  int rv = fseek(fp, 0, SEEK_END);
+  assert_or_error_with_errno(rv == 0, "read-file", "Failed to get size of file.");
+  if (Exception_check()) {
+    fclose(fp);
+    return NULL;
   }
-  else {
-    flags = O_RDONLY;
-  }
-  
+  long length = ftell(fp);
 
-  int fd = open(pathobj->value_string, flags);
-  assert_or_error_with_errno(fd != -1, "open-file", "Could not open file \'%s\'", pathobj->value_string);
+  rv = fseek(fp, 0, SEEK_SET);
+  assert_or_error_with_errno(rv == 0, "read-file", "Failed to return to start of file.");
+  if (Exception_check()) {
+    fclose(fp);
+    return NULL;
+  }
+
+  char *contents = malloc((length+1)*sizeof(char));
+  assert_or_error_with_errno(contents != NULL, "read-file", "Failed to allocate memory to hold file contents.");
+  if (Exception_check()) {
+    fclose(fp);
+    return NULL;
+  }
+
+  rv = fread(contents, 1, length, fp);
+  assert_or_error_with_errno(rv != -1, "read-file", "Failed to read file into memory.");
+  if (Exception_check()) {
+    fclose(fp);
+    return NULL;
+  }
+
+  contents[length] = '\0';
+
+  fclose(fp);
+
+
+  return LispObject_new_string(contents);
+}
+LispBuiltin read_file_obj = {&read_file, LISPBUILTIN_GREEDY};
   ERROR_CHECK;
 
   return LispObject_new_int(fd);
@@ -589,6 +603,6 @@ struct environment_var builtin_functions[] = {
 	{ "print", NULL, NULL, &print_obj, NULL, NULL },
 	{ "load-file", NULL, NULL, &load_file_obj, NULL, NULL },
 	{ "exit", NULL, NULL, &exit_obj, NULL, NULL },
-	{ "open-file", NULL, NULL, &open_file_obj, NULL, NULL },
+	{ "read-file", NULL, NULL, &read_file_obj, NULL, NULL },
   { NULL, NULL, NULL, NULL, NULL, NULL }
 };
