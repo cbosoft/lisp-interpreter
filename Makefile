@@ -21,7 +21,7 @@ obj/%.o: src/%.c
 	mkdir -p obj
 	$(CXX) $(CFLAGS) $< -c -o $@
 
-LISP: $(OBJ)
+chrisp: $(OBJ)
 	$(CXX) $(CFLAGS) $(OBJ) -o $@ $(LINK)
 
 clean:
