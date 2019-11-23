@@ -11,6 +11,7 @@ OBJ = \
 			obj/builtins.o \
 			obj/debug.o \
 			obj/function.o \
+			obj/import.o \
 			obj/list.o \
 			obj/util.o \
 			obj/singletons.o \
