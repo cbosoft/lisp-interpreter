@@ -14,6 +14,7 @@
 #include "list.h"
 #include "eval.h"
 #include "gc.h"
+#include "import.h"
 
 extern LispObject nil;
 
@@ -652,6 +653,61 @@ LispBuiltin append_file_obj = {&append_file, LISPBUILTIN_GREEDY};
 
 
 
+// (import module)
+LispObject *import_module(LispListElement *arg, LispEnvironment *env)
+{
+  debug_message("BUILTIN FUNCTION IMPORT-MODULE");
+
+  TOUCH(env);
+  int nargs = LispList_count(arg);
+  assert_or_error(nargs == 1, "import-module", "Function takes 1 arguments (name): (got %d).", nargs);
+  ERROR_CHECK;
+  debug_message("AFTER NARGS CHECK\n");
+
+  LispObject *name = arg->value;
+  assert_or_error(name->type == LISPOBJECT_SYMBOL, "import-module", "name to import should be a Symbol, not %s", LispObject_type(name));
+  ERROR_CHECK;
+  debug_message("AFTER NAME TYPE CHECK\n");
+
+  char *path = search(name->symbol_name);
+  ERROR_CHECK;
+
+  debug_message("SEARCH RETURNED PATH %s\n", path);
+
+  eval_file(path, env);
+
+  return &nil;
+}
+LispBuiltin import_module_obj = {&import_module, LISPBUILTIN_LAZY};
+
+
+
+
+// (import module)
+LispObject *lisp_eval_file(LispListElement *arg, LispEnvironment *env)
+{
+  debug_message("BUILTIN FUNCTION EVAL_FILE");
+
+  TOUCH(env);
+  int nargs = LispList_count(arg);
+  assert_or_error(nargs == 1, "eval-file", "Function takes 1 arguments (path): (got %d).", nargs);
+  ERROR_CHECK;
+  debug_message("AFTER NARGS CHECK\n");
+
+  LispObject *path = arg->value;
+  assert_or_error(path->type == LISPOBJECT_STRING, "eval-file", "path should be a String, not %s", LispObject_type(path));
+  ERROR_CHECK;
+  debug_message("AFTER PATH TYPE CHECK\n");
+
+  eval_file(path->value_string, env);
+
+  return &nil;
+}
+LispBuiltin lisp_eval_file_obj = {&lisp_eval_file, LISPBUILTIN_GREEDY};
+
+
+
+
 // builtins are enumerated here, and referred to in the global env setup
 struct environment_var builtin_functions[] = {
   { "add", "+", NULL, &add_obj, NULL, NULL},
@@ -676,5 +732,7 @@ struct environment_var builtin_functions[] = {
 	{ "read-file", NULL, NULL, &read_file_obj, NULL, NULL },
 	{ "write-file", NULL, NULL, &write_file_obj, NULL, NULL },
 	{ "append-file", NULL, NULL, &append_file_obj, NULL, NULL },
+	{ "import-module", "import", NULL, &import_module_obj, NULL, NULL },
+	{ "eval-file", NULL, NULL, &lisp_eval_file_obj, NULL, NULL },
   { NULL, NULL, NULL, NULL, NULL, NULL }
 };
