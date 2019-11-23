@@ -78,7 +78,7 @@ void tokenise(char *input, char ***tokens, int *n_tokens)
         if (((in_quote == 2) && (ch == '"')) || ((in_quote == 1) && (ch == '\''))) {
           in_quote = 0;
         }
-        else {
+        else if (!in_quote) {
           in_quote = ch == '"' ? 2 : 1;
         }
 
