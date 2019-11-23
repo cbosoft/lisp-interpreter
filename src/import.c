@@ -9,7 +9,7 @@
 #include "exception.h"
 
 char *search_paths[] = {
-  "~/lib",
+  "./lib",
   "~/.chrisp",
   "/usr/lib/chrisp",
   NULL
