@@ -234,28 +234,9 @@ void LispObject_print_(LispObject *o) {
 
   LispListElement *list_iter = NULL; 
   FILE *fp = stdout;
+  char *repr = NULL;
 
   switch (o->type) {
-
-    case LISPOBJECT_STRING:
-      fprintf(fp, "%s", o->value_string);
-      break;
-
-    case LISPOBJECT_SYMBOL:
-      fprintf(fp, "%s", o->symbol_name);
-      break;
-
-    case LISPOBJECT_INT:
-      fprintf(fp, "%d", o->value_int);
-      break;
-
-    case LISPOBJECT_FLOAT:
-      fprintf(fp, "%f", o->value_float);
-      break;
-
-    case LISPOBJECT_BOOL:
-      fprintf(fp, "%s", (o->value_bool)?"true":"false");
-      break;
 
     case LISPOBJECT_LIST:
       
@@ -268,6 +249,11 @@ void LispObject_print_(LispObject *o) {
       }
 
       fprintf(stdout, ")");
+      break;
+
+   default:
+      repr = LispObject_repr(o);
+      fprintf(fp, "%s", repr);
       break;
 
   }
@@ -367,8 +353,11 @@ char *LispObject_type(LispObject *o)
 // Represent object as a string
 char *LispObject_repr(LispObject *o)
 {
+  debug_message("REPR\n");
+
   char *rv;
   if (o->type == LISPOBJECT_STRING) {
+    debug_message("STRING\n");
     rv = calloc(strlen(o->value_string)+3, sizeof(char));
     sprintf(rv, "'%s'", o->value_string);
   }
