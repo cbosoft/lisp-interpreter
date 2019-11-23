@@ -100,128 +100,13 @@ LispObject *LispObject_new_symbol(char *name)
 // A blank list can have objects added to it using LispObject_add_object_to_list(LispObject *obj).
 LispObject *LispObject_new_list()
 {
+  debug_message("new list\n");
   LispObject *rv = LispObject_new_nil();
   ERROR_CHECK;
+  debug_message("after error check\n");
   rv->type = LISPOBJECT_LIST;
   rv->value_list = LispList_new_element();
   return rv;
-}
-
-
-
-
-// Create a new LispObject, inferring type from string $s.
-// if it contains only digits 0 to 9, its an integer. If it also contains 'e',
-// '.', '+' or '-' then its a float. If its a left parens '(' then its a list.
-// If its 'false' or 'true', then its a bool. Otherwise, its a string.
-LispObject *LispObject_new_guess_type(char *s) {
-  int len = strlen(s), i, ch;
-
-  debug_message("GUESSING %s\n", s);
-  
-  int not_integer = 0, type = -1;
-
-  if ((s[0] == '"' && s[len-1] == '"') ||
-      (s[0] == '\'' && s[len-1] == '\'')) {
-    debug_message("GUESSING %s is STRING\n", s);
-    s[len-1] = '\0';
-    s++;
-    return LispObject_new_string(s);
-  }
-
-  if (strcmp(s, "(") == 0) {
-    debug_message("GUESSING %s is LIST\n", s);
-    return LispObject_new_list();
-  }
-
-  if (strcmp(s, "false") == 0) {
-    debug_message("GUESSING %s is BOOL\n", s);
-    return LispObject_new_bool(0);
-  }
-
-  if (strcmp(s, "true") == 0) {
-    debug_message("GUESSING %s is BOOL\n", s);
-    return LispObject_new_bool(1);
-  }
-
-  debug_message("GUESSING %s is PROBABLY NUMBER OR SYMBOL\n", s);
-  for (i = 0, ch=(int)s[0]; i < len; i++, ch=(int)s[i]) {
-
-    // if char is not number 0-9...
-    if ((ch < (int)'0') || (ch > (int)'9')) {
-
-      // if is period '.', then is probably float
-      if (ch == (int)'.'){
-        not_integer = 1;
-      }
-      else if (ch == (int)'e') {
-
-        if (len > 1)
-          not_integer = 1;
-        else {
-
-          type = LISPOBJECT_SYMBOL;
-          goto end;
-
-        }
-
-      }
-      else if ((ch == (int)'+') || (ch == (int)'-') ) {
-
-        not_integer = 1;
-        if (len == 1) {
-
-          type = LISPOBJECT_SYMBOL;
-          goto end;
-
-        }
-
-      }
-      else {
-
-        type = LISPOBJECT_SYMBOL;
-        goto end;
-
-      }
-
-    }
-
-  }
-
-  if (not_integer)
-    type = LISPOBJECT_FLOAT;
-  else
-    type = LISPOBJECT_INT;
-
-end:
-
-  assert_or_error(type >= 0, "LispObject_new_guess_type", "could not guess object type for %s", s);
-  ERROR_CHECK;
-
-  switch (type) {
-
-    case LISPOBJECT_INT:
-      debug_message("Guessing %s is Int\n", s);
-      return LispObject_new_int(atoi(s));
-
-    case LISPOBJECT_FLOAT:
-      debug_message("Guessing %s is Float\n", s);
-      return LispObject_new_float(atof(s));
-
-    case LISPOBJECT_BOOL:
-      debug_message("Guessing %s is Bool\n", s);
-      return LispObject_new_bool(strcmp(s, "true") == 0);
-
-    case LISPOBJECT_STRING:
-      debug_message("Guessing %s is String\n", s);
-      return LispObject_new_symbol(s);
-
-    case LISPOBJECT_SYMBOL:
-      debug_message("Guessing %s is SYMBOL\n", s);
-      return LispObject_new_symbol(s);
-  }
-
-  return NULL;
 }
 
 

@@ -2,3 +2,4 @@
 #include "object.h"
 
 LispListElement *parse(char **tokens, int n_tokens);
+void parser_init();

@@ -54,6 +54,12 @@ int main(int argc, char **argv)
   }
 
 
+  parser_init();
+  if (Exception_check()) {
+    Exception_print();
+    return 1;
+  }
+
   LispEnvironment *env = LispEnvironment_new_global_environment();
   LispObject *rv = NULL;
 

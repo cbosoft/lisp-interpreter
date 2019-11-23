@@ -16,7 +16,7 @@ OBJ = \
 			obj/util.o \
 			obj/singletons.o \
 			obj/help.o
-LINK = -ledit -lncurses -lgc
+LINK = -ledit -lncurses -lgc -lpcre
 
 obj/%.o: src/%.c
 	mkdir -p obj
