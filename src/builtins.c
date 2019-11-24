@@ -566,6 +566,42 @@ LispBuiltin lisp_eval_file_obj = {&lisp_eval_file, LISPBUILTIN_GREEDY};
 
 
 
+// (concat list1 list2)
+// Concatenate two lists.
+LispObject *concat(LispListElement *arg, LispEnvironment *env)
+{
+  debug_message("BUILTIN FUNCTION CONCAT");
+
+  TOUCH(env);
+  int nargs = LispList_count(arg);
+  ASSERT_OR_ERROR(nargs == 2, "ArgumentError", "concat", NULL, NULL, "Function takes 2 arguments (list1 list2): (got %d).", nargs);
+  debug_message("AFTER NARGS CHECK\n");
+
+  LispObject *list1 = arg->value;
+  ASSERT_OR_ERROR(list1->type == LISPOBJECT_LIST, "TypeError", "eval-file", list1, NULL, "list1 should be a List, not %s", LispObject_type(list1));
+  debug_message("AFTER LIST1 TYPE CHECK\n");
+
+  LispObject *list2 = arg->next->value;
+  ASSERT_OR_ERROR(list2->type == LISPOBJECT_LIST, "TypeError", "eval-file", list2, NULL, "list2 should be a List, not %s", LispObject_type(list2));
+  debug_message("AFTER LIST2 TYPE CHECK\n");
+
+  LispListElement *i;
+  LispObject *rv = LispObject_new_list();
+  ERROR_CHECK;
+
+  for (i = list1->value_list; i->value != NULL; i = i->next)
+    LispList_add_object_to_list(rv->value_list, i->value);
+
+  for (i = list2->value_list; i->value != NULL; i = i->next)
+    LispList_add_object_to_list(rv->value_list, i->value);
+
+  return rv;
+}
+LispBuiltin concat_obj = {&concat, LISPBUILTIN_GREEDY};
+
+
+
+
 // builtins are enumerated here, and referred to in the global env setup
 struct environment_var builtin_functions[] = {
   { "add", "+", NULL, &add_obj, NULL, NULL},
@@ -592,5 +628,6 @@ struct environment_var builtin_functions[] = {
 	{ "append-file", NULL, NULL, &append_file_obj, NULL, NULL },
 	{ "import-module", "import", NULL, &import_module_obj, NULL, NULL },
 	{ "eval-file", NULL, NULL, &lisp_eval_file_obj, NULL, NULL },
+	{ "concat", NULL, NULL, &concat_obj, NULL, NULL },
   { NULL, NULL, NULL, NULL, NULL, NULL }
 };
