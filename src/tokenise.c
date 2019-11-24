@@ -1,3 +1,4 @@
+#define _POSIX_C_SOURCE 200809L
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -6,11 +7,23 @@
 #include "gc.h"
 
 #define ADD_TO_TOKENS(VALUE) \
-  (*tokens) = realloc( (*tokens), (++(*n_tokens))*sizeof(char*)); \
-  (*tokens)[(*n_tokens)-1] = calloc((strlen(VALUE)+1), sizeof(char)); \
-  strcpy( (*tokens)[(*n_tokens)-1], VALUE ); // why does strncpy complain here?
+  new = malloc(sizeof(LispToken)); \
+  new->string = calloc((strlen(VALUE)+1), sizeof(char)); \
+  strcpy( new->string, VALUE );\
+  new->line = line_no;\
+  new->col = col_no;\
+  new->next = NULL;\
+  new->file = source_cpy;\
+  if (current != NULL) {\
+    current->next = new;\
+  }\
+  else {\
+    rv = new;\
+  }\
+  current = new;
 
 
+// simple sanity check over whether all parentheses are closed
 int parenscheck(char *input)
 {
   char ch;
@@ -32,7 +45,11 @@ int parenscheck(char *input)
   return nopen - nclosed;
 }
 
-void tokenise(char *input, char ***tokens, int *n_tokens)
+
+
+
+// Convert input into list of tokens
+LispToken *tokenise(char *input, char *source)
 {
 
   char ch;
@@ -41,16 +58,21 @@ void tokenise(char *input, char ***tokens, int *n_tokens)
   char *kw_or_name = NULL;
   int kw_or_name_len = 0;
   int input_len = strlen(input);
-
-  (*tokens) = NULL;
-  (*n_tokens) = 0;
-
   int in_quote = 0;
+  int line_no = 0;
+  int col_no = 0;
 
-  for (i = 0, ch= input[0]; i < input_len; i++, ch=input[i]) {
+  char *source_cpy = strdup(source);
+
+  LispToken *rv = NULL, *current = rv, *new = NULL;
+
+
+  for (i = 0, ch = input[0]; i < input_len; i++, ch=input[i]) {
+    col_no ++;
 
     if (input[i] == ';') {
-      for (;input[i] != '\n' && i < input_len; i++);
+      for (;input[i] != '\n' && i < input_len; i++, line_no++);
+      col_no = 0;
       continue;
     }
     
@@ -68,6 +90,10 @@ void tokenise(char *input, char ***tokens, int *n_tokens)
       // action needed on breaking char?
       if ((ch == '(') || (ch == ')')) {
         ADD_TO_TOKENS(ch == '(' ? "(" : ")");
+      }
+      else if (ch == '\n') {
+        col_no = 0;
+        line_no ++;
       }
 
     }
@@ -98,4 +124,5 @@ void tokenise(char *input, char ***tokens, int *n_tokens)
     kw_or_name_len = 0;
   }
 
+  return rv;
 }

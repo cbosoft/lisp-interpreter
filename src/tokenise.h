@@ -1,4 +1,5 @@
 #pragma once
+#include "types.h"
 
-void tokenise(char *input, char ***tokens, int *n_tokens);
+LispToken *tokenise(char *input, char *source);
 int parenscheck(char *input);

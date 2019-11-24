@@ -1,5 +1,5 @@
 #pragma once
-#include "object.h"
+#include "types.h"
 
-LispListElement *parse(char **tokens, int n_tokens);
+LispListElement *parse(LispToken *tokens);
 void parser_init();

@@ -68,3 +68,13 @@ struct environment_var {
   LispObject *value;
   struct environment_var *next;
 };
+
+typedef struct LispToken LispToken;
+struct LispToken {
+  char *string;
+  // position of occurence
+  int line;
+  int col;
+  char *file;
+  LispToken *next;
+};
