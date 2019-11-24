@@ -109,7 +109,7 @@ void Exception_print()
   if (exception_errno_set)
     fprintf(stderr, "because "FG_YELLOW"(%d) %s"RESET"\n", errno, strerror(errno));
 
-  if (exception_faulty_object != NULL)
+  if ((exception_faulty_object != NULL) && (exception_faulty_object->file !=NULL))
     fprintf(stderr, "Problematic code from "FG_RED"%s (L:%d, C:%d)"RESET"\n", 
         exception_faulty_object->file, 
         exception_faulty_object->line,
