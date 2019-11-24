@@ -602,6 +602,35 @@ LispBuiltin concat_obj = {&concat, LISPBUILTIN_GREEDY};
 
 
 
+// (append list obj)
+// Add object to list
+LispObject *append(LispListElement *arg, LispEnvironment *env)
+{
+  debug_message("BUILTIN FUNCTION APPEND");
+
+  TOUCH(env);
+  int nargs = LispList_count(arg);
+  ASSERT_OR_ERROR(nargs == 2, "ArgumentError", "concat", NULL, NULL, "Function takes 2 arguments (list append): (got %d).", nargs);
+  debug_message("AFTER NARGS CHECK\n");
+
+  LispObject *list = arg->value;
+  ASSERT_OR_ERROR(list->type == LISPOBJECT_LIST, "TypeError", "eval-file", list, NULL, "list should be a List, not %s", LispObject_type(list));
+  debug_message("AFTER LIST TYPE CHECK\n");
+
+  LispListElement *i;
+  LispObject *rv = LispObject_new_list();
+  ERROR_CHECK;
+
+  for (i = list->value_list; i->value != NULL; i = i->next)
+    LispList_add_object_to_list(rv->value_list, i->value);
+
+  LispObject *obj = arg->next->value;
+  LispList_add_object_to_list(rv->value_list, obj);
+
+  return rv;
+}
+LispBuiltin append_obj = {&append, LISPBUILTIN_GREEDY};
+
 // builtins are enumerated here, and referred to in the global env setup
 struct environment_var builtin_functions[] = {
   { "add", "+", NULL, &add_obj, NULL, NULL},
@@ -629,5 +658,6 @@ struct environment_var builtin_functions[] = {
 	{ "import-module", "import", NULL, &import_module_obj, NULL, NULL },
 	{ "eval-file", NULL, NULL, &lisp_eval_file_obj, NULL, NULL },
 	{ "concat", NULL, NULL, &concat_obj, NULL, NULL },
+	{ "append", NULL, NULL, &append_obj, NULL, NULL },
   { NULL, NULL, NULL, NULL, NULL, NULL }
 };
