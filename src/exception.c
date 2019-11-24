@@ -8,6 +8,7 @@
 
 #include "colour.h"
 #include "exception.h"
+#include "types.h"
 
 #define ERRLEN 256
 
@@ -16,25 +17,55 @@ enum EXCEPTION_STATUS {
   EXCEPTION_ERROR
 };
 
+// TODO: make struct?
 static int exception_condition = EXCEPTION_NONE;
+static char *exception_type = NULL;
 static char *exception_message = NULL;
-static char *exception_source = NULL;
+static char *exception_in = NULL;
+static LispObject *exception_faulty_object = NULL;
 static int exception_errno_set = 0;
 
 
 
 
 // Raise an exception
-void Exception_raise (const char *message, const char *source)
+void Exception_raise(const char *type, const char *in, LispObject *faulty_object, const char *message)
 {
+  exception_type = strdup(type);
+
   exception_message = strdup(message);
 
-  if (source != NULL)
-    exception_source = strdup(source);
-  else
-    exception_source = NULL;
+  exception_in = in != NULL ? strdup(in) : NULL;
+
+  exception_faulty_object = faulty_object;
 
   exception_condition = EXCEPTION_ERROR;
+}
+
+
+
+
+// Raise exception, formatting message
+void Exception_raisef(const char *type, const char *in, LispObject *faulty_object, const char *message_fmt, ...)
+{
+  char message[ERRLEN] = {0};
+
+  va_list ap;
+
+  va_start(ap, message_fmt);
+  vsnprintf(message, ERRLEN-1, message_fmt, ap);
+  va_end(ap);
+
+  Exception_raise(type, in, faulty_object, message);
+}
+
+
+
+
+// Check if an exception is waiting to be shown
+void Exception_set_errno(int v)
+{
+  exception_errno_set = v;
 }
 
 
@@ -54,7 +85,8 @@ void Exception_reset()
 {
   exception_condition = EXCEPTION_NONE;
   exception_message = NULL;
-  exception_source = NULL;
+  exception_in = NULL;
+  exception_faulty_object = NULL;
 }
 
 
@@ -67,55 +99,22 @@ void Exception_print()
   if (!Exception_check())
     return;
 
-  fprintf(stderr, "Exception "FG_RED"%s"RESET" raised\n", exception_message);
+  fprintf(stderr, ""FG_RED"%s"RESET" raised: %s\n", 
+      exception_type!=NULL ? exception_type : "Exception", 
+      exception_message);
 
-  if (exception_source != NULL)
-    fprintf(stderr, "while running "FG_BLUE"%s"RESET"\n", exception_source);
+  if (exception_in != NULL)
+    fprintf(stderr, "while running "FG_BLUE"%s"RESET"\n", exception_in);
 
   if (exception_errno_set)
     fprintf(stderr, "because "FG_YELLOW"(%d) %s"RESET"\n", errno, strerror(errno));
 
+  if (exception_faulty_object != NULL)
+    fprintf(stderr, "Problematic code from "FG_RED"%s (L:%d, C:%d)"RESET"\n", 
+        exception_faulty_object->file, 
+        exception_faulty_object->line,
+        exception_faulty_object->col);
+
+
   Exception_reset();
-}
-
-
-
-
-// assert a condition is true, otherwise raise an exception.
-void assert_or_error(int condition, const char *source, const char *fmt, ...)
-{
-  if (condition)
-    return;
-
-  char message[ERRLEN] = {0};
-  
-  va_list ap;
-
-  va_start(ap, fmt);
-  vsnprintf(message, ERRLEN-1, fmt, ap);
-  va_end(ap);
-
-  Exception_raise((const char *)message, source);
-
-}
-
-
-
-
-// assert a condition is true, otherwise raise an exception, including information from errno
-void assert_or_error_with_errno(int condition, const char *source, const char *fmt, ...)
-{
-  if (condition)
-    return;
-
-  char message[ERRLEN] = {0};
-  
-  va_list ap;
-
-  va_start(ap, fmt);
-  vsnprintf(message, ERRLEN-1, fmt, ap);
-  va_end(ap);
-
-  exception_errno_set = 1;
-  Exception_raise((const char *)message, source);
 }

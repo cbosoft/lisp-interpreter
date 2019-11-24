@@ -41,8 +41,7 @@ char *search(char *name)
     glob_t glob_result = {0};
     glob(possible_path_noext, 0, NULL, &glob_result);
 
-    assert_or_error(glob_result.gl_pathc < 2, "search", "Ambiguous result while searching for '%s'", name);
-    ERROR_CHECK;
+    ASSERT_OR_ERROR(glob_result.gl_pathc < 2, "Exception", "search", NULL, NULL, "Ambiguous result while searching for '%s'", name);
 
     if (glob_result.gl_pathc == 1) {
       // one single result
@@ -52,8 +51,7 @@ char *search(char *name)
 
     glob(possible_path, 0, NULL, &glob_result);
 
-    assert_or_error(glob_result.gl_pathc < 2, "search", "Ambiguous result while searching for '%s'", name);
-    ERROR_CHECK;
+    ASSERT_OR_ERROR(glob_result.gl_pathc < 2, "Exception", "search", NULL, NULL, "Ambiguous result while searching for '%s'", name);
 
     if (glob_result.gl_pathc == 1) {
       // one single result
@@ -63,6 +61,6 @@ char *search(char *name)
 
   }
 
-  assert_or_error(0, "search", "No module found with name '%s'", name);
+  Exception_raisef("NameError", "search", NULL, "No module found with name '%s'", name);
   return NULL;
 }

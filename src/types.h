@@ -20,6 +20,10 @@ struct LispObject {
 
   int type;
 
+  int line;
+  int col;
+  char *file;
+
   char *symbol_name;
   LispListElement *value_list;
 };

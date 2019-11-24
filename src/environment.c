@@ -79,7 +79,7 @@ void LispEnvironment_del_variable(LispEnvironment *env, char *name)
     }
   }
 
-  assert_or_error(0, "LispEnvironment_del_variable", "Variable with name or alias %s not found in environment.", name);
+  Exception_raisef("NameError", "LispEnvironment_del_variable", NULL, "Variable with name or alias %s not found in environment.", name);
 
 }
 
@@ -98,7 +98,7 @@ void LispEnvironment_add_variable_with_alias(LispEnvironment *env, char *name, c
     *var = calloc(1, sizeof(struct environment_var)), 
     *i = NULL;
 
-  // TODO error check on malloc
+  ASSERT_OR_ERROR(var != NULL, "MemoryError", "LispEnvironment_add_variable_with_alias", NULL,, "Error allocating memory");
 
   var->name = strdup(name);
 
@@ -125,13 +125,17 @@ void LispEnvironment_add_variable_with_alias(LispEnvironment *env, char *name, c
 
 
 
-// Given the name of a variable, get its value and return 0. If no value is found, return 1.
+// Given the name of a variable, get its value and return 0. If no value is found, return 1. 
+// This function does not raise error.
 int LispEnvironment_get(LispEnvironment *env, char *name, LispFunction **lfunc, LispBuiltin **bfunc, LispObject **lobj)
 {
   struct environment_var *i;
   
   if (env == NULL) // no environment, nothing to check.
-    return 1; // TODO should this be an error?
+    return 1; // don't change to error!
+
+  if (name == NULL) // no name, nothing to check.
+    return 1;
 
   debug_message("LOOKING FOR VARIABLE %s IN ENV\n", name);
 
@@ -172,12 +176,8 @@ int LispEnvironment_get(LispEnvironment *env, char *name, LispFunction **lfunc, 
 LispObject *LispEnvironment_get_variable(LispEnvironment *env, char *name)
 {
   LispObject *rv = NULL;
-  assert_or_error(!LispEnvironment_get(env, name, NULL, NULL, &rv), "LispEnvironment_get_variable", "Object with name \"%s\" not found.", name);
-  ERROR_CHECK;
-  
-  assert_or_error(rv != NULL, "LispEnvironment_get_variable", "Object \"%s\" has no value as variable.");
-  ERROR_CHECK;
-
+  ASSERT_OR_ERROR(!LispEnvironment_get(env, name, NULL, NULL, &rv), "NameError", "LispEnvironment_get_variable", NULL, NULL, "Object with name \"%s\" not found.", name);
+  ASSERT_OR_ERROR(rv != NULL, "TypeError", "LispEnvironment_get_variable", NULL, NULL, "Object \"%s\" has no value as variable.");
   return rv;
 }
 
@@ -189,12 +189,8 @@ LispObject *LispEnvironment_get_variable(LispEnvironment *env, char *name)
 LispFunction *LispEnvironment_get_lispfunction(LispEnvironment *env, char *name)
 {
   LispFunction *rv = NULL;
-  assert_or_error(!LispEnvironment_get(env, name, &rv, NULL, NULL), "LispEnvironment_get_lispfunction", "Object with name \"%s\" not found.", name);
-  ERROR_CHECK;
-  
-  assert_or_error(rv != NULL, "LispEnvironment_get_lispfunction", "Object \"%s\" has no value as function.");
-  ERROR_CHECK;
-
+  ASSERT_OR_ERROR(!LispEnvironment_get(env, name, &rv, NULL, NULL), "NameError", "LispEnvironment_get_lispfunction", NULL, NULL, "Object with name \"%s\" not found.", name);
+  ASSERT_OR_ERROR(rv != NULL, "TypeError", "LispEnvironment_get_lispfunction", NULL, NULL, "Object \"%s\" has no value as function.");
   return rv;
 }
 
@@ -206,11 +202,7 @@ LispFunction *LispEnvironment_get_lispfunction(LispEnvironment *env, char *name)
 LispBuiltin *LispEnvironment_get_builtinfunction(LispEnvironment *env, char *name)
 {
   LispBuiltin *rv = NULL;
-  assert_or_error(!LispEnvironment_get(env, name, NULL, &rv, NULL), "LispEnvironment_get_builtinfunction", "Object with name \"%s\" not found.", name);
-  ERROR_CHECK;
-  
-  assert_or_error(rv != NULL, "LispEnvironment_get_builtinfunction", "Object \"%s\" has no value as function.");
-  ERROR_CHECK;
-
+  ASSERT_OR_ERROR(!LispEnvironment_get(env, name, NULL, &rv, NULL), "NameError", "LispEnvironment_get_builtinfunction", NULL, NULL, "Object with name \"%s\" not found.", name);
+  ASSERT_OR_ERROR(rv != NULL, "TypeError", "LispEnvironment_get_builtinfunction", NULL, NULL, "Object \"%s\" has no value as function.");
   return rv;
 }

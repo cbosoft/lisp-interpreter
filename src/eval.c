@@ -31,22 +31,14 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
 
   debug_message("IN EVAL\n");
 
-  // TODO move builtins into environment
-  assert_or_error(env != NULL, "eval", "eval without env: symbols not available");
-  ERROR_CHECK;
-
-  // TODO garbage collect, or otherwise free up used memory.  Program structure,
-  // a series of lisp objects, should stay in memory and not be altered until
-  // finished with.  The variables and definitions in a (sub) environment should
-  // be free'd after use.
+  ASSERT_OR_ERROR(env != NULL, "Exception", "eval", NULL, NULL, "eval called without environment.");
 
   debug_message("EVAL %s\n", LispObject_type(root));
   switch (root->type) {
 
   case LISPOBJECT_SYMBOL:
     LispEnvironment_get(env, root->symbol_name, NULL, NULL, &var_obj);
-    assert_or_error(var_obj != NULL, "eval", "Symbol %s has not value as variable", root->symbol_name);
-    ERROR_CHECK;
+    ASSERT_OR_ERROR(var_obj != NULL, "TypeError", "eval", root, NULL, "Symbol %s has no value as variable", root->symbol_name);
     return var_obj;
 
   case LISPOBJECT_LIST:
@@ -83,20 +75,15 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
     list_args = list_elem->next;
     nargs = LispList_count(list_args);
 
-    assert_or_error(fn->type == LISPOBJECT_SYMBOL, "eval", "Cannot evaluate function: %s (%s)", LispObject_repr(fn), LispObject_type(fn));
+    ASSERT_OR_ERROR(fn->type == LISPOBJECT_SYMBOL, "Exception", "eval", NULL, NULL, "Cannot evaluate function: %s (%s)", LispObject_repr(fn), LispObject_type(fn));
     fname = fn->symbol_name;
-    ERROR_CHECK;
 
-    assert_or_error(!LispEnvironment_get(env, fname, &var_lfunc, &var_bfunc, &var_obj), "eval", "Object with name \"%s\" not found in environment.", fname);
-    ERROR_CHECK;
+    ASSERT_OR_ERROR(!LispEnvironment_get(env, fname, &var_lfunc, &var_bfunc, &var_obj), "NameError", "eval", fn, NULL, "Object with name \"%s\" not found in environment.", fname);
 
-
-    
     if (var_lfunc != NULL) {
       debug_message("SYMBOL %s IS LISP FUNCTION\n", fn->symbol_name);
       
-      assert_or_error(nargs == var_lfunc->number_required_args, "eval", "number of arguments does not match required (got %d, need %d).", nargs, var_lfunc->number_required_args);
-      ERROR_CHECK;
+      ASSERT_OR_ERROR(nargs == var_lfunc->number_required_args, "Exception", "eval", fn, NULL, "number of arguments does not match required (got %d, need %d).", nargs, var_lfunc->number_required_args);
       sub_env = LispEnvironment_new_environment(env);
 
       list_iter = list_args;
@@ -149,8 +136,8 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
       
     }
     else {
-      assert_or_error(0, "eval", "malformed function definition found: name with no function.");
-      ERROR_CHECK;
+      Exception_raise("SyntaxError", "eval", fn, "malformed function definition found: name with no function.");
+      return NULL;
     }
     
     break;
@@ -164,21 +151,19 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
 
 
 // eval_string
-LispObject *eval_string(char *s, LispEnvironment *env)
+LispObject *eval_string(char *s, LispEnvironment *env, char *source)
 {
 
-  char **tokens = NULL;
-  int n_tokens = 0;
-
-  tokenise(s, &tokens, &n_tokens);
+  LispToken *tokens = tokenise(s, source);
+  ERROR_CHECK;
 
   debug_message("TOKENS:\n");
-  for (int i = 0; i < n_tokens; i++) {
-    debug_message("| %s\n", tokens[i]);
+  for (LispToken *i = tokens; i != NULL; i = i->next) {
+    debug_message("| %s\n", i->string);
   }
 
   LispListElement 
-    *parsed_objects = parse(tokens, n_tokens), 
+    *parsed_objects = parse(tokens), 
     *obj_iter = NULL;
   ERROR_CHECK;
 
@@ -198,13 +183,12 @@ LispObject *eval_file(char *filename, LispEnvironment *env)
 {
   FILE *fp = fopen(filename, "r");
 
-  assert_or_error(fp != NULL, "eval_file", "Could not open file '%s'.", filename);
-  ERROR_CHECK;
+  ASSERT_OR_ERROR(fp != NULL, "IOError", "eval_file", NULL, NULL, "Could not open file '%s'.", filename);
 
   int rv = 0;
 
   rv = fseek(fp, 0, SEEK_END);
-  assert_or_error_with_errno(rv == 0, "eval_file", "Failed to get size of file.");
+  ASSERT_OR_ERROR_WITH_ERRNO(rv == 0, "IOError", "eval_file", NULL, NULL, "Failed to get size of file '%s'.", filename);
   if (Exception_check()) {
     fclose(fp);
     return NULL;
@@ -213,21 +197,21 @@ LispObject *eval_file(char *filename, LispEnvironment *env)
 
   long length = ftell(fp);
   rv = fseek(fp, 0, SEEK_SET);
-  assert_or_error_with_errno(rv == 0, "eval_file", "Failed to return to start of file.");
+  ASSERT_OR_ERROR_WITH_ERRNO(rv == 0, "IOError", "eval_file", NULL, NULL, "Failed to return to start of file '%s'.", filename);
   if (Exception_check()) {
     fclose(fp);
     return NULL;
   }
 
   char *contents = malloc((length+1)*sizeof(char));
-  assert_or_error_with_errno(contents != NULL, "eval_file", "Failed to allocate memory to hold file contents.");
+  ASSERT_OR_ERROR_WITH_ERRNO(rv == 0, "MemoryError", "eval_file", NULL, NULL, "Failed to allocate sufficient memory to hold file '%s' contents.", filename);
   if (Exception_check()) {
     fclose(fp);
     return NULL;
   }
 
   rv = fread(contents, 1, length, fp);
-  assert_or_error_with_errno(rv != -1, "eval_file", "Failed to read file into memory.");
+  ASSERT_OR_ERROR(fp != NULL, "IOError", "eval_file", NULL, NULL, "Failed to read file '%s' contents.", filename);
   if (Exception_check()) {
     fclose(fp);
     return NULL;
@@ -237,7 +221,7 @@ LispObject *eval_file(char *filename, LispEnvironment *env)
 
   fclose(fp);
 
-  LispObject *object_to_return = eval_string(contents, env);
+  LispObject *object_to_return = eval_string(contents, env, filename);
 
   return object_to_return;
 }

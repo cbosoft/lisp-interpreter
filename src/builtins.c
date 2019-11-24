@@ -23,167 +23,50 @@ extern LispObject nil;
 
 
 
-// Add two numbers
-LispObject *add(LispListElement *arg, LispEnvironment *env)
-{
-  debug_message("BUILTIN FUNCTION ADD\n");
-
-  TOUCH(env);
-
-  int nargs = LispList_count(arg);
-  assert_or_error(nargs == 2, "add", "Function takes 2 arguments (got %d).", nargs);
-  ERROR_CHECK;
-  
-  LispObject *l = arg->value;
-  LispObject *r = arg->next->value;
-
-  assert_or_error( 
-      (l->type == LISPOBJECT_INT || l->type == LISPOBJECT_FLOAT) && 
-      (r->type == LISPOBJECT_INT || r->type == LISPOBJECT_FLOAT),
-      "add", 
-      "Function expects numerical arguments, got %s and %s.", LispObject_type(l), LispObject_type(r));
-  ERROR_CHECK;
-
-
-  if (l->type == LISPOBJECT_FLOAT || r->type == LISPOBJECT_FLOAT) {
-    double l_operand = l->type == LISPOBJECT_FLOAT ? l->value_float : (double)l->value_int;
-    double r_operand = r->type == LISPOBJECT_FLOAT ? r->value_float : (double)r->value_int;
-    LispObject *rv = LispObject_new_float(l_operand + r_operand);
-    return rv;
-  }
-
-  int l_operand = l->type == LISPOBJECT_FLOAT ? (int)l->value_float : l->value_int;
-  int r_operand = r->type == LISPOBJECT_FLOAT ? (int)r->value_float : r->value_int;
-  LispObject *rv = LispObject_new_int(l_operand + r_operand);
+// Numerical operations on two objects
+#define NUMERICAL_OPERATION(FUNC, OPERATION)\
+  debug_message("BUILTIN FUNCTION ADD\n");\
+  TOUCH(env);\
+  int nargs = LispList_count(arg);\
+  ASSERT_OR_ERROR(nargs == 2, "ArgumentError", "add", NULL, NULL, "Function takes 2 arguments (got %d).", nargs);\
+  LispObject *l = arg->value;\
+  LispObject *r = arg->next->value;\
+  ASSERT_OR_ERROR( \
+      (l->type == LISPOBJECT_INT || l->type == LISPOBJECT_FLOAT) && \
+      (r->type == LISPOBJECT_INT || r->type == LISPOBJECT_FLOAT),\
+      "TypeError",\
+      FUNC, \
+      NULL, NULL, \
+      "Function expects numerical arguments, got %s and %s.", LispObject_type(l), LispObject_type(r));\
+  if (l->type == LISPOBJECT_FLOAT || r->type == LISPOBJECT_FLOAT) {\
+    double l_operand = l->type == LISPOBJECT_FLOAT ? l->value_float : (double)l->value_int;\
+    double r_operand = r->type == LISPOBJECT_FLOAT ? r->value_float : (double)r->value_int;\
+    LispObject *rv = LispObject_new_float(l_operand OPERATION r_operand);\
+    return rv;\
+  }\
+  int l_operand = l->type == LISPOBJECT_FLOAT ? (int)l->value_float : l->value_int;\
+  int r_operand = r->type == LISPOBJECT_FLOAT ? (int)r->value_float : r->value_int;\
+  LispObject *rv = LispObject_new_int(l_operand OPERATION r_operand);\
   return rv;
-}
+LispObject *add(LispListElement *arg, LispEnvironment *env) { NUMERICAL_OPERATION("add", +) }
+LispObject *subtract(LispListElement *arg, LispEnvironment *env) { NUMERICAL_OPERATION("subtract", +) }
+LispObject *multiply(LispListElement *arg, LispEnvironment *env) { NUMERICAL_OPERATION("multiply", +) }
+LispObject *divide(LispListElement *arg, LispEnvironment *env) { NUMERICAL_OPERATION("divide", +) }
 LispBuiltin add_obj = {&add, LISPBUILTIN_GREEDY};
-
-
-
-
-// Subtract a number from another
-LispObject *subtract(LispListElement *arg, LispEnvironment *env)
-{
-  debug_message("BUILTIN FUNCTION SUBTRACT\n");
-
-  TOUCH(env);
-
-  int nargs = LispList_count(arg);
-  assert_or_error(nargs == 2, "subtract", "Function takes 2 arguments (got %d).", nargs);
-  ERROR_CHECK;
-  
-  LispObject *l = arg->value;
-  LispObject *r = arg->next->value;
-
-  assert_or_error( 
-      (l->type == LISPOBJECT_INT || l->type == LISPOBJECT_FLOAT) && 
-      (r->type == LISPOBJECT_INT || r->type == LISPOBJECT_FLOAT),
-      "subtract", 
-      "Function expects numerical arguments, got %s and %s.", LispObject_type(l), LispObject_type(r));
-  ERROR_CHECK;
-
-  if (l->type == LISPOBJECT_FLOAT || r->type == LISPOBJECT_FLOAT) {
-    double l_operand = l->type == LISPOBJECT_FLOAT ? l->value_float : (double)l->value_int;
-    double r_operand = r->type == LISPOBJECT_FLOAT ? r->value_float : (double)r->value_int;
-    LispObject *rv = LispObject_new_float(l_operand - r_operand);
-    return rv;
-  }
-
-  int l_operand = l->type == LISPOBJECT_FLOAT ? (int)l->value_float : l->value_int;
-  int r_operand = r->type == LISPOBJECT_FLOAT ? (int)r->value_float : r->value_int;
-  LispObject *rv = LispObject_new_int(l_operand - r_operand);
-  return rv;
-}
 LispBuiltin subtract_obj = {&subtract, LISPBUILTIN_GREEDY};
-
-
-
-
-// 
-LispObject *multiply(LispListElement *arg, LispEnvironment *env)
-{
-  debug_message("BUILTIN FUNCTION MULTIPLY\n");
-
-  TOUCH(env);
-
-  int nargs = LispList_count(arg);
-  assert_or_error(nargs == 2, "multiply", "Function takes 2 arguments (got %d).", nargs);
-  ERROR_CHECK;
-  
-  LispObject *l = arg->value;
-  LispObject *r = arg->next->value;
-
-  assert_or_error( 
-      (l->type == LISPOBJECT_INT || l->type == LISPOBJECT_FLOAT) && 
-      (r->type == LISPOBJECT_INT || r->type == LISPOBJECT_FLOAT),
-      "multiply", 
-      "Function expects numerical arguments, got %s and %s.", LispObject_type(l), LispObject_type(r));
-  ERROR_CHECK;
-
-  if (l->type == LISPOBJECT_FLOAT || r->type == LISPOBJECT_FLOAT) {
-    double l_operand = l->type == LISPOBJECT_FLOAT ? l->value_float : (double)l->value_int;
-    double r_operand = r->type == LISPOBJECT_FLOAT ? r->value_float : (double)r->value_int;
-    LispObject *rv = LispObject_new_float(l_operand * r_operand);
-    return rv;
-  }
-
-  int l_operand = l->type == LISPOBJECT_FLOAT ? (int)l->value_float : l->value_int;
-  int r_operand = r->type == LISPOBJECT_FLOAT ? (int)r->value_float : r->value_int;
-  LispObject *rv = LispObject_new_int(l_operand * r_operand);
-  return rv;
-}
 LispBuiltin multiply_obj = {&multiply, LISPBUILTIN_GREEDY};
-
-
-
-// 
-LispObject *divide(LispListElement *arg, LispEnvironment *env)
-{
-  debug_message("BUILTIN FUNCTION DIVIDE\n");
-
-  TOUCH(env);
-
-  int nargs = LispList_count(arg);
-  assert_or_error(nargs == 2, "divide", "Function takes 2 arguments (got %d).", nargs);
-  ERROR_CHECK;
-  
-  LispObject *l = arg->value;
-  LispObject *r = arg->next->value;
-
-  assert_or_error( 
-      (l->type == LISPOBJECT_INT || l->type == LISPOBJECT_FLOAT) && 
-      (r->type == LISPOBJECT_INT || r->type == LISPOBJECT_FLOAT),
-      "divide", 
-      "Function expects numerical arguments, got %s and %s.", LispObject_type(l), LispObject_type(r));
-  ERROR_CHECK;
-
-  if (l->type == LISPOBJECT_FLOAT || r->type == LISPOBJECT_FLOAT) {
-    double l_operand = l->type == LISPOBJECT_FLOAT ? l->value_float : (double)l->value_int;
-    double r_operand = r->type == LISPOBJECT_FLOAT ? r->value_float : (double)r->value_int;
-    LispObject *rv = LispObject_new_float(l_operand / r_operand);
-    return rv;
-  }
-
-  int l_operand = l->type == LISPOBJECT_FLOAT ? (int)l->value_float : l->value_int;
-  int r_operand = r->type == LISPOBJECT_FLOAT ? (int)r->value_float : r->value_int;
-  LispObject *rv = LispObject_new_int(l_operand / r_operand);
-  return rv;
-}
 LispBuiltin divide_obj = {&divide, LISPBUILTIN_GREEDY};
 
 
 
 
 // Returns args as output without change
-// TODO remove this as is implemented at lower level
 LispObject *quote(LispListElement *arg, LispEnvironment *env)
 {
   debug_message("BUILTIN FUNCTION QUOTE\n");
 
   int nargs = LispList_count(arg);
-  assert_or_error(nargs == 1, "quote", "Function takes 1 argument (got %d).", nargs);
-  ERROR_CHECK;
+  ASSERT_OR_ERROR(nargs == 1, "ArgumentError", "quote", NULL, NULL, "Function takes 1 argument (got %d).", nargs);
 
   TOUCH(env);
   return arg->value;
@@ -204,13 +87,11 @@ LispObject *define(LispListElement *arg, LispEnvironment *env)
   debug_message("BUILTIN FUNCTION DEFINE\n");
 
   int nargs = LispList_count(arg);
-  assert_or_error(nargs == 3, "define", "Function takes 3 arguments: name, arglist, body (got %d).", nargs);
-  ERROR_CHECK;
+  ASSERT_OR_ERROR(nargs == 3, "ArgumentError", "define", NULL, NULL, "Function takes 3 arguments: name, arglist, body (got %d).", nargs);
   debug_message("AFTER NARGS CHECK\n");
   
   LispObject *name = arg->value;
-  assert_or_error(name->type == LISPOBJECT_SYMBOL, "define", "Argument has wrong type: name should be a Symbol, not %s", LispObject_type(name));
-  ERROR_CHECK;
+  ASSERT_OR_ERROR(name->type == LISPOBJECT_SYMBOL, "TypeError", "define", name, NULL, "Argument has wrong type: name should be a Symbol, not %s", LispObject_type(name));
   debug_message("AFTER NAME TYPE CHECK\n");
 
   if (!LispEnvironment_get(env, name->symbol_name, NULL, NULL, NULL)) {
@@ -218,15 +99,13 @@ LispObject *define(LispListElement *arg, LispEnvironment *env)
   }
   Exception_reset();
 
-  assert_or_error(arg->next->value->type == LISPOBJECT_LIST, "define", "Argument has wrong type: arglist should be a List, not %s", LispObject_type(arg->next->value));
-  ERROR_CHECK;
-  debug_message("AFTER ARGLIST CHECK\n");
   LispObject *arglist = arg->next->value;
+  ASSERT_OR_ERROR(arglist->type == LISPOBJECT_LIST, "TypeError", "define", arglist, NULL, "Argument has wrong type: arglist should be a List, not %s", LispObject_type(arglist));
+  debug_message("AFTER ARGLIST CHECK\n");
 
   LispListElement *i;
   for (i = arglist->value_list; i->value != NULL; i = i->next) {
-    assert_or_error(i->value->type == LISPOBJECT_SYMBOL, "define", "Argument has wrong type: arglist items should be Symbols, not %s", LispObject_type(i->value));
-    ERROR_CHECK;
+    ASSERT_OR_ERROR(i->value->type == LISPOBJECT_SYMBOL, "TypeError", "define", i->value, NULL, "Argument has wrong type: arglist items should be Symbols, not %s", LispObject_type(i->value));
   }
   debug_message("AFTER ARGLIST_ITEMS CHECK\n");
 
@@ -257,12 +136,11 @@ LispObject *defvar(LispListElement *arg, LispEnvironment *env)
   debug_message("BUILTIN FUNCTION DEFVAR\n");
 
   int nargs = LispList_count(arg);
-  assert_or_error(nargs == 2, "defvar", "Function takes 2 arguments: name, value (got %d).", nargs);
-  ERROR_CHECK;
+  ASSERT_OR_ERROR(nargs == 2, "ArgumentError", "defvar", NULL, NULL,  "Function takes 2 arguments: name, value (got %d).", nargs);
   debug_message("AFTER NARGS CHECK\n");
   
   LispObject *name = arg->value;
-  assert_or_error(name->type == LISPOBJECT_SYMBOL, "defvar", "Argument has wrong type: name should be a Symbol, not %s", LispObject_type(name));
+  ASSERT_OR_ERROR(name->type == LISPOBJECT_SYMBOL, "TypeError", "defvar", name, NULL, "Argument has wrong type: name should be a Symbol, not %s", LispObject_type(name));
   ERROR_CHECK;
   debug_message("AFTER NAME TYPE CHECK\n");
 
@@ -292,13 +170,11 @@ LispObject *count(LispListElement *arg, LispEnvironment *env)
 
   TOUCH(env);
   int nargs = LispList_count(arg);
-  assert_or_error(nargs == 1, "define", "Function takes 1 arguments: list (got %d).", nargs);
-  ERROR_CHECK;
+  ASSERT_OR_ERROR(nargs == 1, "ArgumentError", "define", NULL, NULL, "Function takes 1 arguments: list (got %d).", nargs);
   debug_message("AFTER NARGS CHECK\n");
   
   LispObject *list = arg->value;
-  assert_or_error(list->type == LISPOBJECT_LIST, "define", "Argument has wrong type: list should be a List, not %s", LispObject_type(list));
-  ERROR_CHECK;
+  ASSERT_OR_ERROR(list->type == LISPOBJECT_LIST, "TypeError", "define", list, NULL, "Argument has wrong type: list should be a List, not %s", LispObject_type(list));
   debug_message("AFTER LIST CHECK\n");
 
   int nelems = LispList_count(list->value_list); // obj->list_child is the real start of the list
@@ -317,12 +193,12 @@ LispObject *lisp_if(LispListElement *arg, LispEnvironment *env)
   debug_message("BUILTIN FUNCTION lisp_if");
 
   int nargs = LispList_count(arg);
-  assert_or_error(nargs == 3, "lisp_if", "Function takes 3 arguments: condition, result-if-true, result-else (got %d).", nargs);
-  ERROR_CHECK;
+  ASSERT_OR_ERROR(nargs == 3, "ArgumentError", "lisp_if", NULL, NULL, "Function takes 3 arguments: condition, result-if-true, result-else (got %d).", nargs);
   debug_message("AFTER NARGS CHECK\n");
   
   LispObject *condition = eval(arg->value, env);
   ERROR_CHECK;
+
   int condition_value = LispObject_is_truthy(condition);
   ERROR_CHECK;
   debug_message("AFTER CONDITION EVAL\n");
@@ -352,8 +228,7 @@ LispBuiltin lisp_if_obj = {&lisp_if, LISPBUILTIN_LAZY};
   debug_message("BUILTIN FUNCTION lisp_comparison");\
   TOUCH(env);\
   int nargs = LispList_count(arg);\
-  assert_or_error(nargs == 2, "lisp_comparison", "Function takes 2 arguments: left, right (got %d).", nargs);\
-  ERROR_CHECK;\
+  ASSERT_OR_ERROR(nargs == 2, "ArgumentError", "lisp_comparison", NULL, NULL, "Function takes 2 arguments: left, right (got %d).", nargs);\
   LispObject \
     *left = arg->value, \
     *right = arg->next->value;\
@@ -383,18 +258,15 @@ LispObject *pop(LispListElement *arg, LispEnvironment *env)
   TOUCH(env);
 
   int nargs = LispList_count(arg);
-  assert_or_error(nargs == 1, "pop", "Function takes 1 arguments: list (got %d).", nargs);
-  ERROR_CHECK;
+  ASSERT_OR_ERROR(nargs == 1, "ArgumentError", "pop", NULL, NULL, "Function takes 1 arguments: list (got %d).", nargs);
   debug_message("AFTER NARGS CHECK\n");
 
   LispObject *list = arg->value;
-  assert_or_error(list->type == LISPOBJECT_LIST, "pop", "list must be a List, not %s", LispObject_type(list));
-  ERROR_CHECK;
+  ASSERT_OR_ERROR(list->type == LISPOBJECT_LIST, "TypeError", "pop", list, NULL, "list must be a List, not %s", LispObject_type(list));
   debug_message("AFTER TYPE CHECK\n");
 
   int list_len = LispList_count(list->value_list);
-  assert_or_error(list_len > 0, "pop", "pop called on a list with no elements.");
-  ERROR_CHECK;
+  ASSERT_OR_ERROR(list_len > 0, "ArgumentError", "pop", list, NULL, "pop called on a list with no elements.");
   debug_message("AFTER LIST LEN CHECK\n");
 
   return list->value_list->value;
@@ -412,18 +284,15 @@ LispObject *rest(LispListElement *arg, LispEnvironment *env)
   TOUCH(env);
 
   int nargs = LispList_count(arg);
-  assert_or_error(nargs == 1, "rest", "Function takes 1 arguments: list (got %d).", nargs);
-  ERROR_CHECK;
+  ASSERT_OR_ERROR(nargs == 1, "ArgumentError", "rest", NULL, NULL, "Function takes 1 arguments: list (got %d).", nargs);
   debug_message("AFTER NARGS CHECK\n");
 
   LispObject *list = arg->value;
-  assert_or_error(list->type == LISPOBJECT_LIST, "rest", "list must be a List, not %s", LispObject_type(list));
-  ERROR_CHECK;
+  ASSERT_OR_ERROR(list->type == LISPOBJECT_LIST, "TypeError", "rest", list, NULL, "list must be a List, not %s", LispObject_type(list));
   debug_message("AFTER TYPE CHECK\n");
 
   int list_len = LispList_count(list->value_list);
-  assert_or_error(list_len > 0, "rest", "rest called on a list with no elements.");
-  ERROR_CHECK;
+  ASSERT_OR_ERROR(list_len > 0, "ArgumentError", "rest", list, NULL, "rest called on a list with no elements.");
   debug_message("AFTER LIST LEN CHECK\n");
 
   LispObject *rest = calloc(1, sizeof(LispObject));
@@ -445,8 +314,7 @@ LispObject *print(LispListElement *arg, LispEnvironment *env)
   TOUCH(env);
 
   int nargs = LispList_count(arg);
-  assert_or_error(nargs == 1, "print", "Function takes 1 arguments: (got %d).", nargs);
-  ERROR_CHECK;
+  ASSERT_OR_ERROR(nargs == 1, "ArgumentError", "print", NULL, NULL, "Function takes 1 arguments: (got %d).", nargs);
   debug_message("AFTER NARGS CHECK\n");
 
   LispObject *o = arg->value;
@@ -466,13 +334,11 @@ LispObject *load_file(LispListElement *arg, LispEnvironment *env)
   debug_message("BUILTIN FUNCTION LOAD-FILE");
 
   int nargs = LispList_count(arg);
-  assert_or_error(nargs == 1, "load-file", "Function takes 1 arguments: (got %d).", nargs);
-  ERROR_CHECK;
+  ASSERT_OR_ERROR(nargs == 1, "ArgumentError", "load-file", NULL, NULL, "Function takes 1 arguments: (got %d).", nargs);
   debug_message("AFTER NARGS CHECK\n");
 
   LispObject *filename_obj = arg->value;
-  assert_or_error(filename_obj->type == LISPOBJECT_STRING, "load-file", "filename must be a String, not %s", LispObject_type(filename_obj));
-  ERROR_CHECK;
+  ASSERT_OR_ERROR(filename_obj->type == LISPOBJECT_STRING, "TypeError", "load-file", filename_obj, NULL, "filename must be a String, not %s", LispObject_type(filename_obj));
   debug_message("AFTER TYPE CHECK\n");
 
   eval_file(filename_obj->value_string, env);
@@ -485,23 +351,21 @@ LispBuiltin load_file_obj = {&load_file, LISPBUILTIN_GREEDY};
 
 
 
-// exit (n): exit with error code $n.
+// (exit rv): exit with error code $rv.
 LispObject *lisp_exit(LispListElement *arg, LispEnvironment *env)
 {
   debug_message("BUILTIN FUNCTION EXIT");
 
   TOUCH(env);
   int nargs = LispList_count(arg);
-  assert_or_error(nargs < 2, "exit", "Function takes at most 1 argument: (got %d).", nargs);
-  ERROR_CHECK;
+  ASSERT_OR_ERROR(nargs < 2, "ArgumentError", "exit", NULL, NULL, "Function takes at most 1 argument: (got %d).", nargs);
   debug_message("AFTER NARGS CHECK\n");
 
   int rv = 0;
 
   if (nargs) {
     LispObject *rv_obj = arg->value;
-    assert_or_error(rv_obj->type == LISPOBJECT_INT, "exit", "filename must be an Integer, not %s", LispObject_type(rv_obj));
-    ERROR_CHECK;
+    ASSERT_OR_ERROR(rv_obj->type == LISPOBJECT_INT, "TypeError", "exit", rv_obj, NULL, "rv must be an Integer, not %s", LispObject_type(rv_obj));
     debug_message("AFTER TYPE CHECK\n");
     rv = rv_obj->value_int;
   }
@@ -524,22 +388,18 @@ LispObject *read_file(LispListElement *arg, LispEnvironment *env)
 
   TOUCH(env);
   int nargs = LispList_count(arg);
-  assert_or_error(nargs == 1, "read-file", "Function takes 1 argument (path): (got %d).", nargs);
-  ERROR_CHECK;
+  ASSERT_OR_ERROR(nargs == 1, "ArgumentError", "read-file", NULL, NULL, "Function takes 1 argument (path): (got %d).", nargs);
   debug_message("AFTER NARGS CHECK\n");
 
   LispObject *pathobj = arg->value;
-  assert_or_error(pathobj->type == LISPOBJECT_STRING, "read-file", "path argument must be a String, not %s", LispObject_type(pathobj));
-  ERROR_CHECK;
+  ASSERT_OR_ERROR(pathobj->type == LISPOBJECT_STRING, "TypeError", "read-file", pathobj, NULL, "path argument must be a String, not %s", LispObject_type(pathobj));
   debug_message("AFTER PATH TYPE CHECK\n");
 
   FILE *fp = fopen(pathobj->value_string, "r");
-  assert_or_error_with_errno(fp != NULL, "read-file", "Could not open file '%s'", pathobj->value_string);
-  ERROR_CHECK;
-
+  ASSERT_OR_ERROR_WITH_ERRNO(fp != NULL, "IOError", "read-file", NULL, NULL, "Could not open file '%s'", pathobj->value_string);
 
   int rv = fseek(fp, 0, SEEK_END);
-  assert_or_error_with_errno(rv == 0, "read-file", "Failed to get size of file.");
+  ASSERT_OR_RAISE_WITH_ERRNO(rv == 0, "IOError", "read-file", NULL, "Failed to get size of file.");
   if (Exception_check()) {
     fclose(fp);
     return NULL;
@@ -547,21 +407,21 @@ LispObject *read_file(LispListElement *arg, LispEnvironment *env)
   long length = ftell(fp);
 
   rv = fseek(fp, 0, SEEK_SET);
-  assert_or_error_with_errno(rv == 0, "read-file", "Failed to return to start of file.");
+  ASSERT_OR_RAISE_WITH_ERRNO(rv == 0, "IOError", "read-file", NULL, "Failed to return to start of file.");
   if (Exception_check()) {
     fclose(fp);
     return NULL;
   }
 
   char *contents = malloc((length+1)*sizeof(char));
-  assert_or_error_with_errno(contents != NULL, "read-file", "Failed to allocate memory to hold file contents.");
+  ASSERT_OR_RAISE_WITH_ERRNO(contents != NULL, "IOError", "read-file", NULL, "Failed to allocate memory to hold file contents.");
   if (Exception_check()) {
     fclose(fp);
     return NULL;
   }
 
   rv = fread(contents, 1, length, fp);
-  assert_or_error_with_errno(rv != -1, "read-file", "Failed to read file into memory.");
+  ASSERT_OR_RAISE_WITH_ERRNO(rv != -1, "IOError", "read-file", NULL, "Failed to read file into memory.");
   if (Exception_check()) {
     fclose(fp);
     return NULL;
@@ -586,28 +446,28 @@ LispObject *write_file(LispListElement *arg, LispEnvironment *env)
 
   TOUCH(env);
   int nargs = LispList_count(arg);
-  assert_or_error(nargs == 2, "write-file", "Function takes 2 arguments (path content): (got %d).", nargs);
+  ASSERT_OR_ERROR(nargs == 2, "ArgumentError", "write-file", NULL, NULL, "Function takes 2 arguments (path content): (got %d).", nargs);
   ERROR_CHECK;
   debug_message("AFTER NARGS CHECK\n");
 
   LispObject *pathobj = arg->value;
-  assert_or_error(pathobj->type == LISPOBJECT_STRING, "write-file", "path argument must be a String, not %s", LispObject_type(pathobj));
+  ASSERT_OR_ERROR(pathobj->type == LISPOBJECT_STRING, "TypeError", "write-file", pathobj, NULL, "path argument must be a String, not %s", LispObject_type(pathobj));
   ERROR_CHECK;
   debug_message("AFTER PATH TYPE CHECK\n");
 
   LispObject *contentobj = arg->next->value;
-  assert_or_error(contentobj->type == LISPOBJECT_STRING, "write-file", "content argument must be a String, not %s", LispObject_type(contentobj));
+  ASSERT_OR_ERROR(contentobj->type == LISPOBJECT_STRING, "TypeError", "write-file", contentobj, NULL, "content argument must be a String, not %s", LispObject_type(contentobj));
   ERROR_CHECK;
   debug_message("AFTER CONTENT TYPE CHECK\n");
 
   FILE *fp = fopen(pathobj->value_string, "w");
-  assert_or_error_with_errno(fp != NULL, "write-file", "Could not open file '%s'", pathobj->value_string);
-  ERROR_CHECK;
+  ASSERT_OR_ERROR_WITH_ERRNO(fp != NULL, "IOError", "write-file", NULL, NULL, "Could not open file '%s' for writing.", pathobj->value_string);
 
   int rv = fprintf(fp, "%s", contentobj->value_string);
-  assert_or_error(rv > 0, "write-file", "Could not write file '%s'", pathobj->value_string);
-  ERROR_CHECK;
+  ASSERT_OR_RAISE(rv > 0, "IOError", "write-file", NULL, "Could not write file '%s'", pathobj->value_string);
   fclose(fp);
+
+  ERROR_CHECK;
 
   return LispObject_new_string(contentobj->value_string);
 }
@@ -623,28 +483,28 @@ LispObject *append_file(LispListElement *arg, LispEnvironment *env)
 
   TOUCH(env);
   int nargs = LispList_count(arg);
-  assert_or_error(nargs == 2, "write-file", "Function takes 2 arguments (path content): (got %d).", nargs);
+  ASSERT_OR_ERROR(nargs == 2, "ArgumentError", "write-file", NULL, NULL, "Function takes 2 arguments (path content): (got %d).", nargs);
   ERROR_CHECK;
   debug_message("AFTER NARGS CHECK\n");
 
   LispObject *pathobj = arg->value;
-  assert_or_error(pathobj->type == LISPOBJECT_STRING, "write-file", "path argument must be a String, not %s", LispObject_type(pathobj));
+  ASSERT_OR_ERROR(pathobj->type == LISPOBJECT_STRING, "TypeError", "write-file", pathobj, NULL, "path argument must be a String, not %s", LispObject_type(pathobj));
   ERROR_CHECK;
   debug_message("AFTER PATH TYPE CHECK\n");
 
   LispObject *contentobj = arg->next->value;
-  assert_or_error(contentobj->type == LISPOBJECT_STRING, "write-file", "content argument must be a String, not %s", LispObject_type(contentobj));
+  ASSERT_OR_ERROR(contentobj->type == LISPOBJECT_STRING, "TypeError", "write-file", contentobj, NULL, "content argument must be a String, not %s", LispObject_type(contentobj));
   ERROR_CHECK;
   debug_message("AFTER CONTENT TYPE CHECK\n");
 
   FILE *fp = fopen(pathobj->value_string, "a");
-  assert_or_error_with_errno(fp != NULL, "write-file", "Could not open file '%s'", pathobj->value_string);
-  ERROR_CHECK;
+  ASSERT_OR_ERROR_WITH_ERRNO(fp != NULL, "IOError", "write-file", NULL, NULL, "Could not open file '%s' for append.", pathobj->value_string);
 
   int rv = fprintf(fp, "%s", contentobj->value_string);
-  assert_or_error(rv > 0, "write-file", "Could not write file '%s'", pathobj->value_string);
-  ERROR_CHECK;
+  ASSERT_OR_RAISE(rv > 0, "IOError", "write-file", NULL, "Could not write file '%s'", pathobj->value_string);
   fclose(fp);
+
+  ERROR_CHECK;
 
   return LispObject_new_string(contentobj->value_string);
 }
@@ -660,13 +520,11 @@ LispObject *import_module(LispListElement *arg, LispEnvironment *env)
 
   TOUCH(env);
   int nargs = LispList_count(arg);
-  assert_or_error(nargs == 1, "import-module", "Function takes 1 arguments (name): (got %d).", nargs);
-  ERROR_CHECK;
+  ASSERT_OR_ERROR(nargs == 1, "ArgumentError", "import-module", NULL, NULL, "Function takes 1 arguments (name): (got %d).", nargs);
   debug_message("AFTER NARGS CHECK\n");
 
   LispObject *name = arg->value;
-  assert_or_error(name->type == LISPOBJECT_SYMBOL, "import-module", "name to import should be a Symbol, not %s", LispObject_type(name));
-  ERROR_CHECK;
+  ASSERT_OR_ERROR(name->type == LISPOBJECT_SYMBOL, "TypeError", "import-module", name, NULL, "name to import should be a Symbol, not %s", LispObject_type(name));
   debug_message("AFTER NAME TYPE CHECK\n");
 
   char *path = search(name->symbol_name);
@@ -675,6 +533,7 @@ LispObject *import_module(LispListElement *arg, LispEnvironment *env)
   debug_message("SEARCH RETURNED PATH %s\n", path);
 
   eval_file(path, env);
+  ERROR_CHECK;
 
   return &nil;
 }
@@ -683,23 +542,22 @@ LispBuiltin import_module_obj = {&import_module, LISPBUILTIN_LAZY};
 
 
 
-// (import module)
+// (eval-file path)
 LispObject *lisp_eval_file(LispListElement *arg, LispEnvironment *env)
 {
   debug_message("BUILTIN FUNCTION EVAL_FILE");
 
   TOUCH(env);
   int nargs = LispList_count(arg);
-  assert_or_error(nargs == 1, "eval-file", "Function takes 1 arguments (path): (got %d).", nargs);
-  ERROR_CHECK;
+  ASSERT_OR_ERROR(nargs == 1, "ArgumentError", "eval-file", NULL, NULL, "Function takes 1 arguments (path): (got %d).", nargs);
   debug_message("AFTER NARGS CHECK\n");
 
   LispObject *path = arg->value;
-  assert_or_error(path->type == LISPOBJECT_STRING, "eval-file", "path should be a String, not %s", LispObject_type(path));
-  ERROR_CHECK;
+  ASSERT_OR_ERROR(path->type == LISPOBJECT_STRING, "TypeError", "eval-file", path, NULL, "path should be a String, not %s", LispObject_type(path));
   debug_message("AFTER PATH TYPE CHECK\n");
 
   eval_file(path->value_string, env);
+  ERROR_CHECK;
 
   return &nil;
 }

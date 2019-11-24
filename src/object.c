@@ -19,7 +19,7 @@ LispObject *LispObject_new_nil()
 {
   LispObject *rv = calloc(1, sizeof(LispObject));
 
-  assert_or_error(rv != NULL, "LispObject_new", "Error allocating memory for new object");
+  ASSERT_OR_ERROR(rv != NULL, "MemoryError", "LispObject_new", NULL, NULL, "Error allocating memory for new object");
 
   return rv;
 }
@@ -208,8 +208,7 @@ void LispObject_assign_value(LispObject *dest, LispObject *source)
 // Get string representation of type of object $o
 char *LispObject_type(LispObject *o)
 {
-  assert_or_error(o != NULL, "LispObject_type", "Can't get type of NULL object");
-  ERROR_CHECK;
+  ASSERT_OR_ERROR(o != NULL, "NullException", "LispObject_type", NULL, NULL, "Object is null.");
 
   switch (o->type)
   {
@@ -306,7 +305,7 @@ int LispObject_is_truthy(LispObject *o)
       break;
 
     case LISPOBJECT_SYMBOL:
-      Exception_raise("LispObject_is_truthy", "Cannot discern \"truthy-ness\" of symbol");
+      Exception_raise("Exception", "LispObject_is_truthy", o, "\"truthy-ness\" of symbol is ambiguous.");
       break;
   }
 
@@ -321,11 +320,12 @@ int LispObject_is_truthy(LispObject *o)
 // five can be quickly defined. TODO: compare non-numerical values. Compare 
 // lists? Compare strings?
 #define NUMERICAL_COMPARE(L,R,OPERATOR) \
-  assert_or_error(\
-      (left->type == LISPOBJECT_FLOAT || left->type == LISPOBJECT_INT) &&\
+  ASSERT_OR_ERROR(\
+      (left->type == LISPOBJECT_FLOAT || left->type == LISPOBJECT_INT),\
+      "TypeError", "LispObject_numerical_compare", left, -1, "Left operand: comparison only defined for numbers (Int, Float): got %s.", LispObject_type(left));\
+  ASSERT_OR_ERROR(\
       (right->type == LISPOBJECT_FLOAT || right->type == LISPOBJECT_INT),\
-      "LispObject_numerical_compare", "numerical comparison not defined for non-numerical values.");\
-  if (Exception_check()) return -1;\
+      "TypeError", "LispObject_numerical_compare", right, -1, "Right operand: comparison only define for numbers (Int, Float): got %s.", LispObject_type(right));\
   if (L->type == R->type) {\
     if (L->type == LISPOBJECT_INT) {\
       return L->value_int OPERATOR R->value_int;\
@@ -350,11 +350,11 @@ int LispObject_lt(LispObject *left, LispObject *right){ NUMERICAL_COMPARE(left, 
 int LispObject_le(LispObject *left, LispObject *right){ NUMERICAL_COMPARE(left, right, <=); }
 int LispObject_eq(LispObject *left, LispObject *right)
 {
-  assert_or_error( 
+  ASSERT_OR_ERROR( 
       (left->type == right->type) ||
       ((left->type == LISPOBJECT_FLOAT) && (right->type == LISPOBJECT_INT)) ||
       ((right->type == LISPOBJECT_FLOAT) && (left->type == LISPOBJECT_INT)),
-      "LispObject_equal", "comparison operands must both be the same type, or at least both numbers.");
+      "TypeError", "LispObject_equal", NULL, -1, "comparison operands must both be the same type, or at least both numbers.");
 
   switch (left->type) {
     case LISPOBJECT_BOOL:

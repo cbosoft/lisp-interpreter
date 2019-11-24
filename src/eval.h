@@ -4,4 +4,4 @@
 
 LispObject *eval(LispObject *ast, LispEnvironment *env);
 LispObject *eval_file(char *filename, LispEnvironment *env);
-LispObject *eval_string(char *s, LispEnvironment *env);
+LispObject *eval_string(char *s, LispEnvironment *env, char *source);

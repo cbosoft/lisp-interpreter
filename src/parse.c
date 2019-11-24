@@ -22,39 +22,44 @@ int pcre_error_offset = 0;
 void parser_init()
 {
   int_regexp = pcre_compile("^-?\\d+$", 0, &pcre_error, &pcre_error_offset, NULL);
-  assert_or_error(int_regexp != NULL, "parser_init", "Regex (int) compilation failed: %s", pcre_error);
+  ASSERT_OR_ERROR(int_regexp != NULL, "RegexError", "parser_init", NULL,, "Regex (int) compilation failed: %s", pcre_error);
   if (Exception_check()) return;
 
   float_regexp = pcre_compile("^-?\\d+(\\.|e\\+|e-|e)\\d+$", 0, &pcre_error, &pcre_error_offset, NULL);
-  assert_or_error(float_regexp != NULL, "parser_init", "Regex (float) compilation failed: %s", pcre_error);
+  ASSERT_OR_ERROR(float_regexp != NULL, "RegexError", "parser_init", NULL,, "Regex (float) compilation failed: %s", pcre_error);
   if (Exception_check()) return;
 
   string_regexp = pcre_compile("^\".*\"$|^'.*'$", 0, &pcre_error, &pcre_error_offset, NULL);
-  assert_or_error(float_regexp != NULL, "parser_init", "Regex (string) compilation failed: %s", pcre_error);
+  ASSERT_OR_ERROR(float_regexp != NULL, "RegexError", "parser_init", NULL,, "Regex (string) compilation failed: %s", pcre_error);
 }
 
 
 
 
 // Create new object, guessing type
-LispObject *new_object_guess_type(char *s) {
+LispObject *new_object_guess_type(LispToken *t) {
+  char *s = t->string;
   int len = strlen(s);
+  LispObject *rv = NULL;
 
   debug_message("GUESSING %s\n", s);
   
   if (strcmp(s, "(") == 0) {
     debug_message("GUESSING %s is LIST\n", s);
-    return LispObject_new_list();
+    rv = LispObject_new_list();
+    goto end;
   }
 
   if (strcmp(s, "false") == 0) {
     debug_message("GUESSING %s is BOOL\n", s);
-    return LispObject_new_bool(0);
+    rv = LispObject_new_bool(0);
+    goto end;
   }
 
   if (strcmp(s, "true") == 0) {
     debug_message("GUESSING %s is BOOL\n", s);
-    return LispObject_new_bool(1);
+    rv = LispObject_new_bool(1);
+    goto end;
   }
 
   // PCRE FTW
@@ -63,31 +68,41 @@ LispObject *new_object_guess_type(char *s) {
 
   if (rc >= 0) {
     debug_message("GUESSING %s is INT\n", s);
-    return LispObject_new_int(atoi(s));
+    rv = LispObject_new_int(atoi(s));
+    goto end;
   }
 
   rc = pcre_exec( float_regexp, NULL, s, len, 0, 0, ovector, 30);
 
   if (rc >= 0) {
     debug_message("GUESSING %s is FLOAT\n", s);
-    return LispObject_new_float(atof(s));
+    rv = LispObject_new_float(atof(s));
+    goto end;
   }
 
   rc = pcre_exec( string_regexp, NULL, s, len, 0, 0, ovector, 30);
 
   if (rc >= 0) {
     debug_message("GUESSING %s is STRING\n", s);
-    return LispObject_new_string(s);
+    rv = LispObject_new_string(s);
+    goto end;
   }
 
-  return LispObject_new_symbol(s);
+  rv = LispObject_new_symbol(s);
+
+end:
+  rv->line = t->line;
+  rv->col = t->col;
+  rv->file = t->file;
+  return rv;
 }
 
 
 
-LispListElement *parse(char **tokens, int n_tokens)
+
+// Parse a list of tokens into AST/lisp data
+LispListElement *parse(LispToken *tokens)
 {
-  // TODO: root should, instead of a list object, be just a linked list (no object).
   LispListElement *root = LispList_new_element();
   LispObject *current_list = NULL, *new = NULL, **open_lists= NULL;
 
@@ -95,12 +110,15 @@ LispListElement *parse(char **tokens, int n_tokens)
 
   int n_open_lists = 0;
 
-  for (int i = 0; i < n_tokens; i++) {
-    debug_message("TOKEN: %s\n", tokens[i]);
+  for (LispToken *token = tokens; token != NULL; token = token->next) {
+    debug_message("TOKEN: %s\n", token->string);
 
-    if (strcmp(tokens[i], "(") == 0) {
+    if (strcmp(token->string, "(") == 0) {
       debug_message("OPENING NEW LIST\n");
       new = LispObject_new_list();
+      new->line = token->line;
+      new->col = token->col;
+      new->file = token->file;
       ERROR_CHECK;
       debug_message("after OPENING NEW LIST\n");
 
@@ -119,7 +137,7 @@ LispListElement *parse(char **tokens, int n_tokens)
 
       current_list = new;
     }
-    else if (strcmp(tokens[i], ")") == 0) {
+    else if (strcmp(token->string, ")") == 0) {
       debug_message("CLOSING LIST\n");
 
       if (n_open_lists) {
@@ -134,7 +152,7 @@ LispListElement *parse(char **tokens, int n_tokens)
     }
     else {
       debug_message("GUESS\n");
-      new = new_object_guess_type(tokens[i]);
+      new = new_object_guess_type(token);
       ERROR_CHECK;
 
       debug_message("NEW OBJECT %s (%s)\n", LispObject_repr(new), LispObject_type(new));

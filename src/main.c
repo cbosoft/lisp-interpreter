@@ -19,7 +19,7 @@
 #define RV_CHECK_AND_PRINT(RV,C) \
   if ( (rv = RV) == NULL) {\
     if (!Exception_check()) {\
-      Exception_raise("main", "eval returned NULL.");\
+      Exception_raise("Exception", "main", NULL, "eval returned NULL.");\
     }\
     Exception_print();\
     return 1;\
@@ -70,7 +70,7 @@ int main(int argc, char **argv)
       EXECUTED_FILE_OR_CLI_STRING = 1;
     }
     else if (EITHER(argv[i], "-c", "--command")) {
-      RV_CHECK_AND_PRINT(eval_string(argv[++i], env), i >= argc - 1);
+      RV_CHECK_AND_PRINT(eval_string(argv[++i], env, "COMMANDLINE"), i >= argc - 1);
       EXECUTED_FILE_OR_CLI_STRING = 1;
     }
 
@@ -118,7 +118,7 @@ int main(int argc, char **argv)
     }
 
     if (parens_tally < 0) {
-      assert_or_error(0, "main", "Unmatched ')' in input.");
+      Exception_raisef("Syntax Error", "main", NULL, "Too many ')' characters (%d).", -parens_tally);
       Exception_print();
       continue;
     }
@@ -140,9 +140,9 @@ int main(int argc, char **argv)
           add_history(expanded);
 
           // EVAL, PRINT
-          if ( (rv = eval_string(expanded, env)) == NULL) {
+          if ( (rv = eval_string(expanded, env, "STDIN")) == NULL) {
             if (!Exception_check()) {
-              Exception_raise("main", "eval returned NULL.");
+              Exception_raise("Exception", "main", NULL, "eval returned NULL.");
             }
             Exception_print();
           }
