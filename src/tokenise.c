@@ -4,7 +4,11 @@
 #include <string.h>
 
 #include "tokenise.h"
+#include "exception.h"
+#include "debug.h"
 #include "gc.h"
+
+#define IS_WHITESPACE(CH) ((CH == ' ') || (CH == '\n') || (CH == '\t'))
 
 #define ADD_TO_TOKENS(VALUE) \
   new = malloc(sizeof(LispToken)); \
@@ -52,7 +56,7 @@ int parenscheck(char *input)
 LispToken *tokenise(char *input, char *source)
 {
 
-  char ch;
+  char ch, nch;
   int i = 0;
 
   char *kw_or_name = NULL;
@@ -61,13 +65,16 @@ LispToken *tokenise(char *input, char *source)
   int in_quote = 0;
   int line_no = 0;
   int col_no = 0;
+  int parens_level = 0;
+  int add_close_parens_on_break = 0;
+  int add_close_parens_on_parens = 0;
 
   char *source_cpy = strdup(source);
 
   LispToken *rv = NULL, *current = rv, *new = NULL;
 
 
-  for (i = 0, ch = input[0]; i < input_len; i++, ch=input[i]) {
+  for (i = 0, ch = input[0], nch=input[1]; i < input_len; ch = input[++i], nch=input[i+1]) {
     col_no ++;
 
     if (input[i] == ';') {
@@ -77,7 +84,7 @@ LispToken *tokenise(char *input, char *source)
     }
     
     // if breaking char: space, newline, or parens
-    if (((ch == ' ') || (ch == '\n') || (ch == ')') || (ch == '(') || (ch == '\t')) && !in_quote) {
+    if (( IS_WHITESPACE(ch) || (ch == ')') || (ch == '(') || (ch == '\'')) && !in_quote) {
 
       // finish reading keyword or name
       if (kw_or_name != NULL) {
@@ -85,30 +92,57 @@ LispToken *tokenise(char *input, char *source)
         ADD_TO_TOKENS(kw_or_name);
         kw_or_name = NULL;
         kw_or_name_len = 0;
+
+        if (add_close_parens_on_break) {
+          add_close_parens_on_break = 0;
+          ADD_TO_TOKENS(")");
+        }
       }
 
+      // TODO switch-case
       // action needed on breaking char?
-      if ((ch == '(') || (ch == ')')) {
-        ADD_TO_TOKENS(ch == '(' ? "(" : ")");
+      if (ch == '(') {
+        ADD_TO_TOKENS("(");
+        parens_level++;
+      }
+      if (ch == ')') {
+        ADD_TO_TOKENS(")");
+        parens_level--;
+
+        if (add_close_parens_on_parens) {
+          add_close_parens_on_parens = 0;
+          ADD_TO_TOKENS(")");
+        }
       }
       else if (ch == '\n') {
         col_no = 0;
         line_no ++;
       }
+      else if (ch == '\'') {
+
+        ADD_TO_TOKENS("(");
+        ADD_TO_TOKENS("quote");
+
+        if (nch == '('){
+          debug_message("NEXT CHAR IS '('; quote list\n");
+          add_close_parens_on_parens = 1;
+        }
+        else if (IS_WHITESPACE(nch)) {
+          //error
+          debug_message("NEXT CHAR IS WHITE SPACE! ERROR");
+          Exception_raise("SyntaxError", "tokenise", NULL, "single quote should be before a list or other object.");
+        }
+        else {
+          add_close_parens_on_break = 1;
+          debug_message("NEXT CHAR IS '('; quote kw\n");
+        }
+      }
 
     }
     else {
 
-      if ((ch == '"') || (ch == '\''))  {
-
-        if (((in_quote == 2) && (ch == '"')) || ((in_quote == 1) && (ch == '\''))) {
-          in_quote = 0;
-        }
-        else if (!in_quote) {
-          in_quote = ch == '"' ? 2 : 1;
-        }
-
-      }
+      if (ch == '"')
+        in_quote = !in_quote;
 
       kw_or_name = realloc(kw_or_name, ((++kw_or_name_len) + 1)*sizeof(char));
       kw_or_name[kw_or_name_len-1] = ch;
@@ -122,6 +156,11 @@ LispToken *tokenise(char *input, char *source)
     ADD_TO_TOKENS(kw_or_name);
     kw_or_name = NULL;
     kw_or_name_len = 0;
+
+    if (add_close_parens_on_break) {
+      add_close_parens_on_break = 0;
+      ADD_TO_TOKENS(")");
+    }
   }
 
   return rv;
