@@ -266,8 +266,8 @@ LispObject *pop(LispListElement *arg, LispEnvironment *env)
   debug_message("AFTER TYPE CHECK\n");
 
   int list_len = LispList_count(list->value_list);
-  ASSERT_OR_ERROR(list_len > 0, "ArgumentError", "pop", list, NULL, "pop called on a list with no elements.");
-  debug_message("AFTER LIST LEN CHECK\n");
+  if (list_len == 0)
+    return &nil;
 
   return list->value_list->value;
 }
@@ -292,8 +292,8 @@ LispObject *rest(LispListElement *arg, LispEnvironment *env)
   debug_message("AFTER TYPE CHECK\n");
 
   int list_len = LispList_count(list->value_list);
-  ASSERT_OR_ERROR(list_len > 0, "ArgumentError", "rest", list, NULL, "rest called on a list with no elements.");
-  debug_message("AFTER LIST LEN CHECK\n");
+  if (list_len == 0)
+    return &nil;
 
   LispObject *rest = calloc(1, sizeof(LispObject));
   rest->type = LISPOBJECT_LIST;
