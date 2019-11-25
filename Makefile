@@ -1,7 +1,6 @@
 CXX = gcc
 CFLAGS = -g -Wall -Wextra
 OBJ = \
-			obj/main.o \
 			obj/tokenise.o \
 			obj/parse.o \
 			obj/eval.o \
@@ -22,8 +21,12 @@ obj/%.o: src/%.c
 	mkdir -p obj
 	$(CXX) $(CFLAGS) $< -c -o $@
 
-chrisp: $(OBJ)
-	$(CXX) $(CFLAGS) $(OBJ) -o $@ $(LINK)
+chrisp: obj/main.o $(OBJ)
+	$(CXX) $(CFLAGS) obj/main.o $(OBJ) -o $@ $(LINK)
+
+
+tests: obj/tests.o $(OBJ)
+	$(CXX) $(CFLAGS) obj/tests.o $(OBJ) -o $@ $(LINK) && ./tests
 
 clean:
 	rm -rf obj LISP
