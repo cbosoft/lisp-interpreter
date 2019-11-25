@@ -30,7 +30,7 @@
 
 
 
-int DEBUG_MODE = 0;
+extern int DEBUG_MODE;
 int INTERACTIVE_MODE = 0;
 int EXECUTED_FILE_OR_CLI_STRING = 0;
 

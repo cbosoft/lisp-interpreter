@@ -5,7 +5,7 @@
 
 #include "colour.h"
 
-extern int DEBUG_MODE;
+int DEBUG_MODE = 0;
 
 #define MSGLEN 256
 
