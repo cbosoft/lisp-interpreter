@@ -25,10 +25,10 @@ extern LispObject nil;
 
 // Numerical operations on two objects
 #define NUMERICAL_OPERATION(FUNC, OPERATION)\
-  debug_message("BUILTIN FUNCTION ADD\n");\
+  debug_message("BUILTIN FUNCTION "FUNC"\n");\
   TOUCH(env);\
   int nargs = LispList_count(arg);\
-  ASSERT_OR_ERROR(nargs == 2, "ArgumentError", "add", NULL, NULL, "Function takes 2 arguments (got %d).", nargs);\
+  ASSERT_OR_ERROR(nargs == 2, "ArgumentError", FUNC, NULL, NULL, "Function takes 2 arguments (got %d).", nargs);\
   LispObject *l = arg->value;\
   LispObject *r = arg->next->value;\
   ASSERT_OR_ERROR( \
@@ -49,9 +49,43 @@ extern LispObject nil;
   LispObject *rv = LispObject_new_int(l_operand OPERATION r_operand);\
   return rv;
 LispObject *add(LispListElement *arg, LispEnvironment *env) { NUMERICAL_OPERATION("add", +) }
-LispObject *subtract(LispListElement *arg, LispEnvironment *env) { NUMERICAL_OPERATION("subtract", +) }
-LispObject *multiply(LispListElement *arg, LispEnvironment *env) { NUMERICAL_OPERATION("multiply", +) }
-LispObject *divide(LispListElement *arg, LispEnvironment *env) { NUMERICAL_OPERATION("divide", +) }
+LispObject *subtract(LispListElement *arg, LispEnvironment *env) { NUMERICAL_OPERATION("subtract", -) }
+LispObject *multiply(LispListElement *arg, LispEnvironment *env) { NUMERICAL_OPERATION("multiply", *) }
+LispObject *divide(LispListElement *arg, LispEnvironment *env) { 
+  debug_message("BUILTIN FUNCTION DIVIDE\n");
+  TOUCH(env);
+  int nargs = LispList_count(arg);
+  ASSERT_OR_ERROR(nargs == 2, "ArgumentError", "divide", NULL, NULL, "Function takes 2 arguments (got %d).", nargs);
+  LispObject *l = arg->value;
+  LispObject *r = arg->next->value;
+
+  ASSERT_OR_ERROR( 
+      (l->type == LISPOBJECT_INT || l->type == LISPOBJECT_FLOAT) && 
+      (r->type == LISPOBJECT_INT || r->type == LISPOBJECT_FLOAT),
+      "TypeError",
+      "divide", 
+      NULL, NULL, 
+      "Function expects numerical arguments, got %s and %s.", LispObject_type(l), LispObject_type(r));
+
+  ASSERT_OR_ERROR( 
+      ((r->type == LISPOBJECT_INT) && (r->value_int != 0)) ||
+      ((r->type == LISPOBJECT_FLOAT) && (r->value_float != 0.0)),
+      "DivideByZeroError",
+      "divide", 
+      NULL, NULL, 
+      "Cannot divide by zero.");
+
+  if (l->type == LISPOBJECT_FLOAT || r->type == LISPOBJECT_FLOAT) {
+    double l_operand = l->type == LISPOBJECT_FLOAT ? l->value_float : (double)l->value_int;
+    double r_operand = r->type == LISPOBJECT_FLOAT ? r->value_float : (double)r->value_int;
+    LispObject *rv = LispObject_new_float(l_operand / r_operand);
+    return rv;
+  }
+  int l_operand = l->type == LISPOBJECT_FLOAT ? (int)l->value_float : l->value_int;
+  int r_operand = r->type == LISPOBJECT_FLOAT ? (int)r->value_float : r->value_int;
+  LispObject *rv = LispObject_new_int(l_operand / r_operand);
+  return rv;
+}
 LispBuiltin add_obj = {&add, LISPBUILTIN_GREEDY};
 LispBuiltin subtract_obj = {&subtract, LISPBUILTIN_GREEDY};
 LispBuiltin multiply_obj = {&multiply, LISPBUILTIN_GREEDY};
@@ -630,6 +664,33 @@ LispObject *append(LispListElement *arg, LispEnvironment *env)
   return rv;
 }
 LispBuiltin append_obj = {&append, LISPBUILTIN_GREEDY};
+
+
+
+
+// (map f (arg1[ arg2[ ...]]))
+LispObject *map(LispListElement *arg, LispEnvironment *env)
+{
+  debug_message("BUILTIN FUNCTION MAP");
+
+  TOUCH(env);
+  int nargs = LispList_count(arg);
+  ASSERT_OR_ERROR(nargs == 1, "ArgumentError", "eval-file", NULL, NULL, "Function takes 1 arguments (path): (got %d).", nargs);
+  debug_message("AFTER NARGS CHECK\n");
+
+  LispObject *path = arg->value;
+  ASSERT_OR_ERROR(path->type == LISPOBJECT_STRING, "TypeError", "eval-file", path, NULL, "path should be a String, not %s", LispObject_type(path));
+  debug_message("AFTER PATH TYPE CHECK\n");
+
+  eval_file(path->value_string, env);
+  ERROR_CHECK;
+
+  return &nil;
+}
+LispBuiltin mapf_obj = {&map, LISPBUILTIN_LAZY};
+
+
+
 
 // builtins are enumerated here, and referred to in the global env setup
 struct environment_var builtin_functions[] = {
