@@ -3,13 +3,13 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "gc.h"
 #include "object.h"
 #include "builtins.h"
 #include "exception.h"
 #include "debug.h"
 #include "types.h"
 #include "list.h"
-#include "gc.h"
 
 
 
