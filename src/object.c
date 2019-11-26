@@ -317,6 +317,10 @@ int LispObject_is_truthy(LispObject *o)
     case LISPOBJECT_NIL:
       rv = 0;
       break;
+
+    case LISPOBJECT_LIST:
+      rv = LispList_count(o->value_list) > 0;
+      break;
   }
 
   return rv;
