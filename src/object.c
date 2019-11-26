@@ -226,9 +226,15 @@ char *LispObject_type(LispObject *o)
 
     case LISPOBJECT_STRING:
       return "String";
+
+    case LISPOBJECT_LIST:
+      return "List";
+
+    case LISPOBJECT_NIL:
+      return "Nil";
   }
 
-  return "List";
+  return "Unkown object";
 }
 
 
