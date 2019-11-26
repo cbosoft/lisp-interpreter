@@ -313,6 +313,10 @@ int LispObject_is_truthy(LispObject *o)
     case LISPOBJECT_SYMBOL:
       Exception_raise("Exception", "LispObject_is_truthy", o, "\"truthy-ness\" of symbol is ambiguous.");
       break;
+
+    case LISPOBJECT_NIL:
+      rv = 0;
+      break;
   }
 
   return rv;
