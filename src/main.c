@@ -38,7 +38,7 @@ int EXECUTED_FILE_OR_CLI_STRING = 0;
 int main(int argc, char **argv)
 {
 
-  for (int i = 0; i < argc; i++) {
+  for (int i = 1; i < argc; i++) {
 
     if (EITHER(argv[i], "-i", "--interactive")) {
       INTERACTIVE_MODE = 1;
@@ -63,7 +63,7 @@ int main(int argc, char **argv)
   LispEnvironment *env = LispEnvironment_new_global_environment();
   LispObject *rv = NULL;
 
-  for (int i = 0; i < argc; i++) {
+  for (int i = 1; i < argc; i++) {
 
     if (EITHER(argv[i], "-f", "--file")) {
       RV_CHECK_AND_PRINT(eval_file(argv[++i], env), i >= argc - 1);
