@@ -24,9 +24,11 @@ obj/%.o: src/%.c
 crisp: obj/main.o $(OBJ)
 	$(CXX) $(CFLAGS) obj/main.o $(OBJ) -o $@ $(LINK)
 
-
 tests: obj/tests.o $(OBJ)
 	$(CXX) $(CFLAGS) obj/tests.o $(OBJ) -o $@ $(LINK) && ./tests
+
+install:
+	cp crisp /usr/bin/.
 
 clean:
 	rm -rf obj crisp
