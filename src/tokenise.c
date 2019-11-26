@@ -63,8 +63,8 @@ LispToken *tokenise(char *input, char *source)
   int kw_or_name_len = 0;
   int input_len = strlen(input);
   int in_quote = 0;
-  int line_no = 0;
-  int col_no = 0;
+  int line_no = 1;
+  int col_no = 1;
   int parens_level = 0;
   int add_close_parens_on_break = 0;
   int add_close_parens_on_parens = 0;
@@ -78,7 +78,7 @@ LispToken *tokenise(char *input, char *source)
 
     if (input[i] == ';') {
       for (;input[i] != '\n' && i < input_len; i++, line_no++);
-      col_no = 0;
+      col_no = 1;
       continue;
     }
     
@@ -114,7 +114,7 @@ LispToken *tokenise(char *input, char *source)
         }
       }
       else if (ch == '\n') {
-        col_no = 0;
+        col_no = 1;
         line_no ++;
       }
       else if (ch == '\'') {
