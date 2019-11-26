@@ -388,3 +388,12 @@ int LispObject_eq(LispObject *left, LispObject *right)
   // must be numbers
   NUMERICAL_COMPARE(left, right, ==);
 }
+
+
+
+
+// boolean operations
+#define BOOLEAN(OPERATOR) \
+  return LispObject_is_truthy(left) OPERATOR LispObject_is_truthy(right);
+int LispObject_or(LispObject *left, LispObject *right){ BOOLEAN(||); }
+int LispObject_and(LispObject *left, LispObject *right){ BOOLEAN(&&); }

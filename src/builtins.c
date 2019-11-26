@@ -272,11 +272,15 @@ LispObject *lisp_ge(LispListElement *arg, LispEnvironment *env) {COMPARE(LispObj
 LispObject *lisp_lt(LispListElement *arg, LispEnvironment *env) {COMPARE(LispObject_lt)}
 LispObject *lisp_le(LispListElement *arg, LispEnvironment *env) {COMPARE(LispObject_le)}
 LispObject *lisp_eq(LispListElement *arg, LispEnvironment *env) {COMPARE(LispObject_eq)}
+LispObject *lisp_or(LispListElement *arg, LispEnvironment *env) {COMPARE(LispObject_or)}
+LispObject *lisp_and(LispListElement *arg, LispEnvironment *env) {COMPARE(LispObject_and)}
 LispBuiltin lisp_gt_obj = {&lisp_gt, LISPBUILTIN_GREEDY};
 LispBuiltin lisp_ge_obj = {&lisp_ge, LISPBUILTIN_GREEDY};
 LispBuiltin lisp_lt_obj = {&lisp_lt, LISPBUILTIN_GREEDY};
 LispBuiltin lisp_le_obj = {&lisp_le, LISPBUILTIN_GREEDY};
 LispBuiltin lisp_eq_obj = {&lisp_eq, LISPBUILTIN_GREEDY};
+LispBuiltin lisp_or_obj = {&lisp_or, LISPBUILTIN_GREEDY};
+LispBuiltin lisp_and_obj = {&lisp_and, LISPBUILTIN_GREEDY};
 
 
 
@@ -293,6 +297,8 @@ LispObject *pop(LispListElement *arg, LispEnvironment *env)
   debug_message("AFTER NARGS CHECK\n");
 
   LispObject *list = arg->value;
+  if (list->type == LISPOBJECT_NIL)
+    return &nil;
   ASSERT_OR_ERROR(list->type == LISPOBJECT_LIST, "TypeError", "pop", list, NULL, "list must be a List, not %s", LispObject_type(list));
   debug_message("AFTER TYPE CHECK\n");
 
@@ -319,6 +325,8 @@ LispObject *rest(LispListElement *arg, LispEnvironment *env)
   debug_message("AFTER NARGS CHECK\n");
 
   LispObject *list = arg->value;
+  if (list->type == LISPOBJECT_NIL)
+    return &nil;
   ASSERT_OR_ERROR(list->type == LISPOBJECT_LIST, "TypeError", "rest", list, NULL, "list must be a List, not %s", LispObject_type(list));
   debug_message("AFTER TYPE CHECK\n");
 
@@ -705,6 +713,8 @@ struct environment_var builtin_functions[] = {
 	{ "lt", "<", NULL, &lisp_lt_obj, NULL, NULL },
 	{ "le", "<=", NULL, &lisp_le_obj, NULL, NULL },
 	{ "eq", "=", NULL, &lisp_eq_obj, NULL, NULL },
+	{ "or", "||", NULL, &lisp_or_obj, NULL, NULL },
+	{ "and", "&&", NULL, &lisp_and_obj, NULL, NULL },
 	{ "pop", "car", NULL, &pop_obj, NULL, NULL },
 	{ "rest", "cdr", NULL, &rest_obj, NULL, NULL },
 	{ "print", NULL, NULL, &print_obj, NULL, NULL },

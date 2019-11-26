@@ -20,3 +20,5 @@ int LispObject_ge(LispObject *left, LispObject *right);
 int LispObject_lt(LispObject *left, LispObject *right);
 int LispObject_le(LispObject *left, LispObject *right);
 int LispObject_eq(LispObject *left, LispObject *right);
+int LispObject_or(LispObject *left, LispObject *right);
+int LispObject_and(LispObject *left, LispObject *right);
