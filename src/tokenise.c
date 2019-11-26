@@ -56,6 +56,11 @@ int parenscheck(char *input)
 LispToken *tokenise(char *input, char *source)
 {
 
+  if (input[0] == '#') {
+    while ((*input) != '\n') input ++;
+    input ++; //?
+  }
+
   char ch, nch;
   int i = 0;
 
@@ -72,7 +77,6 @@ LispToken *tokenise(char *input, char *source)
   char *source_cpy = strdup(source);
 
   LispToken *rv = NULL, *current = rv, *new = NULL;
-
 
   for (i = 0, ch = input[0], nch=input[1]; i < input_len; ch = input[++i], nch=input[i+1]) {
     col_no ++;
