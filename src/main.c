@@ -73,6 +73,13 @@ int main(int argc, char **argv)
       RV_CHECK_AND_PRINT(eval_string(argv[++i], env, "COMMANDLINE"), i >= argc - 1);
       EXECUTED_FILE_OR_CLI_STRING = 1;
     }
+    else if ((EITHER(argv[i], "-d", "--debug")) || (EITHER(argv[i], "-i", "--interactive"))) {
+      // flag: ignore
+    }
+    else {
+      RV_CHECK_AND_PRINT(eval_file(argv[i], env), i >= argc - 1);
+      EXECUTED_FILE_OR_CLI_STRING = 1;
+    }
 
   }
 
