@@ -321,6 +321,10 @@ int LispObject_is_truthy(LispObject *o)
     case LISPOBJECT_LIST:
       rv = LispList_count(o->value_list) > 0;
       break;
+
+    default:
+      Exception_raise("Exception", "LispObject_is_truthy", o, "\"truthy-ness\" of unknown object is ambiguous.");
+      break;
   }
 
   return rv;
