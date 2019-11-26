@@ -111,11 +111,11 @@ LispBuiltin quote_obj = {&quote, LISPBUILTIN_LAZY};
 
 
 // Create an entry in the local environment's function table.
-// Usage: (define name arglist body)
+// Usage: (define name arglist &rest body)
 // Arguments:
 //   name            string or symbol name of the function
 //   arglist         list of string or symbol names of the function arguments,
-//   body            list of things to exectue when called.
+//   body            rest of the arguments make up the list of contents in the function body
 LispObject *define(LispListElement *arg, LispEnvironment *env)
 {
   debug_message("BUILTIN FUNCTION DEFINE\n");
@@ -143,16 +143,13 @@ LispObject *define(LispListElement *arg, LispEnvironment *env)
   }
   debug_message("AFTER ARGLIST_ITEMS CHECK\n");
 
-  LispObject *body = arg->next->next->value;
-  if (arg->next->next->value->type == LISPOBJECT_LIST) {
-    LispFunction *lfunc = LispFunction_new(arglist->value_list, body);
-    LispEnvironment_add_variable(env, name->symbol_name, lfunc, NULL, NULL);
+  LispListElement *body = arg->next->next;
+  LispObject *content = LispObject_new_list();
+  for (LispListElement *i = body; i->value != NULL; i = i->next) {
+    LispList_add_object_to_list(content->value_list, i->value);
   }
-  else {
-    LispEnvironment_add_variable(env, name->symbol_name, NULL, NULL, body);
-  }
-
-
+  LispFunction *lfunc = LispFunction_new(arglist->value_list, content);
+  LispEnvironment_add_variable(env, name->symbol_name, lfunc, NULL, NULL);
   return name;
 }
 LispBuiltin define_obj = {&define, LISPBUILTIN_LAZY};
