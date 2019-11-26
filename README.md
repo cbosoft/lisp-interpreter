@@ -1,4 +1,4 @@
-# ![icon](https://raw.githubusercontent.com/cbosoft/syringepump/assets/logo.png) crisp
+# ![icon](https://raw.githubusercontent.com/cbosoft/lisp-interpreter/maseter/assets/logo.png) crisp
 
 ## (chris' lisp) v0.2
 
