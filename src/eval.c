@@ -221,6 +221,11 @@ LispObject *eval_file(char *filename, LispEnvironment *env)
 
   fclose(fp);
 
+  if ((length > 2) && (contents[0] == '#') && (contents[1] == '!')) {
+    while ((*contents) != '\n') contents ++;
+    contents ++;
+  }
+
   LispObject *object_to_return = eval_string(contents, env, filename);
 
   return object_to_return;
