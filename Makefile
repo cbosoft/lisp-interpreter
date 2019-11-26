@@ -21,7 +21,7 @@ obj/%.o: src/%.c
 	mkdir -p obj
 	$(CXX) $(CFLAGS) $< -c -o $@
 
-chrisp: obj/main.o $(OBJ)
+crisp: obj/main.o $(OBJ)
 	$(CXX) $(CFLAGS) obj/main.o $(OBJ) -o $@ $(LINK)
 
 
@@ -29,4 +29,4 @@ tests: obj/tests.o $(OBJ)
 	$(CXX) $(CFLAGS) obj/tests.o $(OBJ) -o $@ $(LINK) && ./tests
 
 clean:
-	rm -rf obj LISP
+	rm -rf obj crisp

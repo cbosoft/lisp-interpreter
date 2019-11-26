@@ -7,7 +7,7 @@ void display_splash()
 {
   FILE *fp = stderr;
 
-  fprintf(fp, "CHRISP v"VERSION"\n");
+  fprintf(fp, "crisp v"VERSION"\n");
 }
 
 void display_help()

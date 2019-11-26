@@ -1,6 +1,6 @@
-# CHRISP
+# ![icon](https://raw.githubusercontent.com/cbosoft/syringepump/assets/logo.png) crisp
 
-## CHRis' lISp interPretor (v0.1)
+## (chris' lisp) v0.2
 
 Nothing new under the sun; here's another lisp interpretor in C. I wanted to do
 this for fun, nothing more. Expect basic functionality, rudimentary
@@ -10,7 +10,7 @@ operation.
 Uses editline (libedit, BSD) for the REPL, but I like the look of replxx
 ([syntax highlighting!](https://github.com/AmokHuginnsson/replxx/blob/master/examples/c-api.c))
 so may move to that in the future. Garbage collection brought to you by:
-[Boehm-GC](https://www.hboehm.info/gc/)! 
+[Boehm-GC](https://www.hboehm.info/gc/)! Bacon logo from [Freeplk](https://www.flaticon.com/authors/freepik)
 
 # Features:
 
