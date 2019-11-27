@@ -36,6 +36,20 @@ void parser_init()
 
 
 
+int parser_string_is_regexp(char *s, pcre *regexp)
+{
+  int ovector[30];
+  int len = strlen(s);
+  int rc = pcre_exec(regexp, NULL, s, len, 0, 0, ovector, 30);
+  return rc >= 0;
+}
+int parser_string_is_int(char *s){return parser_string_is_regexp(s, int_regexp);}
+int parser_string_is_float(char *s){return parser_string_is_regexp(s, float_regexp);}
+int parser_string_is_string(char *s){return parser_string_is_regexp(s, string_regexp);}
+
+
+
+
 // Create new object, guessing type
 LispObject *new_object_guess_type(LispToken *t) {
   char *s = t->string;
@@ -50,27 +64,20 @@ LispObject *new_object_guess_type(LispToken *t) {
     goto end;
   }
 
-  // PCRE FTW
-  int ovector[30];
-  int rc = pcre_exec( int_regexp, NULL, s, len, 0, 0, ovector, 30);
-
-  if (rc >= 0) {
+  if (parser_string_is_int(s)) {
     debug_message("GUESSING %s is INT\n", s);
-    rv = LispObject_new_int(atoi(s));
+    rv = LispObject_new_int(atol(s));
     goto end;
   }
 
-  rc = pcre_exec( float_regexp, NULL, s, len, 0, 0, ovector, 30);
-
-  if (rc >= 0) {
+  if (parser_string_is_float(s)) {
     debug_message("GUESSING %s is FLOAT\n", s);
     rv = LispObject_new_float(atof(s));
     goto end;
   }
 
-  rc = pcre_exec( string_regexp, NULL, s, len, 0, 0, ovector, 30);
 
-  if (rc >= 0) {
+  if (parser_string_is_string(s)) {
     debug_message("GUESSING %s is STRING\n", s);
     s[len-1] = '\0';
     s++;
