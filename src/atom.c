@@ -8,6 +8,7 @@
 #include "atom.h"
 #include "exception.h"
 #include "debug.h"
+#include "parse.h"
 
 extern LispAtom t_atom;
 
@@ -107,11 +108,11 @@ LispAtom *LispAtom_cast_as(LispAtom *a, int type)
     return LispAtom_new(a->value_int, a->value_float, a->value_string);
   }
 
-  if ((current_type == LISPATOM_FLOAT) && (type == LISPATOM_INT)) {
+  if ((current_type == LISPATOM_FLOAT) && ((type == LISPATOM_INT) || (type == LISPATOM_NUMBER))) {
     long val = (long)(*a->value_float);
     return LispAtom_new(&val, NULL, NULL);
   }
-  if ((current_type == LISPATOM_INT) && (type == LISPATOM_FLOAT)) {
+  if ((current_type == LISPATOM_INT) && ((type == LISPATOM_FLOAT) || (type == LISPATOM_NUMBER))) {
     double val = (double)(*a->value_int);
     return LispAtom_new(NULL, &val, NULL);
   }
@@ -120,15 +121,15 @@ LispAtom *LispAtom_cast_as(LispAtom *a, int type)
     snprintf(rv, 50, "%f", (*a->value_float));
     return LispAtom_new(NULL, NULL, rv);
   }
-  if ((current_type == LISPATOM_STRING) && (type == LISPATOM_FLOAT)) {
-    double val = atol(a->value_string);
-    // TODO error checking
-    return LispAtom_new(NULL, &val, NULL);
-  }
-  if ((current_type == LISPATOM_STRING) && (type == LISPATOM_INT)) {
+  if ((current_type == LISPATOM_STRING) && ((type == LISPATOM_INT) || (type == LISPATOM_NUMBER))) {
+    ASSERT_OR_ERROR(parser_string_is_int(a->value_string), "CastError", "LispAtom_cast_as", NULL, NULL, "Cannot cast string %s as Int.", LispAtom_repr(a));
     long val = atol(a->value_string);
-    // TODO error checking
     return LispAtom_new(&val, NULL, NULL);
+  }
+  if ((current_type == LISPATOM_STRING) && ((type == LISPATOM_FLOAT) || (type == LISPATOM_NUMBER))) {
+    ASSERT_OR_ERROR(parser_string_is_float(a->value_string), "CastError", "LispAtom_cast_as", NULL, NULL, "Cannot cast string %s as Float.", LispAtom_repr(a));
+    double val = atol(a->value_string);
+    return LispAtom_new(NULL, &val, NULL);
   }
   if ((current_type == LISPATOM_INT) && (type == LISPATOM_STRING)) {
     char *rv = calloc(51, sizeof(char));
