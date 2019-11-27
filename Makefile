@@ -1,6 +1,7 @@
 CXX = gcc
 CFLAGS = -g -Wall -Wextra
 OBJ = \
+			obj/atom.o \
 			obj/tokenise.o \
 			obj/parse.o \
 			obj/eval.o \

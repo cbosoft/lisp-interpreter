@@ -1,36 +1,42 @@
 #pragma once
 enum LISPOBJECT_TYPE {
   LISPOBJECT_NIL,
-  LISPOBJECT_STRING,
-  LISPOBJECT_INT,
-  LISPOBJECT_FLOAT,
-  LISPOBJECT_BOOL,
+  LISPOBJECT_ATOM,
   LISPOBJECT_LIST,
   LISPOBJECT_SYMBOL
+};
+
+enum LISPATOM_TYPE {
+  LISPATOM_FLOAT,
+  LISPATOM_INT,
+  LISPATOM_STRING
 };
 
 
 typedef struct LispObject LispObject;
 typedef struct LispListElement LispListElement;
+typedef struct LispAtom LispAtom;
 struct LispObject {
-  char *value_string;
-  int value_int;
-  double value_float;
-  int value_bool;
+  LispAtom *value_atom;
+  char *value_symbol;
+  LispListElement *value_list;
 
   int type;
 
   int line;
   int col;
   char *file;
-
-  char *symbol_name;
-  LispListElement *value_list;
 };
 
 struct LispListElement {
   LispListElement *next;
   LispObject *value;
+};
+
+struct LispAtom {
+  long *value_int;
+  double *value_float;
+  char *value_string;
 };
 
 

@@ -23,7 +23,7 @@ LispFunction *LispFunction_new(LispListElement *list_args, LispObject *body)
   for (list_iter = list_args, i = 0; list_iter->value != NULL; list_iter = list_iter->next, i++) {
 
     // TODO assert list_iter->value is symbol (?)
-    rv->arg_names[i] = strdup(list_iter->value->symbol_name);
+    rv->arg_names[i] = strdup(list_iter->value->value_symbol);
     debug_message("ADDING ARG TO LFUNC: %s\n", rv->arg_names[i]);
 
   }

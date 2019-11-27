@@ -16,7 +16,7 @@
 #include "gc.h"
 
 
-
+extern LispObject nil;
 
 
 LispObject *eval(LispObject *root, LispEnvironment *env)
@@ -37,16 +37,15 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
   switch (root->type) {
 
   case LISPOBJECT_SYMBOL:
-    LispEnvironment_get(env, root->symbol_name, NULL, NULL, &var_obj);
-    ASSERT_OR_ERROR(var_obj != NULL, "TypeError", "eval", root, NULL, "Symbol %s has no value as variable", root->symbol_name);
+    LispEnvironment_get(env, root->value_symbol, NULL, NULL, &var_obj);
+    ASSERT_OR_ERROR(var_obj != NULL, "TypeError", "eval", root, NULL, "Symbol %s has no value as variable", root->value_symbol);
     return var_obj;
 
   case LISPOBJECT_LIST:
     list_elem = root->value_list;
     
     if (list_elem->value == NULL) {
-      debug_message("(empty list evals to false)\n");
-      return LispObject_new_bool(0); // empty list is also boolean false
+      return &nil;
     }
 
     debug_message("LIST CHILD IS %s\n", LispObject_type(list_elem->value));
@@ -76,12 +75,12 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
     nargs = LispList_count(list_args);
 
     ASSERT_OR_ERROR(fn->type == LISPOBJECT_SYMBOL, "Exception", "eval", NULL, NULL, "Cannot evaluate function: %s (%s)", LispObject_repr(fn), LispObject_type(fn));
-    fname = fn->symbol_name;
+    fname = fn->value_symbol;
 
     ASSERT_OR_ERROR(!LispEnvironment_get(env, fname, &var_lfunc, &var_bfunc, &var_obj), "NameError", "eval", fn, NULL, "Object with name \"%s\" not found in environment.", fname);
 
     if (var_lfunc != NULL) {
-      debug_message("SYMBOL %s IS LISP FUNCTION\n", fn->symbol_name);
+      debug_message("SYMBOL %s IS LISP FUNCTION\n", fn->value_symbol);
       
       ASSERT_OR_ERROR(nargs == var_lfunc->number_required_args, "Exception", "eval", fn, NULL, "number of arguments does not match required (got %d, need %d).", nargs, var_lfunc->number_required_args);
       sub_env = LispEnvironment_new_environment(env);
@@ -98,7 +97,7 @@ LispObject *eval(LispObject *root, LispEnvironment *env)
       
     }
     else if (var_bfunc != NULL) {
-      debug_message("SYMBOL %s IS BUILTIN\n", fn->symbol_name);
+      debug_message("SYMBOL %s IS BUILTIN\n", fn->value_symbol);
 
       LispListElement *list_args_evaluated = NULL;
 

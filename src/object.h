@@ -2,13 +2,13 @@
 
 #include "types.h"
 
+LispObject *LispObject_new_nil();
 LispObject *LispObject_new_string(char *value);
 LispObject *LispObject_new_symbol(char *value);
-LispObject *LispObject_new_int(int value);
+LispObject *LispObject_new_int(long value);
 LispObject *LispObject_new_float(double value);
-LispObject *LispObject_new_bool(int value);
 LispObject *LispObject_new_list();
-LispObject *LispObject_new_nil();
+
 void LispObject_assign_value(LispObject *dest, LispObject *source);
 void LispObject_print(LispObject *o);
 void LispObject_free(LispObject *root);

@@ -50,18 +50,6 @@ LispObject *new_object_guess_type(LispToken *t) {
     goto end;
   }
 
-  if (strcmp(s, "false") == 0) {
-    debug_message("GUESSING %s is BOOL\n", s);
-    rv = LispObject_new_bool(0);
-    goto end;
-  }
-
-  if (strcmp(s, "true") == 0) {
-    debug_message("GUESSING %s is BOOL\n", s);
-    rv = LispObject_new_bool(1);
-    goto end;
-  }
-
   // PCRE FTW
   int ovector[30];
   int rc = pcre_exec( int_regexp, NULL, s, len, 0, 0, ovector, 30);

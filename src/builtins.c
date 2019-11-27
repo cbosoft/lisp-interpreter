@@ -15,8 +15,10 @@
 #include "eval.h"
 #include "gc.h"
 #include "import.h"
+#include "atom.h"
 
 extern LispObject nil;
+extern LispObject t;
 
 
 #define TOUCH(LE) if (LE!=NULL) {};
@@ -31,23 +33,28 @@ extern LispObject nil;
   ASSERT_OR_ERROR(nargs == 2, "ArgumentError", FUNC, NULL, NULL, "Function takes 2 arguments (got %d).", nargs);\
   LispObject *l = arg->value;\
   LispObject *r = arg->next->value;\
-  ASSERT_OR_ERROR( \
-      (l->type == LISPOBJECT_INT || l->type == LISPOBJECT_FLOAT) && \
-      (r->type == LISPOBJECT_INT || r->type == LISPOBJECT_FLOAT),\
+  ASSERT_OR_ERROR(l->type == r->type && l->type == LISPOBJECT_ATOM,\
       "TypeError",\
       FUNC, \
       NULL, NULL, \
-      "Function expects numerical arguments, got %s and %s.", LispObject_type(l), LispObject_type(r));\
-  if (l->type == LISPOBJECT_FLOAT || r->type == LISPOBJECT_FLOAT) {\
-    double l_operand = l->type == LISPOBJECT_FLOAT ? l->value_float : (double)l->value_int;\
-    double r_operand = r->type == LISPOBJECT_FLOAT ? r->value_float : (double)r->value_int;\
-    LispObject *rv = LispObject_new_float(l_operand OPERATION r_operand);\
+      "Function expects Atomistic arguments, got %s and %s.", LispObject_type(l), LispObject_type(r));\
+  fprintf(stderr, "LATOM: %s\n", LispAtom_repr(l->value_atom));\
+  debug_message(""FUNC" AFTER ATOM CHECK\n");\
+  LispAtom *cl = NULL, *cr = NULL;\
+  LispAtom_cast_together(l->value_atom, r->value_atom, &cl, &cr);\
+  ERROR_CHECK;\
+  debug_message(""FUNC" AFTER CAST TOGETHER\n");\
+  ASSERT_OR_ERROR(cl->value_string == NULL && cr->value_string == NULL,\
+      "TypeError",\
+      FUNC, \
+      NULL, NULL, \
+      "Function expects numerical arguments.");\
+  if (cl->value_float != NULL) {\
+    LispObject *rv = LispObject_new_float((*cl->value_float) OPERATION (*cr->value_float));\
     return rv;\
   }\
-  int l_operand = l->type == LISPOBJECT_FLOAT ? (int)l->value_float : l->value_int;\
-  int r_operand = r->type == LISPOBJECT_FLOAT ? (int)r->value_float : r->value_int;\
-  LispObject *rv = LispObject_new_int(l_operand OPERATION r_operand);\
-  return rv;
+    LispObject *rv = LispObject_new_int((*cl->value_int) OPERATION (*cr->value_int));\
+    return rv;
 LispObject *add(LispListElement *arg, LispEnvironment *env) { NUMERICAL_OPERATION("add", +) }
 LispObject *subtract(LispListElement *arg, LispEnvironment *env) { NUMERICAL_OPERATION("subtract", -) }
 LispObject *multiply(LispListElement *arg, LispEnvironment *env) { NUMERICAL_OPERATION("multiply", *) }
@@ -58,33 +65,29 @@ LispObject *divide(LispListElement *arg, LispEnvironment *env) {
   ASSERT_OR_ERROR(nargs == 2, "ArgumentError", "divide", NULL, NULL, "Function takes 2 arguments (got %d).", nargs);
   LispObject *l = arg->value;
   LispObject *r = arg->next->value;
-
-  ASSERT_OR_ERROR( 
-      (l->type == LISPOBJECT_INT || l->type == LISPOBJECT_FLOAT) && 
-      (r->type == LISPOBJECT_INT || r->type == LISPOBJECT_FLOAT),
+  ASSERT_OR_ERROR(l->type == r->type && l->type == LISPOBJECT_ATOM,
       "TypeError",
       "divide", 
       NULL, NULL, 
-      "Function expects numerical arguments, got %s and %s.", LispObject_type(l), LispObject_type(r));
-
-  ASSERT_OR_ERROR( 
-      ((r->type == LISPOBJECT_INT) && (r->value_int != 0)) ||
-      ((r->type == LISPOBJECT_FLOAT) && (r->value_float != 0.0)),
-      "DivideByZeroError",
+      "Function expects Atomistic arguments, got %s and %s.", LispObject_type(l), LispObject_type(r));
+  LispAtom *cl = NULL, *cr = NULL;
+  LispAtom_cast_together(l->value_atom, r->value_atom, &cl, &cr);
+  ASSERT_OR_ERROR(cl->value_string == NULL,
+      "TypeError",
       "divide", 
       NULL, NULL, 
+      "Function expects numerical arguments.");
+  ASSERT_OR_ERROR( ((cr->value_int != NULL) &&(*cr->value_int != 0)) || ((cr->value_float != NULL) &&(*cr->value_float != 0.0)),
+      "DivideByZeroError",
+      "divide",
+      NULL, NULL,
       "Cannot divide by zero.");
-
-  if (l->type == LISPOBJECT_FLOAT || r->type == LISPOBJECT_FLOAT) {
-    double l_operand = l->type == LISPOBJECT_FLOAT ? l->value_float : (double)l->value_int;
-    double r_operand = r->type == LISPOBJECT_FLOAT ? r->value_float : (double)r->value_int;
-    LispObject *rv = LispObject_new_float(l_operand / r_operand);
+  if (cl->value_float != NULL) {
+    LispObject *rv = LispObject_new_float((*cl->value_float) / (*cr->value_float));
     return rv;
   }
-  int l_operand = l->type == LISPOBJECT_FLOAT ? (int)l->value_float : l->value_int;
-  int r_operand = r->type == LISPOBJECT_FLOAT ? (int)r->value_float : r->value_int;
-  LispObject *rv = LispObject_new_int(l_operand / r_operand);
-  return rv;
+    LispObject *rv = LispObject_new_int((*cl->value_int) / (*cr->value_int));
+    return rv;
 }
 LispBuiltin add_obj = {&add, LISPBUILTIN_GREEDY};
 LispBuiltin subtract_obj = {&subtract, LISPBUILTIN_GREEDY};
@@ -128,8 +131,8 @@ LispObject *define(LispListElement *arg, LispEnvironment *env)
   ASSERT_OR_ERROR(name->type == LISPOBJECT_SYMBOL, "TypeError", "define", name, NULL, "Argument has wrong type: name should be a Symbol, not %s", LispObject_type(name));
   debug_message("AFTER NAME TYPE CHECK\n");
 
-  if (!LispEnvironment_get(env, name->symbol_name, NULL, NULL, NULL)) {
-    LispEnvironment_del_variable(env, name->symbol_name);
+  if (!LispEnvironment_get(env, name->value_symbol, NULL, NULL, NULL)) {
+    LispEnvironment_del_variable(env, name->value_symbol);
   }
   Exception_reset();
 
@@ -149,7 +152,7 @@ LispObject *define(LispListElement *arg, LispEnvironment *env)
     LispList_add_object_to_list(content->value_list, i->value);
   }
   LispFunction *lfunc = LispFunction_new(arglist->value_list, content);
-  LispEnvironment_add_variable(env, name->symbol_name, lfunc, NULL, NULL);
+  LispEnvironment_add_variable(env, name->value_symbol, lfunc, NULL, NULL);
   return name;
 }
 LispBuiltin define_obj = {&define, LISPBUILTIN_LAZY};
@@ -175,13 +178,13 @@ LispObject *defvar(LispListElement *arg, LispEnvironment *env)
   ERROR_CHECK;
   debug_message("AFTER NAME TYPE CHECK\n");
 
-  if (!LispEnvironment_get(env, name->symbol_name, NULL, NULL, NULL)) {
-    LispEnvironment_del_variable(env, name->symbol_name);
+  if (!LispEnvironment_get(env, name->value_symbol, NULL, NULL, NULL)) {
+    LispEnvironment_del_variable(env, name->value_symbol);
   }
   Exception_reset();
 
   LispObject *value = arg->next->value;
-  LispEnvironment_add_variable(env, name->symbol_name, NULL, NULL, value);
+  LispEnvironment_add_variable(env, name->value_symbol, NULL, NULL, value);
 
   return value;
 }
@@ -256,7 +259,7 @@ LispBuiltin lisp_if_obj = {&lisp_if, LISPBUILTIN_LAZY};
 
 // compare: using the object comparison funcs
 #define COMPARE(OPNAME) \
-  debug_message("BUILTIN FUNCTION lisp_comparison");\
+  debug_message("BUILTIN FUNCTION lisp_comparison\n");\
   TOUCH(env);\
   int nargs = LispList_count(arg);\
   ASSERT_OR_ERROR(nargs == 2, "ArgumentError", "lisp_comparison", NULL, NULL, "Function takes 2 arguments: left, right (got %d).", nargs);\
@@ -265,7 +268,7 @@ LispBuiltin lisp_if_obj = {&lisp_if, LISPBUILTIN_LAZY};
     *right = arg->next->value;\
   int rv_value = OPNAME(left, right);\
   ERROR_CHECK;\
-  return LispObject_new_bool(rv_value);\
+  return rv_value ? &t : &nil;
 
 LispObject *lisp_gt(LispListElement *arg, LispEnvironment *env) {COMPARE(LispObject_gt)}
 LispObject *lisp_ge(LispListElement *arg, LispEnvironment *env) {COMPARE(LispObject_ge)}
@@ -377,10 +380,13 @@ LispObject *load_file(LispListElement *arg, LispEnvironment *env)
   debug_message("AFTER NARGS CHECK\n");
 
   LispObject *filename_obj = arg->value;
-  ASSERT_OR_ERROR(filename_obj->type == LISPOBJECT_STRING, "TypeError", "load-file", filename_obj, NULL, "filename must be a String, not %s", LispObject_type(filename_obj));
+  ASSERT_OR_ERROR(filename_obj->type == LISPOBJECT_ATOM, "TypeError", "load-file", filename_obj, NULL, "filename must be a Atomistic, not %s", LispObject_type(filename_obj));
   debug_message("AFTER TYPE CHECK\n");
 
-  eval_file(filename_obj->value_string, env);
+  LispAtom *filename_atm = LispAtom_cast_as(filename_obj->value_atom, LISPATOM_STRING);
+  ERROR_CHECK;
+
+  eval_file(filename_atm->value_string, env);
   ERROR_CHECK;
 
   return &nil;
@@ -400,13 +406,16 @@ LispObject *lisp_exit(LispListElement *arg, LispEnvironment *env)
   ASSERT_OR_ERROR(nargs < 2, "ArgumentError", "exit", NULL, NULL, "Function takes at most 1 argument: (got %d).", nargs);
   debug_message("AFTER NARGS CHECK\n");
 
-  int rv = 0;
+  long rv = 0;
 
   if (nargs) {
     LispObject *rv_obj = arg->value;
-    ASSERT_OR_ERROR(rv_obj->type == LISPOBJECT_INT, "TypeError", "exit", rv_obj, NULL, "rv must be an Integer, not %s", LispObject_type(rv_obj));
-    debug_message("AFTER TYPE CHECK\n");
-    rv = rv_obj->value_int;
+    ASSERT_OR_ERROR(rv_obj->type == LISPOBJECT_ATOM, "TypeError", "exit", rv_obj, NULL, "rv must be Atomistic, not %s", LispObject_type(rv_obj));
+
+    LispAtom *rv_atm = LispAtom_cast_as(rv_obj->value_atom, LISPATOM_INT);
+    ERROR_CHECK;
+
+    rv = (*rv_atm->value_int);
   }
 
   exit(rv);
@@ -431,11 +440,13 @@ LispObject *read_file(LispListElement *arg, LispEnvironment *env)
   debug_message("AFTER NARGS CHECK\n");
 
   LispObject *pathobj = arg->value;
-  ASSERT_OR_ERROR(pathobj->type == LISPOBJECT_STRING, "TypeError", "read-file", pathobj, NULL, "path argument must be a String, not %s", LispObject_type(pathobj));
+  ASSERT_OR_ERROR(pathobj->type == LISPOBJECT_ATOM, "TypeError", "read-file", pathobj, NULL, "path argument must be a Atomistic, not %s", LispObject_type(pathobj));
   debug_message("AFTER PATH TYPE CHECK\n");
 
-  FILE *fp = fopen(pathobj->value_string, "r");
-  ASSERT_OR_ERROR_WITH_ERRNO(fp != NULL, "IOError", "read-file", NULL, NULL, "Could not open file '%s'", pathobj->value_string);
+  LispAtom *pathatm = LispAtom_cast_as(pathobj->value_atom, LISPATOM_STRING);
+
+  FILE *fp = fopen(pathatm->value_string, "r");
+  ASSERT_OR_ERROR_WITH_ERRNO(fp != NULL, "IOError", "read-file", NULL, NULL, "Could not open file '%s'", pathatm->value_string);
 
   int rv = fseek(fp, 0, SEEK_END);
   ASSERT_OR_RAISE_WITH_ERRNO(rv == 0, "IOError", "read-file", NULL, "Failed to get size of file.");
@@ -490,25 +501,29 @@ LispObject *write_file(LispListElement *arg, LispEnvironment *env)
   debug_message("AFTER NARGS CHECK\n");
 
   LispObject *pathobj = arg->value;
-  ASSERT_OR_ERROR(pathobj->type == LISPOBJECT_STRING, "TypeError", "write-file", pathobj, NULL, "path argument must be a String, not %s", LispObject_type(pathobj));
+  ASSERT_OR_ERROR(pathobj->type == LISPOBJECT_ATOM, "TypeError", "write-file", pathobj, NULL, "path argument must be a Atomistic, not %s", LispObject_type(pathobj));
   ERROR_CHECK;
   debug_message("AFTER PATH TYPE CHECK\n");
 
+  LispAtom *pathatm = LispAtom_cast_as(pathobj->value_atom, LISPATOM_STRING);
+
   LispObject *contentobj = arg->next->value;
-  ASSERT_OR_ERROR(contentobj->type == LISPOBJECT_STRING, "TypeError", "write-file", contentobj, NULL, "content argument must be a String, not %s", LispObject_type(contentobj));
+  ASSERT_OR_ERROR(contentobj->type == LISPOBJECT_ATOM, "TypeError", "write-file", contentobj, NULL, "content argument must be a Atomistic, not %s", LispObject_type(contentobj));
   ERROR_CHECK;
   debug_message("AFTER CONTENT TYPE CHECK\n");
 
-  FILE *fp = fopen(pathobj->value_string, "w");
-  ASSERT_OR_ERROR_WITH_ERRNO(fp != NULL, "IOError", "write-file", NULL, NULL, "Could not open file '%s' for writing.", pathobj->value_string);
+  LispAtom *contentatm = LispAtom_cast_as(contentobj->value_atom, LISPATOM_STRING);
 
-  int rv = fprintf(fp, "%s", contentobj->value_string);
-  ASSERT_OR_RAISE(rv > 0, "IOError", "write-file", NULL, "Could not write file '%s'", pathobj->value_string);
+  FILE *fp = fopen(pathatm->value_string, "w");
+  ASSERT_OR_ERROR_WITH_ERRNO(fp != NULL, "IOError", "write-file", NULL, NULL, "Could not open file '%s' for writing.", pathatm->value_string);
+
+  int rv = fprintf(fp, "%s", contentatm->value_string);
+  ASSERT_OR_RAISE(rv > 0, "IOError", "write-file", NULL, "Could not write file '%s'", pathatm->value_string);
   fclose(fp);
 
   ERROR_CHECK;
 
-  return LispObject_new_string(contentobj->value_string);
+  return LispObject_new_string(contentatm->value_string);
 }
 LispBuiltin write_file_obj = {&write_file, LISPBUILTIN_GREEDY};
 
@@ -527,25 +542,29 @@ LispObject *append_file(LispListElement *arg, LispEnvironment *env)
   debug_message("AFTER NARGS CHECK\n");
 
   LispObject *pathobj = arg->value;
-  ASSERT_OR_ERROR(pathobj->type == LISPOBJECT_STRING, "TypeError", "write-file", pathobj, NULL, "path argument must be a String, not %s", LispObject_type(pathobj));
+  ASSERT_OR_ERROR(pathobj->type == LISPOBJECT_ATOM, "TypeError", "write-file", pathobj, NULL, "path argument must be a Atomistic, not %s", LispObject_type(pathobj));
   ERROR_CHECK;
   debug_message("AFTER PATH TYPE CHECK\n");
 
+  LispAtom *pathatm = LispAtom_cast_as(pathobj->value_atom, LISPATOM_STRING);
+
   LispObject *contentobj = arg->next->value;
-  ASSERT_OR_ERROR(contentobj->type == LISPOBJECT_STRING, "TypeError", "write-file", contentobj, NULL, "content argument must be a String, not %s", LispObject_type(contentobj));
+  ASSERT_OR_ERROR(contentobj->type == LISPOBJECT_ATOM, "TypeError", "write-file", contentobj, NULL, "content argument must be a Atomistic, not %s", LispObject_type(contentobj));
   ERROR_CHECK;
   debug_message("AFTER CONTENT TYPE CHECK\n");
 
-  FILE *fp = fopen(pathobj->value_string, "a");
-  ASSERT_OR_ERROR_WITH_ERRNO(fp != NULL, "IOError", "write-file", NULL, NULL, "Could not open file '%s' for append.", pathobj->value_string);
+  LispAtom *contentatm = LispAtom_cast_as(contentobj->value_atom, LISPATOM_STRING);
 
-  int rv = fprintf(fp, "%s", contentobj->value_string);
-  ASSERT_OR_RAISE(rv > 0, "IOError", "write-file", NULL, "Could not write file '%s'", pathobj->value_string);
+  FILE *fp = fopen(pathatm->value_string, "a");
+  ASSERT_OR_ERROR_WITH_ERRNO(fp != NULL, "IOError", "write-file", NULL, NULL, "Could not open file '%s' for writing.", pathatm->value_string);
+
+  int rv = fprintf(fp, "%s", contentatm->value_string);
+  ASSERT_OR_RAISE(rv > 0, "IOError", "write-file", NULL, "Could not write file '%s'", pathatm->value_string);
   fclose(fp);
 
   ERROR_CHECK;
 
-  return LispObject_new_string(contentobj->value_string);
+  return LispObject_new_string(contentatm->value_string);
 }
 LispBuiltin append_file_obj = {&append_file, LISPBUILTIN_GREEDY};
 
@@ -566,7 +585,7 @@ LispObject *import_module(LispListElement *arg, LispEnvironment *env)
   ASSERT_OR_ERROR(name->type == LISPOBJECT_SYMBOL, "TypeError", "import-module", name, NULL, "name to import should be a Symbol, not %s", LispObject_type(name));
   debug_message("AFTER NAME TYPE CHECK\n");
 
-  char *path = search(name->symbol_name);
+  char *path = search(name->value_symbol);
   ERROR_CHECK;
 
   debug_message("SEARCH RETURNED PATH %s\n", path);
@@ -592,10 +611,12 @@ LispObject *lisp_eval_file(LispListElement *arg, LispEnvironment *env)
   debug_message("AFTER NARGS CHECK\n");
 
   LispObject *path = arg->value;
-  ASSERT_OR_ERROR(path->type == LISPOBJECT_STRING, "TypeError", "eval-file", path, NULL, "path should be a String, not %s", LispObject_type(path));
+  ASSERT_OR_ERROR(path->type == LISPOBJECT_ATOM, "TypeError", "eval-file", path, NULL, "path should be a Atom, not %s", LispObject_type(path));
   debug_message("AFTER PATH TYPE CHECK\n");
 
-  eval_file(path->value_string, env);
+  LispAtom *path_atom = LispAtom_cast_as(path->value_atom, LISPATOM_STRING);
+
+  eval_file(path_atom->value_string, env);
   ERROR_CHECK;
 
   return &nil;
@@ -674,25 +695,25 @@ LispBuiltin append_obj = {&append, LISPBUILTIN_GREEDY};
 
 
 // (map f (arg1[ arg2[ ...]]))
-LispObject *map(LispListElement *arg, LispEnvironment *env)
-{
-  debug_message("BUILTIN FUNCTION MAP");
-
-  TOUCH(env);
-  int nargs = LispList_count(arg);
-  ASSERT_OR_ERROR(nargs == 1, "ArgumentError", "eval-file", NULL, NULL, "Function takes 1 arguments (path): (got %d).", nargs);
-  debug_message("AFTER NARGS CHECK\n");
-
-  LispObject *path = arg->value;
-  ASSERT_OR_ERROR(path->type == LISPOBJECT_STRING, "TypeError", "eval-file", path, NULL, "path should be a String, not %s", LispObject_type(path));
-  debug_message("AFTER PATH TYPE CHECK\n");
-
-  eval_file(path->value_string, env);
-  ERROR_CHECK;
-
-  return &nil;
-}
-LispBuiltin mapf_obj = {&map, LISPBUILTIN_LAZY};
+// LispObject *map(LispListElement *arg, LispEnvironment *env)
+// {
+//   debug_message("BUILTIN FUNCTION MAP");
+// 
+//   TOUCH(env);
+//   int nargs = LispList_count(arg);
+//   ASSERT_OR_ERROR(nargs == 1, "ArgumentError", "eval-file", NULL, NULL, "Function takes 1 arguments (path): (got %d).", nargs);
+//   debug_message("AFTER NARGS CHECK\n");
+// 
+//   LispObject *path = arg->value;
+//   ASSERT_OR_ERROR(path->type == LISPOBJECT_STRING, "TypeError", "eval-file", path, NULL, "path should be a String, not %s", LispObject_type(path));
+//   debug_message("AFTER PATH TYPE CHECK\n");
+// 
+//   eval_file(path->value_string, env);
+//   ERROR_CHECK;
+// 
+//   return &nil;
+// }
+// LispBuiltin mapf_obj = {&map, LISPBUILTIN_LAZY};
 
 
 

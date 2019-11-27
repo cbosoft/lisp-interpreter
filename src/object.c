@@ -10,6 +10,7 @@
 #include "debug.h"
 #include "types.h"
 #include "list.h"
+#include "atom.h"
 
 
 
@@ -33,10 +34,10 @@ LispObject *LispObject_new_string(char *value)
   LispObject *rv = LispObject_new_nil();
   ERROR_CHECK;
 
-  rv->type = LISPOBJECT_STRING;
+  rv->value_atom = LispAtom_new(NULL, NULL, value);
+  ERROR_CHECK;
 
-  rv->value_string = calloc(strlen(value)+1, sizeof(char));
-  strcpy(rv->value_string, value);
+  rv->type = LISPOBJECT_ATOM;
 
   return rv;
 }
@@ -45,12 +46,16 @@ LispObject *LispObject_new_string(char *value)
 
 
 // Create new integer.
-LispObject *LispObject_new_int(int value)
+LispObject *LispObject_new_int(long value)
 {
   LispObject *rv = LispObject_new_nil();
   ERROR_CHECK;
-  rv->type = LISPOBJECT_INT;
-  rv->value_int = value;
+
+  rv->value_atom = LispAtom_new(&value, NULL, NULL);
+  ERROR_CHECK;
+
+  rv->type = LISPOBJECT_ATOM;
+
   return rv;
 }
 
@@ -62,21 +67,12 @@ LispObject *LispObject_new_float(double value)
 {
   LispObject *rv = LispObject_new_nil();
   ERROR_CHECK;
-  rv->type = LISPOBJECT_FLOAT;
-  rv->value_float = value;
-  return rv;
-}
 
-
-
-
-// Create new boolean.
-LispObject *LispObject_new_bool(int value)
-{
-  LispObject *rv = LispObject_new_nil();
+  rv->value_atom = LispAtom_new(NULL, &value, NULL);
   ERROR_CHECK;
-  rv->type = LISPOBJECT_BOOL;
-  rv->value_bool = value;
+
+  rv->type = LISPOBJECT_ATOM;
+
   return rv;
 }
 
@@ -88,8 +84,9 @@ LispObject *LispObject_new_symbol(char *name)
 {
   LispObject *rv = LispObject_new_nil();
   ERROR_CHECK;
+
   rv->type = LISPOBJECT_SYMBOL;
-  rv->symbol_name = strdup(name);
+  rv->value_symbol = strdup(name);
   return rv;
 }
 
@@ -103,6 +100,7 @@ LispObject *LispObject_new_list()
   debug_message("new list\n");
   LispObject *rv = LispObject_new_nil();
   ERROR_CHECK;
+
   debug_message("after error check\n");
   rv->type = LISPOBJECT_LIST;
   rv->value_list = LispList_new_element();
@@ -153,58 +151,6 @@ void LispObject_print(LispObject *o)
 
 
 
-// make "nil" (zero-value) object
-void LispObject_make_nil(LispObject *o)
-{
-  if (o->value_string != NULL) {
-    free(o->value_string);
-    o->value_string = NULL;
-  }
-
-  o->value_int = 0;
-  o->value_float = 0.0;
-  o->value_bool = 0;
-  o->value_list = NULL;
-
-}
-
-
-
-
-// Copy value from 4source into $dest
-void LispObject_assign_value(LispObject *dest, LispObject *source)
-{
-  LispObject_make_nil(dest);
-
-  switch(source->type) {
-    case LISPOBJECT_STRING:
-      dest->value_string = calloc(strlen(source->value_string)+1, sizeof(char));
-      strcpy(dest->value_string, source->value_string);
-      break;
-
-    case LISPOBJECT_INT:
-      dest->value_int = source->value_int;
-      break;
-
-    case LISPOBJECT_FLOAT:
-      dest->value_float = source->value_float;
-      break;
-
-    case LISPOBJECT_BOOL:
-      dest->value_bool = source->value_bool;
-      break;
-
-    case LISPOBJECT_LIST:
-      dest->value_list = source->value_list;
-      break;
-  }
-
-  dest->type = source->type;
-}
-
-
-
-
 // Get string representation of type of object $o
 char *LispObject_type(LispObject *o)
 {
@@ -215,17 +161,8 @@ char *LispObject_type(LispObject *o)
     case LISPOBJECT_SYMBOL:
       return "Symbol";
 
-    case LISPOBJECT_INT:
-      return "Integer";
-
-    case LISPOBJECT_FLOAT:
-      return "Float";
-
-    case LISPOBJECT_BOOL:
-      return "Boolean";
-
-    case LISPOBJECT_STRING:
-      return "String";
+    case LISPOBJECT_ATOM:
+      return "Atom";
 
     case LISPOBJECT_LIST:
       return "List";
@@ -245,41 +182,24 @@ char *LispObject_repr(LispObject *o)
 {
   debug_message("REPR\n");
 
-  char *rv;
-  if (o->type == LISPOBJECT_STRING) {
-    debug_message("STRING\n");
-    rv = calloc(strlen(o->value_string)+3, sizeof(char));
-    sprintf(rv, "'%s'", o->value_string);
+  switch (o->type) {
+
+    case LISPOBJECT_NIL:
+      return "nil";
+
+    case LISPOBJECT_ATOM:
+      return LispAtom_repr(o->value_atom);
+
+    case LISPOBJECT_SYMBOL:
+      return o->value_symbol;
+
+    case LISPOBJECT_LIST:
+      return "(LIST REPR NOT IMPLEMENTED)";
+
+    default:
+      Exception_raise("Exception", "LispObject_repr", NULL, "Unknown type encountered in repr.");
+      return NULL;
   }
-  else if (o->type == LISPOBJECT_SYMBOL) {
-    rv = strdup(o->symbol_name);
-  }
-  else if (o->type == LISPOBJECT_LIST) {
-    //TODO
-    rv = "(LIST REPR NOT IMPLEMENTED)";
-  }
-  else {
-
-    rv = calloc(100, sizeof(char));
-
-    switch (o->type) {
-
-      case LISPOBJECT_INT:
-        snprintf(rv, 100, "%d", o->value_int);
-        break;
-
-      case LISPOBJECT_FLOAT:
-        snprintf(rv, 100, "%f", o->value_float);
-        break;
-
-      case LISPOBJECT_BOOL:
-        snprintf(rv, 100, "%s", o->value_bool ? "true" : "false");
-        break;
-
-    }
-  }
-
-  return rv;
 }
 
 
@@ -289,45 +209,27 @@ char *LispObject_repr(LispObject *o)
 // false. Otherwise, it is true.
 int LispObject_is_truthy(LispObject *o)
 {
-  int rv = -1;
 
   switch (o->type) {
 
-    case LISPOBJECT_INT:
-      rv = o->value_int != 0;
-      break;
-
-    case LISPOBJECT_FLOAT:
-      debug_message("(interpreting float as bool)\n");
-      rv = o->value_float != 0.0;
-      break;
-
-    case LISPOBJECT_BOOL:
-      rv = o->value_bool;
-      break;
-
-    case LISPOBJECT_STRING:
-      rv = o->value_string != NULL;
-      break;
+    case LISPOBJECT_ATOM:
+      return LispAtom_is_truthy(o->value_atom);
 
     case LISPOBJECT_SYMBOL:
       Exception_raise("Exception", "LispObject_is_truthy", o, "\"truthy-ness\" of symbol is ambiguous.");
-      break;
+      return -1;
 
     case LISPOBJECT_NIL:
-      rv = 0;
-      break;
+      return 0;
 
     case LISPOBJECT_LIST:
-      rv = LispList_count(o->value_list) > 0;
-      break;
+      return LispList_count(o->value_list) > 0;
 
     default:
       Exception_raise("Exception", "LispObject_is_truthy", o, "\"truthy-ness\" of unknown object is ambiguous.");
-      break;
+      return -1;
   }
 
-  return rv;
 }
 
 
@@ -337,56 +239,29 @@ int LispObject_is_truthy(LispObject *o)
 // Two objects' numerical values are compared. Implemented as a macro so all 
 // five can be quickly defined. TODO: compare non-numerical values. Compare 
 // lists? Compare strings?
-#define NUMERICAL_COMPARE(L,R,OPERATOR) \
+#define COMPARE(ATOM_OPNAME) \
   ASSERT_OR_ERROR(\
-      (left->type == LISPOBJECT_FLOAT || left->type == LISPOBJECT_INT),\
-      "TypeError", "LispObject_numerical_compare", left, -1, "Left operand: comparison only defined for numbers (Int, Float): got %s.", LispObject_type(left));\
+      (left->type == LISPOBJECT_ATOM),\
+      "TypeError", "LispObject_numerical_compare", left, -1, "Left operand: comparison only defined for Atoms (Int, Float, String): got %s.", LispObject_type(left));\
   ASSERT_OR_ERROR(\
-      (right->type == LISPOBJECT_FLOAT || right->type == LISPOBJECT_INT),\
-      "TypeError", "LispObject_numerical_compare", right, -1, "Right operand: comparison only define for numbers (Int, Float): got %s.", LispObject_type(right));\
-  if (L->type == R->type) {\
-    if (L->type == LISPOBJECT_INT) {\
-      return L->value_int OPERATOR R->value_int;\
-    }\
-    else {\
-      debug_message("(comparing floats)");\
-      return L->value_float OPERATOR R->value_float;\
-    }\
-  }\
-  else {\
-    debug_message("(comparing floats)");\
-    if (L->type == LISPOBJECT_FLOAT) {\
-      return L->value_float OPERATOR ((float)R->value_int);\
-    }\
-    else {\
-      return ((float)L->value_int) OPERATOR R->value_float;\
-    }\
-  }
-int LispObject_gt(LispObject *left, LispObject *right){ NUMERICAL_COMPARE(left, right, >); }
-int LispObject_ge(LispObject *left, LispObject *right){ NUMERICAL_COMPARE(left, right, >=); }
-int LispObject_lt(LispObject *left, LispObject *right){ NUMERICAL_COMPARE(left, right, <); }
-int LispObject_le(LispObject *left, LispObject *right){ NUMERICAL_COMPARE(left, right, <=); }
+      (right->type == LISPOBJECT_ATOM),\
+      "TypeError", "LispObject_numerical_compare", right, -1, "Right operand: comparison only defined for Atoms (Int, Float, String): got %s.", LispObject_type(right));\
+      return ATOM_OPNAME(left->value_atom, right->value_atom);
+int LispObject_gt(LispObject *left, LispObject *right){ COMPARE(LispAtom_gt) }
+int LispObject_ge(LispObject *left, LispObject *right){ COMPARE(LispAtom_ge) }
+int LispObject_lt(LispObject *left, LispObject *right){ COMPARE(LispAtom_lt) }
+int LispObject_le(LispObject *left, LispObject *right){ COMPARE(LispAtom_le) }
 int LispObject_eq(LispObject *left, LispObject *right)
 {
   ASSERT_OR_ERROR( 
-      (left->type == right->type) ||
-      ((left->type == LISPOBJECT_FLOAT) && (right->type == LISPOBJECT_INT)) ||
-      ((right->type == LISPOBJECT_FLOAT) && (left->type == LISPOBJECT_INT)),
-      "TypeError", "LispObject_equal", NULL, -1, "comparison operands must both be the same type, or at least both numbers.");
+      (left->type == right->type) && (left->type != LISPOBJECT_LIST),
+      "TypeError", "LispObject_equal", NULL, -1, "comparison operands must both be the same type, and not a List: got %s and %s.", LispObject_type(left), LispObject_type(right));
 
-  switch (left->type) {
-    case LISPOBJECT_BOOL:
-      return left->value_bool == right->value_bool;
-
-    case LISPOBJECT_STRING:
-      return strcmp(left->value_string, right->value_string) == 0;
-
-    case LISPOBJECT_SYMBOL:
-      return strcmp(left->symbol_name, right->symbol_name) == 0;
-  }
+  if (left->type == LISPOBJECT_SYMBOL)
+    return strcmp(left->value_symbol, right->value_symbol) == 0;
 
   // must be numbers
-  NUMERICAL_COMPARE(left, right, ==);
+  COMPARE(LispAtom_eq);
 }
 
 
@@ -397,3 +272,21 @@ int LispObject_eq(LispObject *left, LispObject *right)
   return LispObject_is_truthy(left) OPERATOR LispObject_is_truthy(right);
 int LispObject_or(LispObject *left, LispObject *right){ BOOLEAN(||); }
 int LispObject_and(LispObject *left, LispObject *right){ BOOLEAN(&&); }
+
+
+
+
+// return value of atom as specified type, or nah
+double LispObject_as_float(LispObject *o)
+{
+  ASSERT_OR_ERROR( o->type == LISPOBJECT_ATOM && ((o->value_atom->value_int != NULL)  || (o->value_atom->value_float != NULL)), "TypeError", "LispObject_as_float", o, 0.0, "Object has no value as atom.");
+  double rv = 0.0;
+  if (o->value_atom->value_float != NULL) {
+    rv = (*(o->value_atom->value_float));
+  }
+  else {
+    rv = (double)(*(o->value_atom->value_int));
+  }
+
+  return rv;
+}
