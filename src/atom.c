@@ -104,34 +104,52 @@ LispAtom *LispAtom_cast_as(LispAtom *a, int type)
     return NULL;
   }
 
-  if (current_type == type) {
+  // existing type is desired type
+  if ((current_type == type) || ((current_type == LISPATOM_INT) && (type == LISPATOM_NUMBER)) || ((current_type == LISPATOM_FLOAT) && (type == LISPATOM_NUMBER))) {
     return LispAtom_new(a->value_int, a->value_float, a->value_string);
   }
 
-  if ((current_type == LISPATOM_FLOAT) && ((type == LISPATOM_INT) || (type == LISPATOM_NUMBER))) {
+  // int to float, float to int
+  if ((current_type == LISPATOM_FLOAT) && (type == LISPATOM_INT)) {
     long val = (long)(*a->value_float);
     return LispAtom_new(&val, NULL, NULL);
   }
-  if ((current_type == LISPATOM_INT) && ((type == LISPATOM_FLOAT) || (type == LISPATOM_NUMBER))) {
+  else if ((current_type == LISPATOM_INT) && (type == LISPATOM_FLOAT)) {
     double val = (double)(*a->value_int);
     return LispAtom_new(NULL, &val, NULL);
   }
-  if ((current_type == LISPATOM_FLOAT) && (type == LISPATOM_STRING)) {
-    char *rv = calloc(51, sizeof(char));
-    snprintf(rv, 50, "%f", (*a->value_float));
-    return LispAtom_new(NULL, NULL, rv);
+
+  // string to number
+  else if ((current_type == LISPATOM_STRING) && (type == LISPATOM_NUMBER)) {
+    int is_int = parser_string_is_int(a->value_string), is_float = parser_string_is_float(a->value_string);
+    ASSERT_OR_ERROR(is_int || is_float, "CastError", "LispAtom_cast_as", NULL, NULL, "Cannot cast string %s as Number (Int or Float).", LispAtom_repr(a));
+    if (is_int) {
+      long val = atol(a->value_string);
+      return LispAtom_new(&val, NULL, NULL);
+    }
+    else {
+      double val = atol(a->value_string);
+      return LispAtom_new(NULL, &val, NULL);
+    }
   }
-  if ((current_type == LISPATOM_STRING) && ((type == LISPATOM_INT) || (type == LISPATOM_NUMBER))) {
+  else if ((current_type == LISPATOM_STRING) && (type == LISPATOM_INT)) {
     ASSERT_OR_ERROR(parser_string_is_int(a->value_string), "CastError", "LispAtom_cast_as", NULL, NULL, "Cannot cast string %s as Int.", LispAtom_repr(a));
     long val = atol(a->value_string);
     return LispAtom_new(&val, NULL, NULL);
   }
-  if ((current_type == LISPATOM_STRING) && ((type == LISPATOM_FLOAT) || (type == LISPATOM_NUMBER))) {
+  else if ((current_type == LISPATOM_STRING) && (type == LISPATOM_FLOAT)) {
     ASSERT_OR_ERROR(parser_string_is_float(a->value_string), "CastError", "LispAtom_cast_as", NULL, NULL, "Cannot cast string %s as Float.", LispAtom_repr(a));
     double val = atol(a->value_string);
     return LispAtom_new(NULL, &val, NULL);
   }
-  if ((current_type == LISPATOM_INT) && (type == LISPATOM_STRING)) {
+
+  // number to string
+  else if ((current_type == LISPATOM_FLOAT) && (type == LISPATOM_STRING)) {
+    char *rv = calloc(51, sizeof(char));
+    snprintf(rv, 50, "%f", (*a->value_float));
+    return LispAtom_new(NULL, NULL, rv);
+  }
+  else if ((current_type == LISPATOM_INT) && (type == LISPATOM_STRING)) {
     char *rv = calloc(51, sizeof(char));
     snprintf(rv, 50, "%ld", (*a->value_int));
     return LispAtom_new(NULL, NULL, rv);
