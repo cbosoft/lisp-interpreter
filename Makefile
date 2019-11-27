@@ -12,6 +12,7 @@ OBJ = \
 			obj/debug.o \
 			obj/function.o \
 			obj/import.o \
+			obj/math.o \
 			obj/list.o \
 			obj/util.o \
 			obj/singletons.o \

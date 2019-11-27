@@ -25,75 +25,11 @@ extern LispObject t;
 
 
 
-// Numerical operations on two objects
-#define NUMERICAL_OPERATION(FUNC, OPERATION)\
-  debug_message("BUILTIN FUNCTION "FUNC"\n");\
-  TOUCH(env);\
-  int nargs = LispList_count(arg);\
-  ASSERT_OR_ERROR(nargs == 2, "ArgumentError", FUNC, NULL, NULL, "Function takes 2 arguments (got %d).", nargs);\
-  LispObject *l = arg->value;\
-  LispObject *r = arg->next->value;\
-  ASSERT_OR_ERROR(l->type == r->type && l->type == LISPOBJECT_ATOM,\
-      "TypeError",\
-      FUNC, \
-      NULL, NULL, \
-      "Function expects Atomistic arguments, got %s and %s.", LispObject_type(l), LispObject_type(r));\
-  fprintf(stderr, "LATOM: %s\n", LispAtom_repr(l->value_atom));\
-  debug_message(""FUNC" AFTER ATOM CHECK\n");\
-  LispAtom *cl = NULL, *cr = NULL;\
-  LispAtom_cast_together(l->value_atom, r->value_atom, &cl, &cr);\
-  ERROR_CHECK;\
-  debug_message(""FUNC" AFTER CAST TOGETHER\n");\
-  ASSERT_OR_ERROR(cl->value_string == NULL && cr->value_string == NULL,\
-      "TypeError",\
-      FUNC, \
-      NULL, NULL, \
-      "Function expects numerical arguments.");\
-  if (cl->value_float != NULL) {\
-    LispObject *rv = LispObject_new_float((*cl->value_float) OPERATION (*cr->value_float));\
-    return rv;\
-  }\
-    LispObject *rv = LispObject_new_int((*cl->value_int) OPERATION (*cr->value_int));\
-    return rv;
-LispObject *add(LispListElement *arg, LispEnvironment *env) { NUMERICAL_OPERATION("add", +) }
-LispObject *subtract(LispListElement *arg, LispEnvironment *env) { NUMERICAL_OPERATION("subtract", -) }
-LispObject *multiply(LispListElement *arg, LispEnvironment *env) { NUMERICAL_OPERATION("multiply", *) }
-LispObject *divide(LispListElement *arg, LispEnvironment *env) { 
-  debug_message("BUILTIN FUNCTION DIVIDE\n");
-  TOUCH(env);
-  int nargs = LispList_count(arg);
-  ASSERT_OR_ERROR(nargs == 2, "ArgumentError", "divide", NULL, NULL, "Function takes 2 arguments (got %d).", nargs);
-  LispObject *l = arg->value;
-  LispObject *r = arg->next->value;
-  ASSERT_OR_ERROR(l->type == r->type && l->type == LISPOBJECT_ATOM,
-      "TypeError",
-      "divide", 
-      NULL, NULL, 
-      "Function expects Atomistic arguments, got %s and %s.", LispObject_type(l), LispObject_type(r));
-  LispAtom *cl = NULL, *cr = NULL;
-  LispAtom_cast_together(l->value_atom, r->value_atom, &cl, &cr);
-  ASSERT_OR_ERROR(cl->value_string == NULL,
-      "TypeError",
-      "divide", 
-      NULL, NULL, 
-      "Function expects numerical arguments.");
-  ASSERT_OR_ERROR( ((cr->value_int != NULL) &&(*cr->value_int != 0)) || ((cr->value_float != NULL) &&(*cr->value_float != 0.0)),
-      "DivideByZeroError",
-      "divide",
-      NULL, NULL,
-      "Cannot divide by zero.");
-  if (cl->value_float != NULL) {
-    LispObject *rv = LispObject_new_float((*cl->value_float) / (*cr->value_float));
-    return rv;
-  }
-    LispObject *rv = LispObject_new_int((*cl->value_int) / (*cr->value_int));
-    return rv;
-}
-LispBuiltin add_obj = {&add, LISPBUILTIN_GREEDY};
-LispBuiltin subtract_obj = {&subtract, LISPBUILTIN_GREEDY};
-LispBuiltin multiply_obj = {&multiply, LISPBUILTIN_GREEDY};
-LispBuiltin divide_obj = {&divide, LISPBUILTIN_GREEDY};
-
+// math.c
+extern LispBuiltin add_obj;
+extern LispBuiltin subtract_obj;
+extern LispBuiltin multiply_obj;
+extern LispBuiltin divide_obj;
 
 
 
