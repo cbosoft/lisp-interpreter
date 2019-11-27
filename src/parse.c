@@ -84,6 +84,8 @@ LispObject *new_object_guess_type(LispToken *t) {
 
   if (rc >= 0) {
     debug_message("GUESSING %s is STRING\n", s);
+    s[len-1] = '\0';
+    s++;
     rv = LispObject_new_string(s);
     goto end;
   }
