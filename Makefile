@@ -1,6 +1,6 @@
-CXX = gcc
-CFLAGS = -g -Wall -Wextra
-OBJ = \
+CXX = g++
+CFLAGS = -g -Wall -Wextra -std=c++17
+C_OBJ = \
 			obj/atom.o \
 			obj/tokenise.o \
 			obj/parse.o \
@@ -17,20 +17,23 @@ OBJ = \
 			obj/util.o \
 			obj/singletons.o \
 			obj/help.o
+OBJ = \
+			obj/tokenise.o \
+			obj/atom.o
 LINK = -ledit -lncurses -lgc -lpcre
 
-obj/%.o: src/%.c
+obj/%.o: src/%.cpp
 	mkdir -p obj
 	$(CXX) $(CFLAGS) $< -c -o $@
 
 crisp: obj/main.o $(OBJ)
 	$(CXX) $(CFLAGS) obj/main.o $(OBJ) -o $@ $(LINK)
 
-tests: obj/tests.o $(OBJ)
-	$(CXX) $(CFLAGS) obj/tests.o $(OBJ) -o $@ $(LINK) && ./tests
+#tests: obj/tests.o $(OBJ)
+#	$(CXX) $(CFLAGS) obj/tests.o $(OBJ) -o $@ $(LINK) && ./tests
 
-install:
-	cp crisp /usr/bin/.
+#install:
+#	cp crisp /usr/bin/.
 
 clean:
 	rm -rf obj crisp
