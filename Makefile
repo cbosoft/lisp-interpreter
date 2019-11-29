@@ -19,14 +19,16 @@ C_OBJ = \
 			obj/help.o
 OBJ = \
 			obj/tokenise.o \
+			obj/parse.o \
+			obj/debug.o \
 			obj/atom.o
 LINK = -ledit -lncurses -lgc -lpcre
 
-obj/%.o: src/%.cpp
+obj/%.o: src/%.cpp src/types.hpp
 	mkdir -p obj
 	$(CXX) $(CFLAGS) $< -c -o $@
 
-crisp: obj/main.o $(OBJ)
+crisp: obj/main.o $(OBJ) src/types.hpp
 	$(CXX) $(CFLAGS) obj/main.o $(OBJ) -o $@ $(LINK)
 
 #tests: obj/tests.o $(OBJ)
