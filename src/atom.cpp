@@ -1,5 +1,5 @@
 #include <sstream>
-#include "atom.hpp"
+#include "types.hpp"
 
 
 
@@ -7,7 +7,7 @@
 std::string LispAtom::repr()
 {
   std::stringstream ss;
-  switch (this->type()) {
+  switch (this->type) {
 
     case LISPATOM_INT:
       ss << this->value_int;
@@ -31,7 +31,7 @@ std::string LispAtom::repr()
 //
 long LispAtom::cast_to_int()
 {
-  switch (this->type()) {
+  switch (this->type) {
 
     case LISPATOM_INT:
       return this->value_int;
