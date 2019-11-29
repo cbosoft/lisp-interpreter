@@ -1,17 +1,5 @@
 #pragma once
-#include <string>
-
-
-class LispToken {
-  private:
-    std::string token;
-
-  public:
-    LispToken *next;
-
-    LispToken(std::string token);
-    void print();
-};
+#include "types.hpp"
 
 
 LispToken *tokenise(std::string input);
