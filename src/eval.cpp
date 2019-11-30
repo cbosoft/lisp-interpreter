@@ -20,7 +20,6 @@ LispObject *LispObject::eval(LispEnvironment *env)
   LispFunction *var_lfunc = NULL;
 
 
-  //ASSERT_OR_ERROR(env != NULL, "Exception", "eval", NULL, NULL, "eval called without environment.");
   if (env == NULL) throw std::runtime_error(Formatter() << "eval called without environment.");
 
   debug_message("EVAL %s\n", this->repr_type());
