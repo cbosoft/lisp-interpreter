@@ -2,9 +2,12 @@
 #include <iostream>
 #include <regex>
 #include <vector>
+#include <fstream>
+#include <ios>
 
 #include "types.hpp"
 #include "debug.hpp"
+#include "tokenise.hpp"
 
 
 
@@ -65,26 +68,61 @@ LispListElement *LispParser::parse(LispToken *tokens)
     debug_message("TOKEN: %s\n", token->get_token().c_str() );
 
     if (token->compare("(") == 0) {
+
       debug_message("OPENING NEW LIST\n");
       LispListElement *newlist = new LispListElement();
       new_obj = new LispObject(newlist);
-      debug_message("after OPENING NEW LIST\n");
       open_lists.top()->append(new_obj);
       open_lists.push(newlist);
+      debug_message("after OPENING NEW LIST\n");
+
     }
     else if (token->compare(")") == 0) {
+
       debug_message("CLOSING LIST\n");
       open_lists.pop();
+
     }
     else {
+
       debug_message("GUESS\n");
       new_obj = this->new_object_guess_type(token);
 
-      //debug_message("NEW OBJECT %s (%s)\n", LispObject_repr(new), LispObject_type(new));
+      debug_message("NEW OBJECT %s\n", new_obj->repr().c_str());
       open_lists.top()->append(new_obj);
+
     }
 
   }
 
   return root;
+}
+
+
+
+
+// parse
+LispListElement *LispParser::parse_string(std::string s)
+{
+
+  LispToken *tokens = tokenise(s);
+
+  debug_message("TOKENS:");
+  for (LispToken *i = tokens; i != NULL; i = i->next) {
+    debug_message("| %s\n", i->get_token());
+  }
+
+  return this->parse(tokens);
+}
+
+
+
+
+// parse file
+LispListElement *LispParser::parse_file(std::string path)
+{
+  std::ifstream ifs(path);
+  std::stringstream buffer;
+  buffer << ifs.rdbuf();
+  return this->parse_string(buffer.str());
 }
