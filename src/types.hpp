@@ -2,6 +2,7 @@
 #include <string>
 #include <regex>
 #include <iostream>
+#include "colour.hpp"
 
 #define OP(O) LispAtom operator O(LispAtom obj) { \
 \
@@ -75,7 +76,7 @@ class LispAtom {
     double cast_to_float();
     std::string cast_to_string();
     void print() {
-      std::cout << this->repr() << std::endl;
+      std::cout << " " << this->repr() << " ";
     }
 };
 
@@ -92,8 +93,9 @@ class LispSymbol {
   public:
     LispSymbol() {};
     LispSymbol(std::string name){ this->name = name; }
+    std::string get_name(){ return this->name; }
     void print() {
-      std::cout << " " << this->name << " " << std::endl;
+      std::cout << " " << this->name << " ";
     }
 };
 
@@ -118,6 +120,7 @@ enum LISPOBJECT_TYPE {
 };
 
 
+class LispEnvironment;
 class LispListElement;
 class LispObject {
   private:
@@ -134,6 +137,41 @@ class LispObject {
       this->type = -1;
     };
 
+    std::string repr() {
+      switch (this->type) {
+        case LISPOBJECT_ATOM:
+          return this->value_atom->repr();
+
+        case LISPOBJECT_LIST:
+          return "(TODO)";
+
+        case LISPOBJECT_SYMBOL:
+          return this->value_symbol->get_name();
+      }
+
+      throw "Unknown type found!";
+    }
+
+    std::string repr_type() {
+      switch (this->type) {
+        case LISPOBJECT_ATOM:
+          return "Atom";
+
+        case LISPOBJECT_LIST:
+          return "List";
+
+        case LISPOBJECT_SYMBOL:
+          return "Symbol";
+      }
+
+      throw "Unknown type found!";
+    }
+
+    int get_type(){ return this->type; }
+    LispObject *eval(LispEnvironment *env);
+
+    template<typename T>
+    LispObject(T atom_val) { this->value_atom = new LispAtom(atom_val); this->type = LISPOBJECT_ATOM; }
     LispObject(LispAtom *atom) { this->value_atom = atom; this->type = LISPOBJECT_ATOM; }
     LispObject(LispListElement *list) { this->value_list = list; this->type = LISPOBJECT_LIST; }
     LispObject(LispSymbol *symbol) { this->value_symbol = symbol; this->type = LISPOBJECT_SYMBOL; }
@@ -167,7 +205,24 @@ class LispListElement {
       this->next = NULL;
     }
     void set_value(LispObject *value) { this->value = value; }
-    LispObject *get_value(LispObject *value) { return this->value; }
+    LispObject *get_value() { return this->value; }
+    LispListElement *get_next() { return this->next; }
+
+    LispObject *eval_each(LispEnvironment *env) {
+      LispListElement *iter = this;
+      for (; iter->next->next != NULL; iter = iter->next) {
+        iter->value->eval(env);
+      }
+      iter = iter->next;
+      return iter->value->eval(env);
+    }
+
+    int count() {
+      if (this->next != NULL)
+        return 1 + this->next->count();
+      else
+        return 0;
+    }
 
     void append(LispObject *next_value) { 
       LispListElement *iter = this;
@@ -180,11 +235,8 @@ class LispListElement {
       
       this->value->print();
 
-      LispListElement *iter = this->next;
-      while (iter->next != NULL) {
-        iter->print();
-        iter = iter->next;
-      }
+      for (LispListElement *iter = this->next; iter->next != NULL; iter = iter->next)
+        iter->value->print();
 
     }
 };
@@ -204,26 +256,22 @@ class LispListElement {
 inline void LispObject::print() {
   //if (this == 0) throw "can't print null obj";
 
-  std::cout << "PRINTING " << this << std::endl;
-
   switch (this->type) {
     case LISPOBJECT_ATOM:
-      std::cout << "PRINTING ATOM\n";
       this->value_atom->print();
       break;
 
     case LISPOBJECT_SYMBOL:
-      std::cout << "PRINTING SYMBOL\n";
       this->value_symbol->print();
       break;
 
     case LISPOBJECT_LIST:
-      std::cout << "PRINTING LIST\n";
       std::cout << "(";
       this->value_list->print();
       std::cout << ")";
       break;
   }
+  std::cout << DIM << "(" << this << ")" << RESET;
 
 }
 
@@ -276,4 +324,78 @@ class LispParser {
     int string_is_string(std::string s) { return std::regex_match(s, this->string_is_string_re); }
 
     LispListElement *parse(LispToken *tokens);
+    LispListElement *parse_string(std::string s);
+    LispListElement *parse_file(std::string path);
+};
+
+
+
+enum LISPENV_RET { LISPENV_OBJ, LISPENV_BFUNC, LISPENV_LFUNC };
+class LispBuiltin; 
+class LispFunction; 
+class LispEnvironment {
+  private:
+    std::map<std::string, LispObject *> objects_map;
+    std::map<std::string, LispBuiltin *> builtin_functions_map;
+    std::map<std::string, LispFunction *> lisp_functions_map;
+    LispEnvironment *parent;
+  public:
+    LispEnvironment() { this->parent = NULL; }
+    LispEnvironment(LispEnvironment *parent) { this->parent = parent; }
+
+    void add_variable(std::string name, LispObject *obj) { this->objects_map.insert_or_assign(name, obj); }
+    void add_builtin(std::string name, LispBuiltin *val){ this->builtin_functions_map.insert_or_assign(name, val); }
+    void add_lispfunc(std::string name, LispFunction *val){ this->lisp_functions_map.insert_or_assign(name, val); }
+
+    LispObject *get_object(std::string name) { return this->objects_map[name]; }
+    LispBuiltin *get_builtin(std::string name) { return this->builtin_functions_map[name]; }
+    int get(std::string name, LispObject **obj, LispBuiltin **bf, LispFunction **lf) {
+      auto obj_iter = this->objects_map.find(name);
+      if (obj_iter != this->objects_map.end()) {
+        (*obj) = obj_iter->second;
+        return LISPENV_OBJ;
+      }
+
+      auto bf_iter = this->builtin_functions_map.find(name);
+      if (bf_iter != this->builtin_functions_map.end()) {
+        (*bf) = bf_iter->second;
+        return LISPENV_BFUNC;
+      }
+
+      auto lf_iter = this->lisp_functions_map.find(name);
+      if (lf_iter != this->lisp_functions_map.end()) {
+        (*lf) = lf_iter->second;
+        return LISPENV_LFUNC;
+      }
+
+      return -1;
+    }
+};
+
+
+
+
+// 
+typedef LispObject* (LispCppFunc)(LispListElement *arg, LispEnvironment *env);
+class LispBuiltin {
+  private:
+    LispCppFunc *func;
+  public:
+    LispBuiltin(LispCppFunc *func) { this->func = func; }
+    LispObject *eval(LispListElement *arg, LispEnvironment *env) { return this->func(arg, env); }
+};
+
+
+
+
+
+class LispFunction {
+  private:
+    std::vector<std::string> arg_names;
+    LispObject *body;
+  public:
+    LispFunction(){};
+    void add_arg(std::string arg){ this->arg_names.push_back(arg); }
+    void set_body(LispObject *body){ this->body = body; }
+    LispObject *eval(LispListElement *arg, LispEnvironment *env);
 };

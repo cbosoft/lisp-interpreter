@@ -21,6 +21,8 @@ OBJ = \
 			obj/tokenise.o \
 			obj/parse.o \
 			obj/debug.o \
+			obj/eval.o \
+			obj/singletons.o \
 			obj/atom.o
 LINK = -ledit -lncurses -lgc -lpcre
 
