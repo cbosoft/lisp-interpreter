@@ -2,6 +2,7 @@
 #include <string>
 #include <regex>
 #include <iostream>
+
 #include "colour.hpp"
 
 #define OP(O) LispAtom operator O(LispAtom obj) { \
@@ -208,14 +209,7 @@ class LispListElement {
     LispObject *get_value() { return this->value; }
     LispListElement *get_next() { return this->next; }
 
-    LispObject *eval_each(LispEnvironment *env) {
-      LispListElement *iter = this;
-      for (; iter->next->next != NULL; iter = iter->next) {
-        iter->value->eval(env);
-      }
-      iter = iter->next;
-      return iter->value->eval(env);
-    }
+    LispObject *eval_each(LispEnvironment *env);
 
     int count() {
       if (this->next != NULL)

@@ -102,3 +102,17 @@ LispObject  *LispFunction::eval(LispListElement *arg, LispEnvironment *env)
 
   return this->body->eval(subenv);
 }
+
+
+
+
+//
+LispObject *LispListElement::eval_each(LispEnvironment *env) {
+  debug_message("eval each\n");
+
+  LispListElement *iter = this;
+  for (; iter->next != NULL && iter->next->value != NULL; iter = iter->next)
+    iter->value->eval(env);
+
+  return iter->value->eval(env);
+}
