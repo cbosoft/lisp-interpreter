@@ -11,13 +11,14 @@ extern LispObject nil;
 
 LispObject *LispObject::eval(LispEnvironment *env)
 {
-  std::string fname = NULL;
+  debug_message("IN EVAL\n");
+
+  std::string fname;
   LispObject *fn = NULL, *var_obj = NULL;
   LispListElement *list_elem = NULL, *list_iter = NULL, *list_args;
   LispBuiltin *var_bfunc = NULL;
   LispFunction *var_lfunc = NULL;
 
-  debug_message("IN EVAL\n");
 
   //ASSERT_OR_ERROR(env != NULL, "Exception", "eval", NULL, NULL, "eval called without environment.");
   if (env == NULL) throw std::runtime_error(Formatter() << "eval called without environment.");
