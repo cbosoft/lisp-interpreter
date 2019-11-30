@@ -2,10 +2,12 @@
 #include <string.h>
 #include <stdio.h>
 #include <assert.h>
+#include <exception>
 
 //#include "eval.h"
 #include "types.hpp"
 #include "debug.hpp"
+#include "formatter.hpp"
 
 
 extern LispObject nil;
@@ -22,14 +24,14 @@ LispObject *LispObject::eval(LispEnvironment *env)
   debug_message("IN EVAL\n");
 
   //ASSERT_OR_ERROR(env != NULL, "Exception", "eval", NULL, NULL, "eval called without environment.");
-  if (env == NULL) throw "eval called without environment.";
+  if (env == NULL) throw std::runtime_error(Formatter() << "eval called without environment.");
 
   debug_message("EVAL %s\n", this->repr_type());
   switch (this->type) {
 
   case LISPOBJECT_SYMBOL:
     var_obj = env->get_object(this->value_symbol->get_name());
-    if (var_obj == NULL) throw "Symbol not defined.";
+    if (var_obj == NULL) throw std::runtime_error(Formatter() << "Symbol " << this->value_symbol->get_name() << " not defined.");
     return var_obj;
 
   case LISPOBJECT_LIST:
@@ -62,10 +64,10 @@ LispObject *LispObject::eval(LispEnvironment *env)
 	
     list_args = list_elem->get_next();
 
-    if (fn->get_type() != LISPOBJECT_SYMBOL) throw "Can't eval function with no name.";
+    if (fn->get_type() != LISPOBJECT_SYMBOL) throw std::runtime_error(Formatter() << "List called as a function must start with a Symbol.");
     fname = fn->get_value_symbol()->get_name();
 
-    if (!env->get(fname, &var_obj, &var_bfunc, &var_lfunc)) throw "Object not found in environment.";
+    if (env->get(fname, &var_obj, &var_bfunc, &var_lfunc) < 0) throw std::runtime_error(Formatter() << "Object \"" << fname << "\" not found in environment.");
 
     if (var_lfunc != NULL) {
       debug_message("SYMBOL %s IS LISP FUNCTION\n", fn->value_symbol);
