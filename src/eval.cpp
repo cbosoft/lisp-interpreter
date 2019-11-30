@@ -22,7 +22,7 @@ LispObject *LispObject::eval(LispEnvironment *env)
 
   if (env == NULL) throw std::runtime_error(Formatter() << "eval called without environment.");
 
-  debug_message("EVAL %s\n", this->repr_type());
+  debug_message("EVAL %s\n", this->repr_type().c_str());
   switch (this->type) {
 
   case LISPOBJECT_SYMBOL:
@@ -37,7 +37,7 @@ LispObject *LispObject::eval(LispEnvironment *env)
       return &nil;
     }
 
-    debug_message("LIST CHILD IS %s\n", list_elem->get_value()->repr_type());
+    debug_message("LIST CHILD IS %s\n", list_elem->get_value()->repr_type().c_str());
 
     fn = list_elem->get_value();
 
