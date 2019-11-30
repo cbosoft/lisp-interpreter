@@ -20,13 +20,14 @@ extern int DEBUG_MODE;
 int main(void)
 {
   DEBUG_MODE = 1;
-  LispToken *tokens = tokenise("(+ 1 1)");
-  tokens->print();
-
   LispParser *parser = new LispParser();
-  LispListElement *root = parser->parse(tokens);
-  if (root == NULL) exit(1);
-  root->print();
+  LispListElement *root = parser->parse_string("(+ 1 1)");
+
+  if (root == NULL) throw "parse returned null";
+
+  LispEnvironment *env = new LispEnvironment();
+
+  root->eval_each(env);
 
   return 0;
 }
