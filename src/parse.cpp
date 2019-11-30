@@ -8,6 +8,7 @@
 #include "types.hpp"
 #include "debug.hpp"
 #include "tokenise.hpp"
+#include "formatter.hpp"
 
 
 
@@ -18,35 +19,35 @@
 LispObject *LispParser::new_object_guess_type(LispToken *t) {
   std::string s = t->get_token();
 
-  debug_message("GUESSING %s\n", s.c_str());
+  debug_message(Formatter() << "GUESSING " << s);
   
   if (s.compare("(") == 0) {
-    debug_message("GUESSING %s is LIST\n", s.c_str());
+    debug_message(Formatter() << "GUESSING "<< s << "is LIST");
     LispListElement *newlist = new LispListElement();
     return new LispObject(newlist);
   }
 
   if (this->string_is_int(s)) {
-    debug_message("GUESSING %s is INT\n", s.c_str());
+    debug_message(Formatter() << "GUESSING " << s << " is INT");
     LispAtom *newatom = new LispAtom( atol(s.c_str()) );
     return new LispObject(newatom);
   }
 
   if (this->string_is_float(s)) {
-    debug_message("GUESSING %s is FLOAT\n", s.c_str());
+    debug_message(Formatter() << "GUESSING " << s << " is FLOAT");
     LispAtom *newatom = new LispAtom( atof(s.c_str()) );
     return new LispObject(newatom);
   }
 
 
   if (this->string_is_string(s)) {
-    debug_message("GUESSING %s is STRING\n", s.c_str());
+    debug_message(Formatter() << "GUESSING " << s << " is STRING");
     std::string body = s.substr(1, s.length()-1);
     LispAtom *newatom = new LispAtom(body);
     return new LispObject(newatom);
   }
 
-  debug_message("GUESSING %s is SYMBOL\n", s.c_str());
+  debug_message(Formatter() << "GUESSING " << s << " is SYMBOL");
   LispSymbol *newsymbol = new LispSymbol(s);
   return new LispObject(newsymbol);
 }
@@ -65,7 +66,7 @@ LispListElement *LispParser::parse(LispToken *tokens)
   debug_message("IN PARSE\n");
 
   for (LispToken *token = tokens; token != NULL; token = token->next) {
-    debug_message("TOKEN: %s\n", token->get_token().c_str() );
+    debug_message(Formatter() << "TOKEN: " << token->get_token());
 
     if (token->compare("(") == 0) {
 
@@ -88,7 +89,7 @@ LispListElement *LispParser::parse(LispToken *tokens)
       debug_message("GUESS\n");
       new_obj = this->new_object_guess_type(token);
 
-      debug_message("NEW OBJECT %s\n", new_obj->repr().c_str());
+      debug_message(Formatter() << "NEW OBJECT " << new_obj->repr());
       open_lists.top()->append(new_obj);
 
     }
@@ -109,7 +110,7 @@ LispListElement *LispParser::parse_string(std::string s)
 
   debug_message("TOKENS:");
   for (LispToken *i = tokens; i != NULL; i = i->next) {
-    debug_message("| %s\n", i->get_token());
+    debug_message(Formatter() << "| " << i->get_token());
   }
 
   return this->parse(tokens);
