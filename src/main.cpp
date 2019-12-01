@@ -21,7 +21,7 @@ int main(void)
 {
   DEBUG_MODE = 1;
   LispParser *parser = new LispParser();
-  LispListElement *root = parser->parse_string("(+ 1 1)");
+  LispList *root = parser->parse_string("(+ 1 1)");
 
   if (root == NULL) throw "parse returned null";
 

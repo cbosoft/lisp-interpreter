@@ -2,6 +2,7 @@
 #include <string>
 #include <regex>
 #include <iostream>
+#include <list>
 
 #include "colour.hpp"
 
@@ -122,11 +123,11 @@ enum LISPOBJECT_TYPE {
 
 
 class LispEnvironment;
-class LispListElement;
+class LispList;
 class LispObject {
   private:
     LispAtom *value_atom;
-    LispListElement *value_list;
+    LispList *value_list;
     LispSymbol *value_symbol;
     int type;
 
@@ -174,15 +175,15 @@ class LispObject {
     template<typename T>
     LispObject(T atom_val) { this->value_atom = new LispAtom(atom_val); this->type = LISPOBJECT_ATOM; }
     LispObject(LispAtom *atom) { this->value_atom = atom; this->type = LISPOBJECT_ATOM; }
-    LispObject(LispListElement *list) { this->value_list = list; this->type = LISPOBJECT_LIST; }
+    LispObject(LispList *list) { this->value_list = list; this->type = LISPOBJECT_LIST; }
     LispObject(LispSymbol *symbol) { this->value_symbol = symbol; this->type = LISPOBJECT_SYMBOL; }
 
     void set_value(LispAtom *atom) {this->value_atom = atom;}
-    void set_value(LispListElement *list) {this->value_list = list; }
+    void set_value(LispList *list) {this->value_list = list; }
     void set_value(LispSymbol *symbol) {this->value_symbol = symbol; }
 
     LispAtom *get_value_atom() { return this->value_atom; }
-    LispListElement *get_value_list() { return this->value_list; }
+    LispList *get_value_list() { return this->value_list; }
     LispSymbol *get_value_symbol() { return this->value_symbol; }
 
     void print();
@@ -195,44 +196,22 @@ class LispObject {
 
 
 
-class LispListElement {
+class LispList {
   private:
-    LispListElement *next;
-    LispObject *value;
+    std::list<LispObject *> obj_list;
 
   public:
-    LispListElement() {
-      this->value = NULL;
-      this->next = NULL;
-    }
-    void set_value(LispObject *value) { this->value = value; }
-    LispObject *get_value() { return this->value; }
-    LispListElement *get_next() { return this->next; }
+    LispList(){};
+    LispList(std::list<LispObject *>::iterator from, std::list<LispObject *>::iterator to){ this->obj_list = std::list<LispObject *>(from, to);}
+    std::list<LispObject *>::iterator end() { return this->obj_list.begin(); }
+    std::list<LispObject *>::iterator begin() { return this->obj_list.end(); }
+    LispList *rest() { return new LispList(++this->begin(), this->end()); }
+
+    int count() { return this->obj_list.size(); }
+    void append(LispObject *next_value) { this->obj_list.push_back(next_value); }
+    void print() { for (auto const& v : this->obj_list) v->print(); }
 
     LispObject *eval_each(LispEnvironment *env);
-
-    int count() {
-      if (this->next != NULL)
-        return 1 + this->next->count();
-      else
-        return 0;
-    }
-
-    void append(LispObject *next_value) { 
-      LispListElement *iter = this;
-      while (iter->next != NULL) iter = iter->next;
-      iter->next = new LispListElement();
-      iter->value = next_value;
-    }
-
-    void print() {
-      
-      this->value->print();
-
-      for (LispListElement *iter = this->next; iter->next != NULL; iter = iter->next)
-        iter->value->print();
-
-    }
 };
 
 
@@ -317,9 +296,9 @@ class LispParser {
     int string_is_float(std::string s) { return std::regex_match(s, this->string_is_float_re); }
     int string_is_string(std::string s) { return std::regex_match(s, this->string_is_string_re); }
 
-    LispListElement *parse(LispToken *tokens);
-    LispListElement *parse_string(std::string s);
-    LispListElement *parse_file(std::string path);
+    LispList *parse(LispToken *tokens);
+    LispList *parse_string(std::string s);
+    LispList *parse_file(std::string path);
 };
 
 
@@ -370,13 +349,13 @@ class LispEnvironment {
 
 
 // 
-typedef LispObject* (LispCppFunc)(LispListElement *arg, LispEnvironment *env);
+typedef LispObject* (LispCppFunc)(LispList *arg, LispEnvironment *env);
 class LispBuiltin {
   private:
     LispCppFunc *func;
   public:
     LispBuiltin(LispCppFunc *func) { this->func = func; }
-    LispObject *eval(LispListElement *arg, LispEnvironment *env) { return this->func(arg, env); }
+    LispObject *eval(LispList *arg, LispEnvironment *env) { return this->func(arg, env); }
 };
 
 
@@ -391,5 +370,5 @@ class LispFunction {
     LispFunction(){};
     void add_arg(std::string arg){ this->arg_names.push_back(arg); }
     void set_body(LispObject *body){ this->body = body; }
-    LispObject *eval(LispListElement *arg, LispEnvironment *env);
+    LispObject *eval(LispList *arg, LispEnvironment *env);
 };

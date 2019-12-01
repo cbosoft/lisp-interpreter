@@ -23,7 +23,7 @@ LispObject *LispParser::new_object_guess_type(LispToken *t) {
   
   if (s.compare("(") == 0) {
     debug_message(Formatter() << "GUESSING "<< s << "is LIST");
-    LispListElement *newlist = new LispListElement();
+    LispList *newlist = new LispList();
     return new LispObject(newlist);
   }
 
@@ -56,11 +56,11 @@ LispObject *LispParser::new_object_guess_type(LispToken *t) {
 
 
 // Parse a list of tokens into AST/lisp data
-LispListElement *LispParser::parse(LispToken *tokens)
+LispList *LispParser::parse(LispToken *tokens)
 {
-  LispListElement *root = new LispListElement();
+  LispList *root = new LispList();
   LispObject *new_obj = NULL;
-  std::stack<LispListElement *> open_lists;
+  std::stack<LispList *> open_lists;
   open_lists.push(root);
 
   debug_message("IN PARSE\n");
@@ -71,7 +71,7 @@ LispListElement *LispParser::parse(LispToken *tokens)
     if (token->compare("(") == 0) {
 
       debug_message("OPENING NEW LIST\n");
-      LispListElement *newlist = new LispListElement();
+      LispList *newlist = new LispList();
       new_obj = new LispObject(newlist);
       open_lists.top()->append(new_obj);
       open_lists.push(newlist);
@@ -103,7 +103,7 @@ LispListElement *LispParser::parse(LispToken *tokens)
 
 
 // parse
-LispListElement *LispParser::parse_string(std::string s)
+LispList *LispParser::parse_string(std::string s)
 {
 
   LispToken *tokens = tokenise(s);
@@ -120,7 +120,7 @@ LispListElement *LispParser::parse_string(std::string s)
 
 
 // parse file
-LispListElement *LispParser::parse_file(std::string path)
+LispList *LispParser::parse_file(std::string path)
 {
   std::ifstream ifs(path);
   std::stringstream buffer;
