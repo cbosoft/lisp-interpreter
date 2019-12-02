@@ -5,7 +5,6 @@
 
 // Gets a string representation of the object's value.
 std::string LispObject::repr() {
-  debug_message("IN REPR");
 
   switch (this->type) {
     case LISPOBJECT_ATOM:
@@ -26,7 +25,6 @@ std::string LispObject::repr() {
 
 // Gets a string representation of the object's type (Atom, Symbol or List)
 std::string LispObject::repr_type() {
-  debug_message(Formatter() << "IN REPR_TYPE " << this);
 
   switch (this->type) {
     case LISPOBJECT_ATOM:
