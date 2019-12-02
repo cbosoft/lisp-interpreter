@@ -646,10 +646,10 @@ struct environment_table_row builtin_functions[] = {
 //	{ "subtract", "-", NULL, &subtract_obj, NULL, NULL },
 //	{ "multiply", "*", NULL, &multiply_obj, NULL, NULL },
 //	{ "divide", "/", NULL, &divide_obj, NULL, NULL },
-	{ "quote", NULL, NULL, NULL, new LispBuiltin(&quote), NULL }
 
+	{ "quote", NULL, NULL, NULL, new LispBuiltin(&quote), NULL },
+	{ "define", NULL, NULL, NULL, new LispBuiltin(&define), NULL }
 
-// 	{ "define", NULL, NULL, &define_obj, NULL, NULL },
 // 	{ "defvar", NULL, NULL, &defvar_obj, NULL, NULL },
 // 	{ "count", NULL, NULL, &count_obj, NULL, NULL },
 // 	{ "if", NULL, NULL, &lisp_if_obj, NULL, NULL },
