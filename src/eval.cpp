@@ -11,7 +11,7 @@ extern LispObject nil;
 
 LispObject *LispObject::eval(LispEnvironment *env)
 {
-  debug_message("IN EVAL\n");
+  debug_message(Formatter() << "in eval");
 
   std::string fname;
   LispObject *fn = NULL, *var_obj = NULL;
@@ -21,9 +21,9 @@ LispObject *LispObject::eval(LispEnvironment *env)
   std::list<LispObject *>::iterator list_elem, list_iter;
 
 
-  if (env == NULL) throw std::runtime_error(Formatter() << "eval called without environment.");
+  if (env == NULL) throw std::runtime_error(Formatter() << "Eval called without environment.");
 
-  debug_message(Formatter() << "EVAL " << this->repr_type());
+  debug_message(Formatter() << "eval " << this->repr_type());
   switch (this->type) {
 
   case LISPOBJECT_SYMBOL:
@@ -34,24 +34,24 @@ LispObject *LispObject::eval(LispEnvironment *env)
   case LISPOBJECT_LIST:
     list_obj = this->value_list;
     
+    debug_message(Formatter() << "list has size " << list_obj->count());
     if (list_obj->count() == 0)
       return &nil;
 
-    //debug_message(Formatter() << "LIST CHILD IS " << list_obj->get_value()->repr_type().c_str());
+    debug_message(Formatter() << "list child is " << list_obj->first()->repr_type());
 
-    fn = (*list_obj->begin());
+    fn = list_obj->first();
 
-    if (fn->get_type() == LISPOBJECT_LIST) {
-
-      list_iter = list_obj->begin();
-      for (; list_iter != --list_obj->end(); ++list_iter) {
-        debug_message(Formatter() << " ITEM TYPE: " << (*list_iter)->repr_type());
-        (*list_iter)->eval(env);
-      }
-      return (*list_iter)->eval(env);
-    }
+    // if (fn->get_type() == LISPOBJECT_LIST) {
+    //   list_iter = list_obj->begin();
+    //   for (; list_iter != --list_obj->end(); ++list_iter) {
+    //     debug_message(Formatter() << " ITEM TYPE: " << (*list_iter)->repr_type());
+    //     (*list_iter)->eval(env);
+    //   }
+    //   return (*list_iter)->eval(env);
+    // }
     // otherwise, list is not list of lists, is function call
-	
+
     list_args = list_obj->rest();
 
     if (fn->get_type() != LISPOBJECT_SYMBOL) throw std::runtime_error(Formatter() << "List called as a function must start with a Symbol.");
@@ -60,16 +60,16 @@ LispObject *LispObject::eval(LispEnvironment *env)
     if (env->get(fname, &var_obj, &var_bfunc, &var_lfunc) < 0) throw std::runtime_error(Formatter() << "Object \"" << fname << "\" not found in environment.");
 
     if (var_lfunc != NULL) {
-      debug_message(Formatter() << "SYMBOL " << fn->value_symbol << " IS LISP FUNCTION");
+      debug_message(Formatter() << "symbol " << fn->value_symbol << " is lisp function");
       return var_lfunc->eval(list_args, env);
     }
     else if (var_bfunc != NULL) {
-      debug_message(Formatter() << "SYMBOL " << fn->value_symbol << " IS BUILTIN");
+      debug_message(Formatter() << "symbol " << fn->value_symbol << " is builtin");
       return var_bfunc->eval(list_args, env);
       
     }
     else {
-      throw "object not found";
+      throw std::runtime_error(Formatter() << "Object \"" << fname << "\" has no value as funciton.");
     }
     
     break;
@@ -92,7 +92,7 @@ LispObject  *LispFunction::eval(LispList *arg, LispEnvironment *env)
   auto arg_iter = arg->begin();
   auto argname_iter = this->arg_names.begin();
   for (; arg_iter != arg->end(); ++arg_iter, ++argname_iter)
-    subenv->add_variable((*argname_iter), (*arg_iter));
+    subenv->add((*argname_iter), (*arg_iter));
 
   return this->body->eval(subenv);
 }
@@ -102,11 +102,11 @@ LispObject  *LispFunction::eval(LispList *arg, LispEnvironment *env)
 
 //
 LispObject *LispList::eval_each(LispEnvironment *env) {
-  debug_message("eval each\n");
+  debug_message("eval each");
 
   auto iter = this->begin();
-  for (; iter != --this->end(); ++iter)
+  for (; iter != this->end(); ++iter)
     (*iter)->eval(env);
 
-  return (*iter)->eval(env);
+  return (*(++iter))->eval(env);
 }
