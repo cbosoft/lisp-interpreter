@@ -42,20 +42,24 @@ LispObject *LispObject::eval(LispEnvironment *env)
 
     fn = list_obj->first();
 
-    // if (fn->get_type() == LISPOBJECT_LIST) {
-    //   list_iter = list_obj->begin();
-    //   for (; list_iter != --list_obj->end(); ++list_iter) {
-    //     debug_message(Formatter() << " ITEM TYPE: " << (*list_iter)->repr_type());
-    //     (*list_iter)->eval(env);
-    //   }
-    //   return (*list_iter)->eval(env);
-    // }
+    if (fn->get_type() == LISPOBJECT_LIST) {
+      list_iter = list_obj->begin();
+      debug_message(Formatter() << "eval items in list, discard result");
+      for (; list_iter != --list_obj->end(); ++list_iter) {
+        debug_message(Formatter() << " ITEM TYPE: " << (*list_iter)->repr_type());
+        (*list_iter)->eval(env);
+      }
+      debug_message(Formatter() << "eval final item in List");
+      return (*(list_iter))->eval(env);
+    }
     // otherwise, list is not list of lists, is function call
 
     list_args = list_obj->rest();
 
     if (fn->get_type() != LISPOBJECT_SYMBOL) throw std::runtime_error(Formatter() << "List called as a function must start with a Symbol.");
     fname = fn->get_value_symbol()->get_name();
+
+    debug_message(Formatter() << "applying function \"" << fname << "\".");
 
     if (env->get(fname, &var_obj, &var_bfunc, &var_lfunc) < 0) throw std::runtime_error(Formatter() << "Object \"" << fname << "\" not found in environment.");
 
@@ -83,10 +87,11 @@ LispObject *LispObject::eval(LispEnvironment *env)
 
 
 // 
-LispObject  *LispFunction::eval(LispList *arg, LispEnvironment *env)
+LispObject *LispFunction::eval(LispList *arg, LispEnvironment *env)
 {
   unsigned long n_args_supplied = arg->count();
   if (n_args_supplied != this->arg_names.size()) throw "argument count doesn't match requirement";
+  debug_message(Formatter() << "lisp function called with " << n_args_supplied << " args.");
 
   LispEnvironment *subenv = new LispEnvironment(env);
   auto arg_iter = arg->begin();
@@ -105,8 +110,11 @@ LispObject *LispList::eval_each(LispEnvironment *env) {
   debug_message("eval each");
 
   auto iter = this->begin();
-  for (; iter != this->end(); ++iter)
+  for (; iter != --this->end(); ++iter) {
+    debug_message(Formatter() << "eval List items, discard result (" << (*iter) << ")");
     (*iter)->eval(env);
+  }
 
-  return (*(++iter))->eval(env);
+  debug_message(Formatter() << "eval last List item, return result (" << (*iter) << ")");
+  return (*(iter))->eval(env);
 }
