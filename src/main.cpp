@@ -21,13 +21,13 @@ int main(void)
 {
   DEBUG_MODE = 1;
   LispParser *parser = new LispParser();
-  LispList *root = parser->parse_string("(+ 1 1)");
+  LispList *root = parser->parse_string("(define thing () 1) (quote (thing))");
 
   if (root == NULL) throw "parse returned null";
 
   LispEnvironment *env = new LispEnvironment();
-
-  root->eval_each(env);
+  LispObject *result = root->eval_each(env);
+  result->print();
 
   return 0;
 }
