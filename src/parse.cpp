@@ -129,3 +129,17 @@ LispList *LispParser::parse_file(std::string path)
   buffer << ifs.rdbuf();
   return this->parse_string(buffer.str());
 }
+
+
+int LispParser::count_parens(char * s) {return this->count_parens(std::string(s)); }
+int LispParser::count_parens(std::string s)
+{
+  int nopen = 0;
+  for (auto &c : s) {
+    if (c == '(')
+      nopen ++;
+    else if (c == ')')
+      nopen --;
+  }
+  return nopen;
+}

@@ -253,6 +253,9 @@ class LispParser {
     LispList *parse_string(std::string s);
     LispList *parse_file(const char* path);
     LispList *parse_file(std::string path);
+
+    int count_parens(char *s);
+    int count_parens(std::string s);
 };
 
 
