@@ -103,6 +103,7 @@ LispList *LispParser::parse(LispToken *tokens)
 
 
 // parse
+LispList *LispParser::parse_string(char *char_arr){ return this->parse_string(std::string(char_arr)); }
 LispList *LispParser::parse_string(std::string s)
 {
 
