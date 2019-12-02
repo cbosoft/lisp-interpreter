@@ -26,6 +26,8 @@ OBJ = \
 			obj/builtins.o \
 			obj/list.o \
 			obj/eval.o \
+			obj/quote.o \
+			obj/define.o \
 			obj/singletons.o \
 			obj/atom.o
 LINK = -ledit -lncurses -lgc -lpcre
