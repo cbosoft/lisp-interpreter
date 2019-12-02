@@ -1,5 +1,5 @@
 CXX = g++
-CFLAGS = -g -Wall -Wextra -std=c++17
+CFLAGS = -g -Wall -Wextra -std=c++17 -O0
 C_OBJ = \
 			obj/atom.o \
 			obj/tokenise.o \
@@ -21,6 +21,10 @@ OBJ = \
 			obj/tokenise.o \
 			obj/parse.o \
 			obj/debug.o \
+			obj/object.o \
+			obj/environment.o \
+			obj/builtins.o \
+			obj/list.o \
 			obj/eval.o \
 			obj/singletons.o \
 			obj/atom.o
