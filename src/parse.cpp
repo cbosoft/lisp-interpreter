@@ -63,33 +63,33 @@ LispList *LispParser::parse(LispToken *tokens)
   std::stack<LispList *> open_lists;
   open_lists.push(root);
 
-  debug_message("IN PARSE\n");
+  debug_message("in parse");
 
   for (LispToken *token = tokens; token != NULL; token = token->next) {
-    debug_message(Formatter() << "TOKEN: " << token->get_token());
+    debug_message(Formatter() << "token: " << token->get_token());
 
     if (token->compare("(") == 0) {
 
-      debug_message("OPENING NEW LIST\n");
+      debug_message("opening new list");
       LispList *newlist = new LispList();
       new_obj = new LispObject(newlist);
       open_lists.top()->append(new_obj);
       open_lists.push(newlist);
-      debug_message("after OPENING NEW LIST\n");
+      debug_message("after opening new list");
 
     }
     else if (token->compare(")") == 0) {
 
-      debug_message("CLOSING LIST\n");
+      debug_message("closing list");
       open_lists.pop();
 
     }
     else {
 
-      debug_message("GUESS\n");
+      debug_message("guess");
       new_obj = this->new_object_guess_type(token);
 
-      debug_message(Formatter() << "NEW OBJECT " << new_obj->repr());
+      debug_message(Formatter() << "new object " << new_obj->repr());
       open_lists.top()->append(new_obj);
 
     }
@@ -108,7 +108,7 @@ LispList *LispParser::parse_string(std::string s)
 
   LispToken *tokens = tokenise(s);
 
-  debug_message("TOKENS:");
+  debug_message("tokens:");
   for (LispToken *i = tokens; i != NULL; i = i->next) {
     debug_message(Formatter() << "| " << i->get_token());
   }
