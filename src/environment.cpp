@@ -58,5 +58,5 @@ int LispEnvironment::get(std::string name, LispObject **obj, LispBuiltin **bf, L
     return LISPENV_LFUNC;
   }
 
-  return -1;
+  return this->parent == NULL ? -1 : this->parent->get(name, obj, bf, lf);
 }
