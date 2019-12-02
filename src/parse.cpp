@@ -121,6 +121,7 @@ LispList *LispParser::parse_string(std::string s)
 
 
 // parse file
+LispList *LispParser::parse_file(const char *path){ return this->parse_file(std::string(path)); }
 LispList *LispParser::parse_file(std::string path)
 {
   std::ifstream ifs(path);

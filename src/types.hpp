@@ -251,6 +251,7 @@ class LispParser {
     LispList *parse(LispToken *tokens);
     LispList *parse_string(char *char_arr);
     LispList *parse_string(std::string s);
+    LispList *parse_file(const char* path);
     LispList *parse_file(std::string path);
 };
 
