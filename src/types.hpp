@@ -249,6 +249,7 @@ class LispParser {
     int string_is_string(std::string s) { return std::regex_match(s, this->string_is_string_re); }
 
     LispList *parse(LispToken *tokens);
+    LispList *parse_string(char *char_arr);
     LispList *parse_string(std::string s);
     LispList *parse_file(std::string path);
 };
@@ -296,7 +297,7 @@ class LispBuiltin {
 
 
 
-class LispFunction {
+class LispFunction : virtual public Printable {
   private:
     std::vector<std::string> arg_names;
     LispObject *body;
@@ -312,6 +313,7 @@ class LispFunction {
     void add_arg(std::string arg){ this->arg_names.push_back(arg); }
     void set_body(LispObject *body){ this->body = body; }
     LispObject *eval(LispList *arg, LispEnvironment *env);
+    std::string repr() { return this->body->repr(); }
 };
 
 
