@@ -2,7 +2,7 @@
 #include "formatter.hpp"
 #include "debug.hpp"
 
-void LispEnvironment::add_something(std::string name, LispObject *obj, LispBuiltin *bfunc, LispFunction *lfunc)
+void LispEnvironment::add_something(std::string name, LispObject_ptr obj, LispBuiltin_ptr bfunc, LispFunction_ptr lfunc)
 {
   debug_message(Formatter() << "adding var \"" << name << "\" to environment");
   if (obj != NULL) {
@@ -34,7 +34,7 @@ LispEnvironment::LispEnvironment()
 
 
 
-int LispEnvironment::get(std::string name, LispObject **obj, LispBuiltin **bf, LispFunction **lf)
+int LispEnvironment::get(std::string name, LispObject_ptr *obj, LispBuiltin_ptr *bf, LispFunction_ptr *lf)
 {
   (*obj) = NULL;
   (*bf) = NULL;

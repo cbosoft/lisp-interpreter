@@ -3,6 +3,7 @@
 #include <regex>
 #include <iostream>
 #include <list>
+#include <memory>
 
 #include "colour.hpp"
 
@@ -35,7 +36,23 @@ class Printable {
     virtual void _print() { std::cout << this->repr() << " "; }
 };
 
+class LispBuiltin; 
+typedef std::shared_ptr<LispBuiltin> LispBuiltin_ptr;
 
+class LispFunction; 
+typedef std::shared_ptr<LispFunction> LispFunction_ptr;
+
+class LispEnvironment;
+typedef std::shared_ptr<LispEnvironment> LispEnvironment_ptr;
+
+class LispSymbol;
+typedef std::shared_ptr<LispSymbol> LispSymbol_ptr;
+
+class LispList;
+typedef std::shared_ptr<LispList> LispList_ptr;
+
+class LispObject;
+typedef std::shared_ptr<LispObject> LispObject_ptr;
 
 
 class LispAtom : virtual public Printable {
@@ -91,6 +108,7 @@ class LispAtom : virtual public Printable {
     double cast_to_float();
     std::string cast_to_string();
 };
+typedef std::shared_ptr<LispAtom> LispAtom_ptr;
 
 
 
@@ -130,20 +148,15 @@ enum LISPOBJECT_TYPE {
 };
 
 
-class LispEnvironment;
-class LispList;
 class LispObject : virtual public Printable {
   private:
-    LispAtom *value_atom;
-    LispList *value_list;
-    LispSymbol *value_symbol;
+    LispAtom_ptr value_atom;
+    LispList_ptr value_list;
+    LispSymbol_ptr value_symbol;
     int type;
 
   public:
     LispObject() {
-      this->value_atom = NULL;
-      this->value_list = NULL;
-      this->value_symbol = NULL;
       this->type = -1;
     };
 
@@ -151,21 +164,21 @@ class LispObject : virtual public Printable {
     std::string repr_type();
 
     int get_type(){ return this->type; }
-    LispObject *eval(LispEnvironment *env);
+    LispObject_ptr eval(LispEnvironment_ptr env);
 
     template<typename T>
-    LispObject(T atom_val) { this->value_atom = new LispAtom(atom_val); this->type = LISPOBJECT_ATOM; }
-    LispObject(LispAtom *atom) { this->value_atom = atom; this->type = LISPOBJECT_ATOM; }
-    LispObject(LispList *list) { this->value_list = list; this->type = LISPOBJECT_LIST; }
-    LispObject(LispSymbol *symbol) { this->value_symbol = symbol; this->type = LISPOBJECT_SYMBOL; }
+    LispObject(T atom_val) { this->value_atom = std::make_shared<LispAtom>(LispAtom(atom_val)); this->type = LISPOBJECT_ATOM; }
+    LispObject(LispAtom_ptr atom) { this->value_atom = atom; this->type = LISPOBJECT_ATOM; }
+    LispObject(LispList_ptr list) { this->value_list = list; this->type = LISPOBJECT_LIST; }
+    LispObject(LispSymbol_ptr symbol) { this->value_symbol = symbol; this->type = LISPOBJECT_SYMBOL; }
 
-    void set_value(LispAtom *atom) {this->value_atom = atom;}
-    void set_value(LispList *list) {this->value_list = list; }
-    void set_value(LispSymbol *symbol) {this->value_symbol = symbol; }
+    void set_value(LispAtom_ptr atom) {this->value_atom = atom;}
+    void set_value(LispList_ptr list) {this->value_list = list; }
+    void set_value(LispSymbol_ptr symbol) {this->value_symbol = symbol; }
 
-    LispAtom *get_value_atom() { return this->value_atom; }
-    LispList *get_value_list() { return this->value_list; }
-    LispSymbol *get_value_symbol() { return this->value_symbol; }
+    LispAtom_ptr get_value_atom() { return this->value_atom; }
+    LispList_ptr get_value_list() { return this->value_list; }
+    LispSymbol_ptr get_value_symbol() { return this->value_symbol; }
 
 };
 
@@ -177,28 +190,28 @@ class LispObject : virtual public Printable {
 
 class LispList : virtual public Printable {
   private:
-    std::list<LispObject *> obj_list;
+    std::list<LispObject_ptr> obj_list;
 
   public:
     LispList(){};
 
-    LispList(std::list<LispObject *>::iterator from, std::list<LispObject *>::iterator to){ 
-      this->obj_list = std::list<LispObject *>(from, to);
+    LispList(std::list<LispObject_ptr>::iterator from, std::list<LispObject_ptr>::iterator to){ 
+      this->obj_list = std::list<LispObject_ptr>(from, to);
     }
 
-    std::list<LispObject *>::iterator end() { return this->obj_list.end(); }
-    std::list<LispObject *>::iterator begin() { return this->obj_list.begin(); }
-    LispObject *first() { return this->obj_list.front(); }
+    std::list<LispObject_ptr>::iterator end() { return this->obj_list.end(); }
+    std::list<LispObject_ptr>::iterator begin() { return this->obj_list.begin(); }
+    LispObject_ptr first() { return this->obj_list.front(); }
 
-    LispList *rest() { 
-      return new LispList(++this->begin(), this->end()); 
+    LispList_ptr rest() { 
+      return std::make_shared<LispList>(LispList(++this->begin(), this->end())); 
     }
 
     int count() { return this->obj_list.size(); }
-    void append(LispObject *next_value) { this->obj_list.push_back(next_value); }
+    void append(LispObject_ptr next_value) { this->obj_list.push_back(next_value); }
     std::string repr();
 
-    LispObject *eval_each(LispEnvironment *env);
+    LispObject_ptr eval_each(LispEnvironment_ptr env);
 };
 
 
@@ -206,13 +219,14 @@ class LispList : virtual public Printable {
 
 
 
-
+class LispToken;
+typedef std::shared_ptr<LispToken> LispToken_ptr;
 class LispToken {
   private:
     std::string token;
 
   public:
-    LispToken *next;
+    LispToken_ptr next;
 
     LispToken(std::string token);
     std::string get_token() {return this->token; }
@@ -236,7 +250,7 @@ class LispParser {
     std::regex string_is_int_re;
     std::regex string_is_float_re;
     std::regex string_is_string_re;
-    LispObject *new_object_guess_type(LispToken *t);
+    LispObject_ptr new_object_guess_type(LispToken_ptr t);
   public:
     LispParser() {
       this->string_is_int_re = std::regex("^-?\\d+$");
@@ -248,11 +262,11 @@ class LispParser {
     int string_is_float(std::string s) { return std::regex_match(s, this->string_is_float_re); }
     int string_is_string(std::string s) { return std::regex_match(s, this->string_is_string_re); }
 
-    LispList *parse(LispToken *tokens);
-    LispList *parse_string(char *char_arr);
-    LispList *parse_string(std::string s);
-    LispList *parse_file(const char* path);
-    LispList *parse_file(std::string path);
+    LispList_ptr parse(LispToken_ptr tokens);
+    LispList_ptr parse_string(char *char_arr);
+    LispList_ptr parse_string(std::string s);
+    LispList_ptr parse_file(const char* path);
+    LispList_ptr parse_file(std::string path);
 
     int count_parens(char *s);
     int count_parens(std::string s);
@@ -261,26 +275,25 @@ class LispParser {
 
 
 enum LISPENV_RET { LISPENV_OBJ, LISPENV_BFUNC, LISPENV_LFUNC };
-class LispBuiltin; 
-class LispFunction; 
 class LispEnvironment {
   private:
-    std::map<std::string, LispObject *> objects_map;
-    std::map<std::string, LispBuiltin *> builtin_functions_map;
-    std::map<std::string, LispFunction *> lisp_functions_map;
-    LispEnvironment *parent;
+    std::map<std::string, LispObject_ptr> objects_map;
+    std::map<std::string, LispBuiltin_ptr> builtin_functions_map;
+    std::map<std::string, LispFunction_ptr> lisp_functions_map;
+    LispEnvironment_ptr parent;
+
   public:
     LispEnvironment();
-    LispEnvironment(LispEnvironment *parent) { this->parent = parent; }
+    LispEnvironment(LispEnvironment_ptr parent) { this->parent = parent; }
 
-    void add(std::string name, LispObject *obj) { this->objects_map.insert_or_assign(name, obj); }
-    void add(std::string name, LispBuiltin *val){ this->builtin_functions_map.insert_or_assign(name, val); }
-    void add(std::string name, LispFunction *val){ this->lisp_functions_map.insert_or_assign(name, val); }
-    void add_something(std::string name, LispObject *obj, LispBuiltin *bfunc, LispFunction *lfunc);
+    void add(std::string name, LispObject_ptr obj) { this->objects_map.insert_or_assign(name, obj); }
+    void add(std::string name, LispBuiltin_ptr val){ this->builtin_functions_map.insert_or_assign(name, val); }
+    void add(std::string name, LispFunction_ptr val){ this->lisp_functions_map.insert_or_assign(name, val); }
+    void add_something(std::string name, LispObject_ptr obj, LispBuiltin_ptr bfunc, LispFunction_ptr lfunc);
 
-    LispObject *get_object(std::string name) { return this->objects_map[name]; }
-    LispBuiltin *get_builtin(std::string name) { return this->builtin_functions_map[name]; }
-    int get(std::string name, LispObject **obj, LispBuiltin **bf, LispFunction **lf);
+    LispObject_ptr get_object(std::string name) { return this->objects_map[name]; }
+    LispBuiltin_ptr get_builtin(std::string name) { return this->builtin_functions_map[name]; }
+    int get(std::string name, LispObject_ptr *obj, LispBuiltin_ptr *bf, LispFunction_ptr *lf);
 
 };
 
@@ -288,13 +301,13 @@ class LispEnvironment {
 
 
 // 
-typedef LispObject* (LispCppFunc)(LispList *arg, LispEnvironment *env);
+typedef LispObject_ptr (LispCppFunc)(LispList_ptr arg, LispEnvironment_ptr env);
 class LispBuiltin {
   private:
     LispCppFunc *func;
   public:
     LispBuiltin(LispCppFunc *func) { this->func = func; }
-    LispObject *eval(LispList *arg, LispEnvironment *env) { return this->func(arg, env); }
+    LispObject_ptr eval(LispList_ptr arg, LispEnvironment_ptr env) { return this->func(arg, env); }
 };
 
 
@@ -304,10 +317,10 @@ class LispBuiltin {
 class LispFunction : virtual public Printable {
   private:
     std::vector<std::string> arg_names;
-    LispObject *body;
+    LispObject_ptr body;
   public:
     LispFunction(){};
-    LispFunction(LispList *arglist, LispObject *body)
+    LispFunction(LispList_ptr arglist, LispObject_ptr body)
     {
       this->body = body;
       for (auto iter = arglist->begin(); iter != arglist->end(); ++iter) {
@@ -315,8 +328,8 @@ class LispFunction : virtual public Printable {
       }
     };
     void add_arg(std::string arg){ this->arg_names.push_back(arg); }
-    void set_body(LispObject *body){ this->body = body; }
-    LispObject *eval(LispList *arg, LispEnvironment *env);
+    void set_body(LispObject_ptr body){ this->body = body; }
+    LispObject_ptr eval(LispList_ptr arg, LispEnvironment_ptr env);
     std::string repr() { return this->body->repr(); }
 };
 
@@ -329,7 +342,7 @@ struct environment_table_row {
 
   const char *doc;
 
-  LispObject *obj;
-  LispBuiltin *bfunc;
-  LispFunction *lfunc;
+  LispObject_ptr obj;
+  LispBuiltin_ptr bfunc;
+  LispFunction_ptr lfunc;
 };

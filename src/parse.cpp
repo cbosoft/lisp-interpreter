@@ -16,63 +16,63 @@
 
 
 // Create new object, guessing type
-LispObject *LispParser::new_object_guess_type(LispToken *t) {
+LispObject_ptr LispParser::new_object_guess_type(LispToken_ptr t) {
   std::string s = t->get_token();
 
   debug_message(Formatter() << "GUESSING " << s);
   
   if (s.compare("(") == 0) {
     debug_message(Formatter() << "GUESSING "<< s << "is LIST");
-    LispList *newlist = new LispList();
-    return new LispObject(newlist);
+    LispList_ptr newlist = std::make_shared<LispList>(LispList());
+    return std::make_shared<LispObject>(LispObject(newlist));
   }
 
   if (this->string_is_int(s)) {
     debug_message(Formatter() << "GUESSING " << s << " is INT");
-    LispAtom *newatom = new LispAtom( atol(s.c_str()) );
-    return new LispObject(newatom);
+    LispAtom_ptr newatom = std::make_shared<LispAtom>(LispAtom( atol(s.c_str()) ));
+    return std::make_shared<LispObject>(LispObject(newatom));
   }
 
   if (this->string_is_float(s)) {
     debug_message(Formatter() << "GUESSING " << s << " is FLOAT");
-    LispAtom *newatom = new LispAtom( atof(s.c_str()) );
-    return new LispObject(newatom);
+    LispAtom_ptr newatom = std::make_shared<LispAtom>(LispAtom( atof(s.c_str()) ));
+    return std::make_shared<LispObject>(LispObject(newatom));
   }
 
 
   if (this->string_is_string(s)) {
     debug_message(Formatter() << "GUESSING " << s << " is STRING");
     std::string body = s.substr(1, s.length()-1);
-    LispAtom *newatom = new LispAtom(body);
-    return new LispObject(newatom);
+    LispAtom_ptr newatom = std::make_shared<LispAtom>(LispAtom(body));
+    return std::make_shared<LispObject>(LispObject(newatom));
   }
 
   debug_message(Formatter() << "GUESSING " << s << " is SYMBOL");
-  LispSymbol *newsymbol = new LispSymbol(s);
-  return new LispObject(newsymbol);
+  LispSymbol_ptr newsymbol = std::make_shared<LispSymbol>(LispSymbol(s));
+  return std::make_shared<LispObject>(LispObject(newsymbol));
 }
 
 
 
 
 // Parse a list of tokens into AST/lisp data
-LispList *LispParser::parse(LispToken *tokens)
+LispList_ptr LispParser::parse(LispToken_ptr tokens)
 {
-  LispList *root = new LispList();
-  LispObject *new_obj = NULL;
-  std::stack<LispList *> open_lists;
+  LispList_ptr root = std::make_shared<LispList>(LispList());
+  LispObject_ptr new_obj;
+  std::stack<LispList_ptr> open_lists;
   open_lists.push(root);
 
   debug_message("in parse");
 
-  for (LispToken *token = tokens; token != NULL; token = token->next) {
+  for (LispToken_ptr token = tokens; token != NULL; token = token->next) {
     debug_message(Formatter() << "token: " << token->get_token());
 
     if (token->compare("(") == 0) {
 
       debug_message("opening new list");
-      LispList *newlist = new LispList();
-      new_obj = new LispObject(newlist);
+      LispList_ptr newlist = std::make_shared<LispList>(LispList());
+      new_obj = std::make_shared<LispObject>(LispObject(newlist));
       open_lists.top()->append(new_obj);
       open_lists.push(newlist);
       debug_message("after opening new list");
@@ -103,14 +103,14 @@ LispList *LispParser::parse(LispToken *tokens)
 
 
 // parse
-LispList *LispParser::parse_string(char *char_arr){ return this->parse_string(std::string(char_arr)); }
-LispList *LispParser::parse_string(std::string s)
+LispList_ptr LispParser::parse_string(char *char_arr){ return this->parse_string(std::string(char_arr)); }
+LispList_ptr LispParser::parse_string(std::string s)
 {
 
-  LispToken *tokens = tokenise(s);
+  LispToken_ptr tokens = tokenise(s);
 
   debug_message("tokens:");
-  for (LispToken *i = tokens; i != NULL; i = i->next) {
+  for (LispToken_ptr i = tokens; i != NULL; i = i->next) {
     debug_message(Formatter() << "| " << i->get_token());
   }
 
@@ -121,8 +121,8 @@ LispList *LispParser::parse_string(std::string s)
 
 
 // parse file
-LispList *LispParser::parse_file(const char *path){ return this->parse_file(std::string(path)); }
-LispList *LispParser::parse_file(std::string path)
+LispList_ptr LispParser::parse_file(const char *path){ return this->parse_file(std::string(path)); }
+LispList_ptr LispParser::parse_file(std::string path)
 {
   std::ifstream ifs(path);
   std::stringstream buffer;

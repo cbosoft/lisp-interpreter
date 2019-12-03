@@ -1,15 +1,15 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <memory>
 
-#include <stdlib.h>
-#include <stdio.h>
 
 #include "tokenise.hpp"
 
 #define IS_WHITESPACE(C) ((C == '\n') || (C == ' ') || (C == '\t'))
+
 #define ADD_TO_TOKENS(KW) \
-  new_token = new LispToken(KW);\
+  new_token = std::make_shared<LispToken>(LispToken(KW));\
   if (rv == NULL) {\
     rv = new_token;\
   }\
@@ -44,7 +44,7 @@ void LispToken::print()
 
 
 // Convert input into list of tokens
-LispToken *tokenise(std::string input)
+LispToken_ptr tokenise(std::string input)
 {
 
   char ch, nch;
@@ -54,7 +54,7 @@ LispToken *tokenise(std::string input)
   bool in_quote = 0, add_close_parens_on_break = 0, add_close_parens_on_parens = 0;
   int parens_level = 0;
 
-  LispToken *rv = NULL, *current_token = NULL, *new_token = NULL;
+  LispToken_ptr rv, current_token, new_token;
 
   for (i = 0, ch = input[0], nch=input[1]; i < input.length(); ch = input[++i], nch=input[i+1]) {
 

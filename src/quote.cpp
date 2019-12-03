@@ -3,7 +3,7 @@
 #include "debug.hpp"
 #include "exception.hpp"
 
-LispObject *quote(LispList *arg, LispEnvironment *env)
+LispObject_ptr quote(LispList_ptr arg, LispEnvironment_ptr env)
 {
   debug_message("builtin function quote");
   (void) env;

@@ -9,16 +9,16 @@
 extern LispObject nil;
 
 
-LispObject *LispObject::eval(LispEnvironment *env)
+LispObject_ptr LispObject::eval(LispEnvironment_ptr env)
 {
   debug_message(Formatter() << "in eval");
 
   std::string fname;
-  LispObject *fn = NULL, *var_obj = NULL;
-  LispList *list_args = NULL, *list_obj = NULL;
-  LispBuiltin *var_bfunc = NULL;
-  LispFunction *var_lfunc = NULL;
-  std::list<LispObject *>::iterator list_elem, list_iter;
+  LispObject_ptr fn, var_obj;
+  LispList_ptr list_args, list_obj;
+  LispBuiltin_ptr var_bfunc;
+  LispFunction_ptr var_lfunc;
+  std::list<LispObject_ptr>::iterator list_elem, list_iter;
 
 
   if (env == NULL) throw std::runtime_error(Formatter() << "Eval called without environment.");
@@ -35,8 +35,9 @@ LispObject *LispObject::eval(LispEnvironment *env)
     list_obj = this->value_list;
     
     debug_message(Formatter() << "list has size " << list_obj->count());
+    list_obj->print();
     if (list_obj->count() == 0)
-      return &nil;
+      return std::make_shared<LispObject>(nil); // TODO use the same shared ptr for all nil?
 
     debug_message(Formatter() << "list child is " << list_obj->first()->repr_type());
 
@@ -80,20 +81,20 @@ LispObject *LispObject::eval(LispEnvironment *env)
   }
   
   // default: root is atom (float, int, string, bool...)
-  return this; // should return self? Or copy of self?
+  return std::shared_ptr<LispObject>(this); // should return self? Or copy of self?
 }
 
 
 
 
 // 
-LispObject *LispFunction::eval(LispList *arg, LispEnvironment *env)
+LispObject_ptr LispFunction::eval(LispList_ptr arg, LispEnvironment_ptr env)
 {
   unsigned long n_args_supplied = arg->count();
   if (n_args_supplied != this->arg_names.size()) throw "argument count doesn't match requirement";
   debug_message(Formatter() << "lisp function called with " << n_args_supplied << " args.");
 
-  LispEnvironment *subenv = new LispEnvironment(env);
+  LispEnvironment_ptr subenv = std::make_shared<LispEnvironment>(LispEnvironment(env));
   auto arg_iter = arg->begin();
   auto argname_iter = this->arg_names.begin();
   for (; arg_iter != arg->end(); ++arg_iter, ++argname_iter)
@@ -106,7 +107,7 @@ LispObject *LispFunction::eval(LispList *arg, LispEnvironment *env)
 
 
 //
-LispObject *LispList::eval_each(LispEnvironment *env) {
+LispObject_ptr LispList::eval_each(LispEnvironment_ptr env) {
   debug_message("eval each");
 
   auto iter = this->begin();

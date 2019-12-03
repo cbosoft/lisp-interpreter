@@ -2,4 +2,4 @@
 #include "types.hpp"
 
 
-LispToken *tokenise(std::string input);
+LispToken_ptr tokenise(std::string input);

@@ -1,5 +1,6 @@
 #include <cstring>
 #include <cstdio>
+#include <memory>
 
 #include <editline/readline.h>
 
@@ -48,26 +49,26 @@ int main(int argc, char **argv)
   }
 
 
-  LispParser *parser = new LispParser();
-  LispEnvironment *env = new LispEnvironment();
-  LispList *root = NULL;
-  LispObject *result = NULL;
+  LispParser parser = LispParser();
+  LispEnvironment_ptr env = std::make_shared<LispEnvironment>(LispEnvironment());
+  LispList_ptr root = NULL;
+  LispObject_ptr result = NULL;
 
   for (int i = 1; i < argc; i++) {
 
     if (EITHER(argv[i], "-f", "--file")) {
-      root = parser->parse_file(argv[++i]);
+      root = parser.parse_file(argv[++i]);
       result = root->eval_each(env);
     }
     else if (EITHER(argv[i], "-c", "--command")) {
-      root = parser->parse_string(argv[++i]);
+      root = parser.parse_string(argv[++i]);
       result = root->eval_each(env);
     }
     else if ((EITHER(argv[i], "-d", "--debug")) || (EITHER(argv[i], "-i", "--interactive"))) {
       // flag: ignore
     }
     else {
-      root = parser->parse_file(argv[++i]);
+      root = parser.parse_file(argv[++i]);
       result = root->eval_each(env);
     }
 
@@ -93,7 +94,7 @@ int main(int argc, char **argv)
 
     input_ss << buf;
 
-    int parens_tally = parser->count_parens(buf);
+    int parens_tally = parser.count_parens(buf);
     while (parens_tally > 0) {
       input_ss << " ";
 
@@ -106,14 +107,14 @@ int main(int argc, char **argv)
       } while (buf == NULL);
 
       input_ss << buf;
-      parens_tally += parser->count_parens(buf);
+      parens_tally += parser.count_parens(buf);
     }
 
     if (parens_tally < 0) {
       throw SyntaxError("Unmatched parenthesis.");
     }
     
-    root = parser->parse_string(input_ss.str());
+    root = parser.parse_string(input_ss.str());
     result = root->eval_each(env);
     result->print();
 

@@ -1,4 +1,4 @@
 #include "types.hpp"
 
-LispObject *quote(LispList *arg, LispEnvironment *env);
-LispObject *define(LispList *arg, LispEnvironment *env);
+LispObject_ptr quote(LispList_ptr arg, LispEnvironment_ptr env);
+LispObject_ptr define(LispList_ptr arg, LispEnvironment_ptr env);
