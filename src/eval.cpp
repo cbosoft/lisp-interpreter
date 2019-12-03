@@ -15,7 +15,8 @@ LispObject_ptr LispObject::eval(LispEnvironment_ptr env)
 
   std::string fname;
   LispObject_ptr fn, var_obj;
-  LispList_ptr list_args, list_obj;
+  LispList evaluated_args_raw;
+  LispList_ptr list_args, list_obj, evaluated_args;
   LispBuiltin_ptr var_bfunc;
   LispFunction_ptr var_lfunc;
   std::list<LispObject_ptr>::iterator list_elem, list_iter;
@@ -55,6 +56,12 @@ LispObject_ptr LispObject::eval(LispEnvironment_ptr env)
     // otherwise, list is not list of lists, is function call
 
     list_args = list_obj->rest();
+    evaluated_args_raw = LispList();
+    for (list_iter = list_args->begin(); list_iter != list_args->end(); ++list_iter) {
+      evaluated_args_raw.append((*list_iter)->eval(env));
+    }
+    evaluated_args = std::make_shared<LispList>(evaluated_args_raw);
+    
 
     if (fn->get_type() != LISPOBJECT_SYMBOL) throw std::runtime_error(Formatter() << "List called as a function must start with a Symbol.");
     fname = fn->get_value_symbol()->get_name();
