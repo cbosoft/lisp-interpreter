@@ -31,7 +31,7 @@ enum LISPATOM_TYPE{
 class Printable {
   public:
     Printable(){};
-    virtual std::string repr(){ throw std::runtime_error("REPR NOT IMPLEMENTED IN PRINTABLE OBJECT."); }
+    virtual std::string repr(){ throw NotImplementedError("In Printable::repr(): virtual function not implemented: intended to be used by sub class."); }
     void print(){ this->_print(); std::cout << std::endl; };
     virtual void _print() { std::cout << this->repr() << " "; }
 };
