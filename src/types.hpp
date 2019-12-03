@@ -6,26 +6,14 @@
 #include <memory>
 
 #include "colour.hpp"
+#include "exception.hpp"
 
-#define OP(O) LispAtom operator O(LispAtom obj) { \
-\
-  switch (this->get_type()) {\
-    case LISPATOM_INT:\
-      return LispAtom(this->value_int O obj.cast_to_int());\
-    case LISPATOM_FLOAT:\
-      return LispAtom(this->value_float O obj.cast_to_float());\
-    case LISPATOM_STRING:\
-      throw "Numerical operation O not defined for string.";\
-  }\
-  throw "Unknown type encountered!.";\
-}
 
 enum LISPATOM_TYPE{
   LISPATOM_INT,
   LISPATOM_FLOAT,
   LISPATOM_STRING
 };
-
 
 
 class Printable {
@@ -54,6 +42,8 @@ typedef std::shared_ptr<LispList> LispList_ptr;
 class LispObject;
 typedef std::shared_ptr<LispObject> LispObject_ptr;
 
+class LispAtom;
+typedef std::shared_ptr<LispAtom> LispAtom_ptr;
 
 class LispAtom : virtual public Printable {
   private:
@@ -82,33 +72,28 @@ class LispAtom : virtual public Printable {
 
     int get_type() { return this->type; }
     std::string repr();
+    std::string repr_type();
+    long get_value_int(){ return this->value_int; }
+    double get_value_float(){ return this->value_float; }
+    std::string get_value_string(){ return this->value_string; }
 
-    LispAtom operator +(LispAtom obj) {
+    LispAtom_ptr add(LispAtom_ptr obj);
+    LispAtom_ptr subtract(LispAtom_ptr obj);
+    LispAtom_ptr multiply(LispAtom_ptr obj);
+    LispAtom_ptr divide(LispAtom_ptr obj);
+    LispAtom_ptr power(LispAtom_ptr obj);
+    LispAtom_ptr modulo(LispAtom_ptr obj);
 
-      switch (this->get_type()) {
-
-        case LISPATOM_INT:
-          return LispAtom(this->value_int + obj.cast_to_int());
-
-        case LISPATOM_FLOAT:
-          return LispAtom(this->value_float + obj.cast_to_float());
-
-        case LISPATOM_STRING:
-          return LispAtom(this->value_string + obj.cast_to_string() );
-      }
-
-      throw "Unknown type encountered";
-    }
-   
-   
-    OP(-); OP(*); OP(/);
-    OP(>); OP(>=); OP(<); OP(<=); OP(==);
+    LispAtom_ptr gt(LispAtom_ptr obj);
+    LispAtom_ptr ge(LispAtom_ptr obj);
+    LispAtom_ptr lt(LispAtom_ptr obj);
+    LispAtom_ptr le(LispAtom_ptr obj);
+    LispAtom_ptr eq(LispAtom_ptr obj);
 
     long cast_to_int();
     double cast_to_float();
     std::string cast_to_string();
 };
-typedef std::shared_ptr<LispAtom> LispAtom_ptr;
 
 
 
@@ -191,6 +176,7 @@ class LispObject : virtual public Printable {
 class LispList : virtual public Printable {
   private:
     std::list<LispObject_ptr> obj_list;
+    std::list<LispObject_ptr>::iterator it;
 
   public:
     LispList(){};
