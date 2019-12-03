@@ -202,6 +202,16 @@ class LispList : virtual public Printable {
     std::list<LispObject_ptr>::iterator end() { return this->obj_list.end(); }
     std::list<LispObject_ptr>::iterator begin() { return this->obj_list.begin(); }
     LispObject_ptr first() { return this->obj_list.front(); }
+    LispObject_ptr next(bool restart = false) {
+      if (restart) {
+        this->it = this->begin();
+      }
+      else {
+        this->it++;
+      }
+
+      return (*this->it);
+    }
 
     LispList_ptr rest() { 
       return std::make_shared<LispList>(LispList(++this->begin(), this->end())); 
