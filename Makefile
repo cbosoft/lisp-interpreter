@@ -28,6 +28,7 @@ OBJ = \
 			obj/eval.o \
 			obj/builtins/quote.o \
 			obj/builtins/define.o \
+			obj/builtins/add.o \
 			obj/singletons.o \
 			obj/atom.o \
 			obj/builtins/exit.o
