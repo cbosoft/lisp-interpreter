@@ -144,6 +144,12 @@ class LispObject : virtual public Printable {
     LispObject() {
       this->type = -1;
     };
+    LispObject(const LispObject& o) {
+      this->type = o.type;
+      this->value_symbol = o.value_symbol;
+      this->value_atom = o.value_atom;
+      this->value_list = o.value_list;
+    }
 
     std::string repr();
     std::string repr_type();
