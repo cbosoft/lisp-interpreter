@@ -26,14 +26,15 @@ OBJ = \
 			obj/builtins.o \
 			obj/list.o \
 			obj/eval.o \
-			obj/quote.o \
-			obj/define.o \
+			obj/builtins/quote.o \
+			obj/builtins/define.o \
 			obj/singletons.o \
-			obj/atom.o
+			obj/atom.o \
+			obj/builtins/exit.o
 LINK = -ledit -lncurses -lgc -lpcre
 
 obj/%.o: src/%.cpp src/types.hpp
-	mkdir -p obj
+	mkdir -p `dirname $@`
 	$(CXX) $(CFLAGS) $< -c -o $@
 
 crisp: obj/main.o $(OBJ) src/types.hpp
