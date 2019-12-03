@@ -35,7 +35,6 @@ LispObject_ptr LispObject::eval(LispEnvironment_ptr env)
     list_obj = this->value_list;
     
     debug_message(Formatter() << "list has size " << list_obj->count());
-    list_obj->print();
     if (list_obj->count() == 0)
       return std::make_shared<LispObject>(nil); // TODO use the same shared ptr for all nil?
 
