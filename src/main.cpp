@@ -57,19 +57,40 @@ int main(int argc, char **argv)
   for (int i = 1; i < argc; i++) {
 
     if (EITHER(argv[i], "-f", "--file")) {
-      root = parser.parse_file(argv[++i]);
-      result = root->eval_each(env);
+      EXECUTED_FILE_OR_CLI_STRING = 1;
+      try {
+        root = parser.parse_file(argv[++i]);
+        result = root->eval_each(env);
+        result->print();
+      }
+      catch (const Exception& ex) {
+        ex.pretty_print();
+      }
     }
     else if (EITHER(argv[i], "-c", "--command")) {
-      root = parser.parse_string(argv[++i]);
-      result = root->eval_each(env);
+      EXECUTED_FILE_OR_CLI_STRING = 1;
+      try {
+        root = parser.parse_string(argv[++i]);
+        result = root->eval_each(env);
+        result->print();
+      }
+      catch (const Exception& ex) {
+        ex.pretty_print();
+      }
     }
     else if ((EITHER(argv[i], "-d", "--debug")) || (EITHER(argv[i], "-i", "--interactive"))) {
       // flag: ignore
     }
     else {
-      root = parser.parse_file(argv[++i]);
-      result = root->eval_each(env);
+      EXECUTED_FILE_OR_CLI_STRING = 1;
+      try {
+        root = parser.parse_file(argv[i]);
+        result = root->eval_each(env);
+        result->print();
+      }
+      catch (const Exception& ex) {
+        ex.pretty_print();
+      }
     }
 
   }
