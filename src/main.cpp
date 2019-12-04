@@ -81,42 +81,55 @@ int main(int argc, char **argv)
   stifle_history(7);
 
   std::stringstream input_ss, prompt_ss;
+  std::string input_str, prompt_str;
+  const char *prompt_cstr = NULL;
   char *buf = NULL;
 
   
   while (true) {
-    // read
-    do {
-      buf = readline("> "); 
-    } while (buf ==  NULL);
-    
-    if (!strlen(buf)) continue;
+    input_ss.str("");
 
-    input_ss << buf;
-
-    int parens_tally = parser.count_parens(buf);
-    while (parens_tally > 0) {
-      input_ss << " ";
-
-      prompt_ss.str(" : ");
-      for (int tallyi = 0; tallyi < parens_tally; tallyi++)
-        prompt_ss << "  ";
-
+    try {
+      // read
       do {
-        buf = readline(prompt_ss.str().c_str());
-      } while (buf == NULL);
+        buf = readline("> "); 
+      } while (buf ==  NULL);
+      
+      if (!strlen(buf)) continue;
 
       input_ss << buf;
-      parens_tally += parser.count_parens(buf);
-    }
 
-    if (parens_tally < 0) {
-      throw SyntaxError("Unmatched parenthesis.");
+      int parens_tally = parser.count_parens(buf);
+      while (parens_tally > 0) {
+        input_ss << " ";
+
+        prompt_ss.str(": ");
+        for (int tallyi = 0; tallyi < parens_tally; tallyi++)
+          prompt_ss << "  ";
+        prompt_str = prompt_ss.str();
+        prompt_cstr = prompt_str.c_str();
+
+        do {
+          buf = readline(prompt_cstr);
+        } while (buf == NULL);
+
+        input_ss << buf;
+        parens_tally += parser.count_parens(buf);
+      }
+
+      if (parens_tally < 0) {
+        throw SyntaxError("Unmatched parenthesis.");
+      }
+      
+      input_str = input_ss.str();
+      add_history(input_str.c_str());
+      root = parser.parse_string(input_str);
+      result = root->eval_each(env);
+      result->print();
     }
-    
-    root = parser.parse_string(input_ss.str());
-    result = root->eval_each(env);
-    result->print();
+    catch (const Exception& ex) {
+      ex.pretty_print();
+    }
 
     //eval, print, loop
   }
