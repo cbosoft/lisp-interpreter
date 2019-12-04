@@ -44,3 +44,4 @@ EXCEPTION(TypeError, "TypeError");
 EXCEPTION(SyntaxError, "SyntaxError");
 EXCEPTION(NotImplementedError, "NotImplementedError");
 EXCEPTION(DivideByZeroError, "DivideByZeroError");
+EXCEPTION(AuthorError, "AuthorError");
