@@ -27,7 +27,9 @@ OBJ = \
 			obj/list.o \
 			obj/eval.o \
 			obj/builtins/quote.o \
-			obj/builtins/define.o \
+			obj/builtins/defun.o \
+			obj/builtins/defvar.o \
+			obj/builtins/defmacro.o \
 			obj/builtins/add.o \
 			obj/builtins/subtract.o \
 			obj/builtins/multiply.o \

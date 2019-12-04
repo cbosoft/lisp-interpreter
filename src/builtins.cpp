@@ -6,7 +6,9 @@
 // builtins are enumerated here, and referred to in the global env setup
 struct environment_table_row builtin_functions[] = {
 	{ "quote", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&quote, true)), NULL },
-	{ "define", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&define, true)), NULL },
+	{ "defun", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&defun, true)), NULL },
+	{ "defmacro", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&defmacro, true)), NULL },
+	{ "defvar", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&defvar, true)), NULL },
 	{ "exit", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&exit)), NULL },
 
   //maths
