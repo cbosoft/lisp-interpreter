@@ -29,6 +29,9 @@ OBJ = \
 			obj/builtins/quote.o \
 			obj/builtins/define.o \
 			obj/builtins/add.o \
+			obj/builtins/subtract.o \
+			obj/builtins/multiply.o \
+			obj/builtins/divide.o \
 			obj/singletons.o \
 			obj/atom.o \
 			obj/builtins/exit.o
