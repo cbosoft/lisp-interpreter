@@ -6,6 +6,7 @@
 #include <memory>
 
 #include "colour.hpp"
+#include "debug.hpp"
 #include "exception.hpp"
 
 
@@ -302,32 +303,71 @@ class LispEnvironment {
 
 
 
+class Executable {
+  private:
+    bool _is_macro;
+  public:
+    Executable() { this->_is_macro = false; }
+    ~Executable() { }
+    void set_macro() { this->_is_macro = true; }
+    bool is_macro() { return this->_is_macro; }
+    virtual LispObject_ptr eval(LispList_ptr arg, LispEnvironment_ptr env) =0;
+};
+
+
+
+
 // 
 typedef LispObject_ptr (LispCppFunc)(LispList_ptr arg, LispEnvironment_ptr env);
-class LispBuiltin {
+class LispBuiltin : virtual public Printable, virtual public Executable {
   private:
     LispCppFunc *func;
   public:
-    LispBuiltin(LispCppFunc *func) { this->func = func; }
+    LispBuiltin() : Executable () {}
+    LispBuiltin(LispCppFunc *func) : Executable() { 
+      debug_message("Constructing new lisp function.");
+      this->func = func; 
+    }
+    LispBuiltin(LispCppFunc *func, bool is_macro) : Executable() { 
+      this->func = func; 
+      if (is_macro) {
+        debug_message("Constructing new lisp mecro.");
+        this->set_macro(); 
+      }
+      else {
+        debug_message("Constructing new lisp function.");
+      }
+    }
     LispObject_ptr eval(LispList_ptr arg, LispEnvironment_ptr env) { return this->func(arg, env); }
+    std::string repr();
 };
 
 
 
 
 
-class LispFunction : virtual public Printable {
+class LispFunction : virtual public Printable, virtual public Executable {
   private:
     std::vector<std::string> arg_names;
     LispObject_ptr body;
   public:
-    LispFunction(){};
+    LispFunction() : Executable() {};
     LispFunction(LispList_ptr arglist, LispObject_ptr body)
+      : Executable()
     {
       this->body = body;
       for (auto iter = arglist->begin(); iter != arglist->end(); ++iter) {
         this->add_arg( (*iter)->get_value_symbol()->get_name() );
       }
+    };
+    LispFunction(LispList_ptr arglist, LispObject_ptr body, bool is_macro)
+      : Executable()
+    {
+      this->body = body;
+      for (auto iter = arglist->begin(); iter != arglist->end(); ++iter) {
+        this->add_arg( (*iter)->get_value_symbol()->get_name() );
+      }
+      if (is_macro) this->set_macro();
     };
     void add_arg(std::string arg){ this->arg_names.push_back(arg); }
     void set_body(LispObject_ptr body){ this->body = body; }
