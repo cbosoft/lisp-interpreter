@@ -15,7 +15,7 @@ class Exception : public std::exception {
   public:
     Exception(std::string detail, std::string type) { this->detail = detail; this->type = type; }
 
-    void pretty_print() {
+    void pretty_print() const {
       std::cerr << BOLD << BG_RED << this->type << RESET << ": " << this->detail << std::endl;
     }
 };
