@@ -125,6 +125,10 @@ LispList_ptr LispParser::parse_file(const char *path){ return this->parse_file(s
 LispList_ptr LispParser::parse_file(std::string path)
 {
   std::ifstream ifs(path);
+  if (ifs.fail()) {
+    throw IOError(Formatter() << "Could not open file \"" << path << "\" (" << errno << ") " << strerror(errno));
+  }
+
   std::stringstream buffer;
   buffer << ifs.rdbuf();
   return this->parse_string(buffer.str());
