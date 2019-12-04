@@ -21,14 +21,14 @@ LispObject_ptr LispObject::eval(LispEnvironment_ptr env)
   std::list<LispObject_ptr>::iterator list_elem, list_iter;
 
 
-  if (env == NULL) throw std::runtime_error(Formatter() << "Eval called without environment.");
+  if (env == NULL) throw AuthorError(Formatter() << "Eval called without environment.");
 
   debug_message(Formatter() << "eval " << this->repr_type());
   switch (this->type) {
 
   case LISPOBJECT_SYMBOL:
     var_obj = env->get_object(this->value_symbol->get_name());
-    if (var_obj == NULL) throw std::runtime_error(Formatter() << "Symbol " << this->value_symbol->get_name() << " not defined.");
+    if (var_obj == NULL) throw NameError(Formatter() << "Symbol " << this->value_symbol->get_name() << " has no value as variable.");
     return var_obj;
 
   case LISPOBJECT_LIST:
@@ -59,12 +59,12 @@ LispObject_ptr LispObject::eval(LispEnvironment_ptr env)
       list_args->append((*list_iter)->eval(env));
     }
 
-    if (fn->get_type() != LISPOBJECT_SYMBOL) throw std::runtime_error(Formatter() << "List called as a function must start with a Symbol.");
+    if (fn->get_type() != LISPOBJECT_SYMBOL) throw SyntaxError(Formatter() << "List called as a function must start with a Symbol.");
     fname = fn->get_value_symbol()->get_name();
 
     debug_message(Formatter() << "applying function \"" << fname << "\".");
 
-    if (env->get(fname, &var_obj, &var_bfunc, &var_lfunc) < 0) throw std::runtime_error(Formatter() << "Object \"" << fname << "\" not found in environment.");
+    if (env->get(fname, &var_obj, &var_bfunc, &var_lfunc) < 0) throw NameError(Formatter() << "Object \"" << fname << "\" not found in environment.");
 
     if (var_lfunc != NULL) {
       debug_message(Formatter() << "symbol " << fn->value_symbol << " is lisp function");
@@ -76,7 +76,7 @@ LispObject_ptr LispObject::eval(LispEnvironment_ptr env)
       
     }
     else {
-      throw std::runtime_error(Formatter() << "Object \"" << fname << "\" has no value as funciton.");
+      throw NameError(Formatter() << "Object \"" << fname << "\" has no value as funciton.");
     }
     
     break;
