@@ -5,8 +5,8 @@
 
 // builtins are enumerated here, and referred to in the global env setup
 struct environment_table_row builtin_functions[] = {
-	{ "quote", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&quote)), NULL },
-	{ "define", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&define)), NULL },
+	{ "quote", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&quote, true)), NULL },
+	{ "define", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&define, true)), NULL },
 	{ "exit", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&exit)), NULL },
 
   //maths
@@ -25,3 +25,8 @@ struct environment_table_row builtin_functions[] = {
   // sentinel
   { NULL, NULL, NULL, NULL, NULL, NULL }
 };
+
+
+std::string LispBuiltin::repr() {
+  return "TODO";
+}
