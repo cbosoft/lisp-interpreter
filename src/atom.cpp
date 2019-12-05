@@ -24,6 +24,9 @@ std::string LispAtom::repr()
       ss << "\"" << this->value_string << "\"";
       break;
 
+    default:
+      throw AuthorError("Unknown type encountered in LispAtom::repr()!");
+
   }
   return ss.str();
 }
@@ -96,7 +99,7 @@ double LispAtom::cast_to_float()
 
   }
 
-  throw "Unknown type encountered in cast";
+  throw AuthorError("Unknown type encountered in cast");
 }
 
 
@@ -122,6 +125,8 @@ std::string LispAtom::cast_to_string()
 
   }
 
+  throw AuthorError("Unknown type encountered in cast");
+}
 
 
 
