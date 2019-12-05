@@ -12,6 +12,29 @@
 
 
 
+LispParser::LispParser() {
+  this->string_is_int_re = std::regex("^-?\\d+$");
+  this->string_is_float_re = std::regex("^-?\\d+(\\.|e\\+|e-|e)\\d+$");
+  this->string_is_string_re = std::regex("^\".*\"$");
+}
+
+int LispParser::string_is_int(std::string s) 
+{ 
+  return std::regex_match(s, this->string_is_int_re); 
+}
+
+int LispParser::string_is_float(std::string s) 
+{ 
+  return std::regex_match(s, this->string_is_float_re); 
+}
+
+int LispParser::string_is_string(std::string s) 
+{ 
+  return std::regex_match(s, this->string_is_string_re); 
+}
+
+
+
 
 
 

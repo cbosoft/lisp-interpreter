@@ -259,15 +259,11 @@ class LispParser {
     std::regex string_is_string_re;
     LispObject_ptr new_object_guess_type(LispToken_ptr t);
   public:
-    LispParser() {
-      this->string_is_int_re = std::regex("^-?\\d+$");
-      this->string_is_float_re = std::regex("^-?\\d+(\\.|e\\+|e-|e)\\d+$");
-      this->string_is_string_re = std::regex("^\".*\"$");
-    }
+    LispParser();
 
-    int string_is_int(std::string s) { return std::regex_match(s, this->string_is_int_re); }
-    int string_is_float(std::string s) { return std::regex_match(s, this->string_is_float_re); }
-    int string_is_string(std::string s) { return std::regex_match(s, this->string_is_string_re); }
+    int string_is_int(std::string s);
+    int string_is_float(std::string s);
+    int string_is_string(std::string s);
 
     LispList_ptr parse(LispToken_ptr tokens);
     LispList_ptr parse_string(char *char_arr);
