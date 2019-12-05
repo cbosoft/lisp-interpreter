@@ -289,9 +289,9 @@ class LispEnvironment {
     LispEnvironment();
     LispEnvironment(LispEnvironment_ptr parent) { this->parent = parent; }
 
-    void add(std::string name, LispObject_ptr obj) { this->objects_map.insert_or_assign(name, obj); }
-    void add(std::string name, LispBuiltin_ptr val){ this->builtin_functions_map.insert_or_assign(name, val); }
-    void add(std::string name, LispFunction_ptr val){ this->lisp_functions_map.insert_or_assign(name, val); }
+    void add(std::string name, LispObject_ptr obj);
+    void add(std::string name, LispBuiltin_ptr val);
+    void add(std::string name, LispFunction_ptr val);
     void add_something(std::string name, LispObject_ptr obj, LispBuiltin_ptr bfunc, LispFunction_ptr lfunc);
 
     LispObject_ptr get_object(std::string name) { return this->objects_map[name]; }

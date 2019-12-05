@@ -21,6 +21,24 @@ void LispEnvironment::add_something(std::string name, LispObject_ptr obj, LispBu
 
 
 
+void LispEnvironment::add(std::string name, LispObject_ptr obj) 
+{ 
+  this->objects_map.insert_or_assign(name, obj); 
+}
+
+void LispEnvironment::add(std::string name, LispBuiltin_ptr val)
+{ 
+  this->builtin_functions_map.insert_or_assign(name, val); 
+}
+
+void LispEnvironment::add(std::string name, LispFunction_ptr val)
+{ 
+  this->lisp_functions_map.insert_or_assign(name, val); 
+}
+
+
+
+
 extern struct environment_table_row builtin_functions[];
 LispEnvironment::LispEnvironment()
 {
