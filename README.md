@@ -5,9 +5,13 @@
 Lisp  is pretty cool: everything is data, nothing really exists, anything can be
 a function or an object... the lines are super blurry. My supervisor had this
 idea to develop an ML algorithm which could alter itself. The function would
-re-write itself to perform the assigned task. I think this has potential, and is
-definitely an interesting problem! To this end, I wrote this little interpreter
-(first in `c`, now in `C++`).
+re-write itself so it could better perform the assigned task. Given a task of
+getting 4 from 1, it might add input to itself four times, or multiply by four.
+Given an expression `(+ (+ (* 3 (* x x)) (* 2 x)) 1)`, and the desired result
+`(+ (* 6 x) 2)` it might come up with symbolic differentiation. I think this has
+potential, and is definitely an interesting problem! In pursuit of this, I wrote
+this little lisp interpreter (first in `c`, now in `C++`), to get a better
+footing in lisp.
 
 Uses editline (libedit, BSD) for the REPL, but I like the look of replxx
 ([syntax
