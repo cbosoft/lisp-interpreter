@@ -21,7 +21,7 @@ std::string LispAtom::repr()
       break;
 
     case LISPATOM_STRING:
-      ss << this->value_string;
+      ss << "\"" << this->value_string << "\"";
       break;
 
   }
