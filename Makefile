@@ -60,8 +60,11 @@ crisp: obj/main.o $(OBJ) src/types.hpp
 #tests: obj/tests.o $(OBJ)
 #	$(CXX) $(CFLAGS) obj/tests.o $(OBJ) -o $@ $(LINK) && ./tests
 
-#install:
-#	cp crisp /usr/bin/.
+install:
+	cp crisp /usr/bin/.
+
+uninstall:
+	rm -rf /usr/bin/crisp
 
 clean:
 	rm -rf obj crisp
