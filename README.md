@@ -1,20 +1,24 @@
 # ![icon](https://raw.githubusercontent.com/cbosoft/lisp-interpreter/master/assets/logo.png) crisp
 
-## (chris' lisp) v0.2
+## (chris' lisp) v0.3
 
-Nothing new under the sun; here's another lisp interpretor in C. I wanted to do
-this for fun, nothing more. Expect basic functionality, rudimentary
-implementation of things which are better implemented elsewhere, and slow
-operation.
+Lisp  is pretty cool: everything is data, nothing really exists, anything can be
+a function or an object... the lines are super blurry. My supervisor had this
+idea to develop an ML algorithm which could alter itself. The function would
+re-write itself to perform the assigned task. I think this has potential, and is
+definitely an interesting problem! To this end, I wrote this little interpreter
+(first in `c`, now in `C++`).
 
 Uses editline (libedit, BSD) for the REPL, but I like the look of replxx
-([syntax highlighting!](https://github.com/AmokHuginnsson/replxx/blob/master/examples/c-api.c))
-so may move to that in the future. Garbage collection brought to you by:
-[Boehm-GC](https://www.hboehm.info/gc/)! Bacon logo from [Freeplk](https://www.flaticon.com/authors/freepik)
+([syntax
+highlighting!](https://github.com/AmokHuginnsson/replxx/blob/master/examples/c-api.c))
+so may move to that in the future. Garbage collection/memory management brought
+to you by the wonderful world of std::shared_ptr! Bacon logo from
+[Freepik](https://www.flaticon.com/authors/freepik)
 
 # Features:
 
-  - Simple arithmetic 
+  - MATHS!
 ```lisp
 (add a b)  ;; -> a + b
 (subtract a b) ;; -> a - b
@@ -22,9 +26,24 @@ so may move to that in the future. Garbage collection brought to you by:
 (divide a b) ;; -> a / b
 ```
 
-  - Function definition 
+  - FUNCTIONS AND VARIABLES!
 ```lisp
-(define name (args, ...) (body))
+(defun name (args ...) body ...) ;; arguments will each be evaluated once
+
+
+(defmacro name (args ...) body ...) ;; arguments won't be evaluated until requested
+
+
+(defvar name value)
+```
+
+  - CONDITIONS!
+```lisp
+(if (- 2 1) 'true 'false)
+
+(cond ((or 0 0) 'nope)
+      ((and 1 0) 'nah)
+      ((or 1 0) 'this-one!))
 ```
 
   - REPL
