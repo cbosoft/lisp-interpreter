@@ -4,14 +4,16 @@
 
 void LispEnvironment::add_something(std::string name, LispObject_ptr obj, LispBuiltin_ptr bfunc, LispFunction_ptr lfunc)
 {
-  debug_message(Formatter() << "adding var \"" << name << "\" to environment");
   if (obj != NULL) {
+    debug_message(Formatter() << "adding var \"" << name << "\" to environment as variable");
     this->add(name, obj);
   }
   else if (bfunc != NULL) {
+    debug_message(Formatter() << "adding var \"" << name << "\" to environment as function (builtin)");
     this->add(name, bfunc);
   }
   else {
+    debug_message(Formatter() << "adding var \"" << name << "\" to environment as function (lisp)");
     this->add(name, lfunc);
   }
 }
@@ -36,6 +38,7 @@ LispEnvironment::LispEnvironment()
 
 int LispEnvironment::get(std::string name, LispObject_ptr *obj, LispBuiltin_ptr *bf, LispFunction_ptr *lf)
 {
+  debug_message(Formatter() << "looking for \"" << name << "\" in environment");
   (*obj) = NULL;
   (*bf) = NULL;
   (*lf) = NULL;
@@ -58,5 +61,10 @@ int LispEnvironment::get(std::string name, LispObject_ptr *obj, LispBuiltin_ptr 
     return LISPENV_LFUNC;
   }
 
-  return this->parent == NULL ? -1 : this->parent->get(name, obj, bf, lf);
+  if (this->parent == NULL) {
+    debug_message(Formatter() << "object not found, and no parent. get failed.");
+    return -1;
+  }
+
+  return this->parent->get(name, obj, bf, lf);
 }
