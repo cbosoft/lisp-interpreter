@@ -19,6 +19,20 @@ struct environment_table_row builtin_functions[] = {
 	{ "divide", "/", NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&divide)), NULL },
 	{ "÷", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&divide)), NULL },
 
+  // Comparison
+	{ "greather-than", ">", NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&gt)), NULL },
+	{ "greather-than-or-equal-to", ">=", NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&ge)), NULL },
+	{ "less-than", "<", NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&lt)), NULL },
+	{ "less-than-or-equal-to", "<=", NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&le)), NULL },
+	{ "equal-to", "=", NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&eq)), NULL },
+
+  // Boolean logic and flow control
+	{ "cond", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&cond, true)), NULL },
+	{ "if", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&lisp_if, true)), NULL },
+	{ "and", "&&", NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&lisp_and)), NULL },
+	{ "or", "||", NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&lisp_or)), NULL },
+	{ "not", "!", NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&lisp_not)), NULL },
+
 
 
 

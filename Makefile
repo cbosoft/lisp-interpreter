@@ -34,6 +34,16 @@ OBJ = \
 			obj/builtins/subtract.o \
 			obj/builtins/multiply.o \
 			obj/builtins/divide.o \
+			obj/builtins/and.o \
+			obj/builtins/or.o \
+			obj/builtins/not.o \
+			obj/builtins/gt.o \
+			obj/builtins/ge.o \
+			obj/builtins/lt.o \
+			obj/builtins/le.o \
+			obj/builtins/eq.o \
+			obj/builtins/if.o \
+			obj/builtins/cond.o \
 			obj/singletons.o \
 			obj/atom.o \
 			obj/builtins/exit.o
