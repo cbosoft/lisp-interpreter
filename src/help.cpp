@@ -2,19 +2,21 @@
 
 #include "version.hpp"
 #include "help.hpp"
+#include "colour.hpp"
 
 
 void display_splash()
 {
-  std::cout << EXE_NAME << "v" << VERSION << std::endl;
+  std::cout << BOLD << EXE_NAME << RESET << " v" << VERSION << std::endl;
 }
 
 
 
 void display_help()
 {
+  display_splash();
+
   std::cout 
-    << EXE_NAME << "v" << VERSION << "\n"
     << "\n"
     << "  Usage:\n"
     << "    crisp [-i] [-d] [-c <command>] [<file> ...]\n"
@@ -25,6 +27,7 @@ void display_help()
     << "    -d | --debug              Show a bunch of debugging messages.\n"
     << "    -c | --command <command>  Execute command <command>.\n"
     << "    -h | --help               Print help and exit.\n"
+    << "\n"
     ;
   exit(0);
 }
