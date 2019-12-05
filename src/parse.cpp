@@ -4,6 +4,7 @@
 #include <vector>
 #include <fstream>
 #include <ios>
+#include <algorithm>
 
 #include "types.hpp"
 #include "debug.hpp"
@@ -154,7 +155,13 @@ LispList_ptr LispParser::parse_file(std::string path)
 
   std::stringstream buffer;
   buffer << ifs.rdbuf();
-  return this->parse_string(buffer.str());
+  std::string file_contents = buffer.str();
+
+  if (file_contents.rfind("#!", 0)) {
+    file_contents.erase(std::remove(file_contents.begin(), file_contents.end(), '\n'), file_contents.end());
+  }
+
+  return this->parse_string(file_contents);
 }
 
 
