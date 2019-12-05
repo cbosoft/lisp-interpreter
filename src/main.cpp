@@ -7,6 +7,7 @@
 #include "types.hpp"
 #include "debug.hpp"
 #include "exception.hpp"
+#include "help.hpp"
 
 
 #define EITHER(S, A, B) ((strcmp(S, A) == 0) || (strcmp(S, B) == 0))
@@ -39,7 +40,7 @@ int main(int argc, char **argv)
       INTERACTIVE_MODE = 1;
     }
     else if (EITHER(argv[i], "-h", "--help")) {
-      //display_help();
+      display_help();
       exit(0);
     }
     else if (EITHER(argv[i], "-d", "--debug")) {
@@ -78,7 +79,10 @@ int main(int argc, char **argv)
         ex.pretty_print();
       }
     }
-    else if ((EITHER(argv[i], "-d", "--debug")) || (EITHER(argv[i], "-i", "--interactive"))) {
+    else if (
+        (EITHER(argv[i], "-d", "--debug")) || 
+        (EITHER(argv[i], "-h", "--help")) || 
+        (EITHER(argv[i], "-i", "--interactive"))) {
       // flag: ignore
     }
     else {
@@ -97,7 +101,7 @@ int main(int argc, char **argv)
 
   if (EXECUTED_FILE_OR_CLI_STRING && !INTERACTIVE_MODE) return 0;
 
-  //display_splash();
+  display_splash();
 
   stifle_history(7);
 

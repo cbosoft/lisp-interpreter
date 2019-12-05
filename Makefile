@@ -46,6 +46,7 @@ OBJ = \
 			obj/builtins/cond.o \
 			obj/singletons.o \
 			obj/atom.o \
+			obj/help.o \
 			obj/builtins/exit.o
 LINK = -ledit -lncurses -lgc -lpcre
 
