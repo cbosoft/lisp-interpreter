@@ -1,12 +1,14 @@
 #include "types.hpp"
 
-LispObject_ptr quote(LispList_ptr arg, LispEnvironment_ptr env);
-
+// Define
 LispObject_ptr defun(LispList_ptr arg, LispEnvironment_ptr env);
 LispObject_ptr defmacro(LispList_ptr arg, LispEnvironment_ptr env);
 LispObject_ptr defvar(LispList_ptr arg, LispEnvironment_ptr env);
 
-LispObject_ptr exit(LispList_ptr arg, LispEnvironment_ptr env);
+// Output
+LispObject_ptr print(LispList_ptr arg, LispEnvironment_ptr env);
+//LispObject_ptr print_formatted(LispList_ptr arg, LispEnvironment_ptr env);
+
 
 
 // maths
@@ -29,6 +31,11 @@ LispObject_ptr lt(LispList_ptr arg, LispEnvironment_ptr env);
 LispObject_ptr le(LispList_ptr arg, LispEnvironment_ptr env);
 LispObject_ptr eq(LispList_ptr arg, LispEnvironment_ptr env);
 
-LispObject_ptr when(LispList_ptr arg, LispEnvironment_ptr env);
-LispObject_ptr unless(LispList_ptr arg, LispEnvironment_ptr env);
-LispObject_ptr lisp_while(LispList_ptr arg, LispEnvironment_ptr env);
+//LispObject_ptr when(LispList_ptr arg, LispEnvironment_ptr env);
+//LispObject_ptr unless(LispList_ptr arg, LispEnvironment_ptr env);
+//LispObject_ptr lisp_while(LispList_ptr arg, LispEnvironment_ptr env);
+
+
+// misc
+LispObject_ptr quote(LispList_ptr arg, LispEnvironment_ptr env);
+LispObject_ptr exit(LispList_ptr arg, LispEnvironment_ptr env);
