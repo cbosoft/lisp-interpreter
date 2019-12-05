@@ -27,8 +27,8 @@ LispObject_ptr LispObject::eval(LispEnvironment_ptr env)
   switch (this->type) {
 
   case LISPOBJECT_SYMBOL:
-    var_obj = env->get_object(this->value_symbol->get_name());
-    if (var_obj == NULL) throw NameError(Formatter() << "Symbol " << this->value_symbol->get_name() << " has no value as variable.");
+    if (env->get(this->value_symbol->get_name(), &var_obj, &var_bfunc, &var_lfunc) != LISPENV_OBJ)
+      throw NameError(Formatter() << "Symbol " << this->value_symbol->get_name() << " has no value as variable.");
     return var_obj;
 
   case LISPOBJECT_LIST:
