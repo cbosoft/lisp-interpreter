@@ -294,8 +294,6 @@ class LispEnvironment {
     void add(std::string name, LispFunction_ptr val);
     void add_something(std::string name, LispObject_ptr obj, LispBuiltin_ptr bfunc, LispFunction_ptr lfunc);
 
-    LispObject_ptr get_object(std::string name) { return this->objects_map[name]; }
-    LispBuiltin_ptr get_builtin(std::string name) { return this->builtin_functions_map[name]; }
     int get(std::string name, LispObject_ptr *obj, LispBuiltin_ptr *bf, LispFunction_ptr *lf);
 
 };
