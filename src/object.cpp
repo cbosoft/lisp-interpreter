@@ -4,7 +4,8 @@
 
 
 // Gets a string representation of the object's value.
-std::string LispObject::repr() {
+std::string LispObject::repr()
+{
 
   switch (this->type) {
     case LISPOBJECT_ATOM:
@@ -17,14 +18,15 @@ std::string LispObject::repr() {
       return this->value_symbol->get_name();
   }
 
-  throw "Unknown type found!";
+  throw AuthorError("Unknown type encountered in LispObject::repr()!");
 }
 
 
 
 
 // Gets a string representation of the object's type (Atom, Symbol or List)
-std::string LispObject::repr_type() {
+std::string LispObject::repr_type()
+{
 
   switch (this->type) {
     case LISPOBJECT_ATOM:
@@ -37,7 +39,7 @@ std::string LispObject::repr_type() {
       return "Symbol";
   }
 
-  throw "Unknown type found!";
+  throw AuthorError("Unknown type encountered in LispObject::repr_type()!");
 }
 
 
