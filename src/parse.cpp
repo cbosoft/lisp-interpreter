@@ -42,7 +42,7 @@ LispObject_ptr LispParser::new_object_guess_type(LispToken_ptr t) {
 
   if (this->string_is_string(s)) {
     debug_message(Formatter() << "GUESSING " << s << " is STRING");
-    std::string body = s.substr(1, s.length()-1);
+    std::string body = s.substr(1, s.length()-2);
     LispAtom_ptr newatom = std::make_shared<LispAtom>(LispAtom(body));
     return std::make_shared<LispObject>(LispObject(newatom));
   }
