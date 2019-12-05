@@ -122,8 +122,31 @@ std::string LispAtom::cast_to_string()
 
   }
 
+
+
+
+
+// Does the value represent boolean "true"?
+bool LispAtom::is_truthy()
+{
+
+  std::stringstream ss;
+  switch (this->type) {
+
+    case LISPATOM_INT:
+      return (bool)this->value_int;
+
+    case LISPATOM_FLOAT:
+      return (bool)this->value_float;
+
+    case LISPATOM_STRING:
+      return (bool)this->value_string.size();
+
+  }
+
   throw "Unknown type encountered in cast";
 }
+
 
 
 // add obj to this and return

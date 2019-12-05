@@ -39,3 +39,24 @@ std::string LispObject::repr_type() {
 
   throw "Unknown type found!";
 }
+
+
+
+
+//
+bool LispObject::is_truthy()
+{
+  switch (this->type) {
+
+    case LISPOBJECT_ATOM:
+      return this->value_atom->is_truthy();
+
+    case LISPOBJECT_LIST:
+      return this->value_list->count();
+
+    case LISPOBJECT_SYMBOL:
+      throw TypeError("Truthy-ness of a symbol is ambiguous.");
+  }
+
+  throw AuthorError("Unknown type encountered in LispObject::is_truthy()!");
+}

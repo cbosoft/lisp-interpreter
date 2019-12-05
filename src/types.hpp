@@ -78,6 +78,8 @@ class LispAtom : virtual public Printable {
     double get_value_float(){ return this->value_float; }
     std::string get_value_string(){ return this->value_string; }
 
+    bool is_truthy();
+
     LispAtom_ptr add(LispAtom_ptr obj);
     LispAtom_ptr subtract(LispAtom_ptr obj);
     LispAtom_ptr multiply(LispAtom_ptr obj);
@@ -171,6 +173,8 @@ class LispObject : virtual public Printable {
     LispAtom_ptr get_value_atom() { return this->value_atom; }
     LispList_ptr get_value_list() { return this->value_list; }
     LispSymbol_ptr get_value_symbol() { return this->value_symbol; }
+
+    bool is_truthy();
 
 };
 
