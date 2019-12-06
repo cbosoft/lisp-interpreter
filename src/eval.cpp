@@ -93,7 +93,7 @@ LispObject_ptr LispObject::eval(LispEnvironment_ptr env)
       return var_bfunc->eval(list_args, env);
     }
     else {
-      throw NameError(Formatter() << "Object \"" << fname << "\" has no value as funciton.");
+      throw NameError(Formatter() << "Object \"" << fname << "\" has no value as function.");
     }
     
     break;
