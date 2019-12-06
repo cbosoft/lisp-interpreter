@@ -45,6 +45,7 @@ OBJ = \
 			obj/builtins/if.o \
 			obj/builtins/cond.o \
 			obj/builtins/print.o \
+			obj/builtins/rest.o \
 			obj/singletons.o \
 			obj/atom.o \
 			obj/help.o \
