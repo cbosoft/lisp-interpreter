@@ -1,4 +1,5 @@
 #include <string>
+#include <sstream>
 #include <iostream>
 #include <regex>
 #include <vector>
@@ -16,7 +17,23 @@ LispParser::LispParser() {
   this->string_is_int_re = std::regex("^-?\\d+$");
   this->string_is_float_re = std::regex("^-?\\d+(\\.|e\\+|e-|e)\\d+$");
   this->string_is_string_re = std::regex("^\".*\"$");
+
+  std::string home(getenv("HOME"));
+  std::stringstream ss;
+
+  ss << "/lib/crisp/";
+  this->module_paths.push_back(ss.str());
+  ss.str("");
+
+  ss << home << "/.crisp/";
+  this->module_paths.push_back(ss.str());
+  ss.str("");
+
+  ss << "./lib/";
+  this->module_paths.push_back(ss.str());
+  ss.str("");
 }
+
 
 int LispParser::string_is_int(std::string s) 
 { 
