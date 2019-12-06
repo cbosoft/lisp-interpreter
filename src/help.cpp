@@ -7,7 +7,7 @@
 
 void display_splash()
 {
-  std::cout << BOLD << EXE_NAME << RESET << " v" << VERSION << std::endl;
+  std::cout << std::endl << "  " << BOLD << EXE_NAME << RESET << " v" << VERSION << std::endl << std::endl;
 }
 
 
@@ -17,7 +17,6 @@ void display_help()
   display_splash();
 
   std::cout 
-    << "\n"
     << "  Usage:\n"
     << "    crisp [-i] [-d] [-c <command>] [<file> ...]\n"
     << "    crisp -h\n"
