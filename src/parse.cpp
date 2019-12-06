@@ -166,6 +166,19 @@ LispList_ptr LispParser::parse_file(std::string path)
 }
 
 
+
+
+// parse module
+LispList_ptr LispParser::parse_module(const char *name){ return this->parse_module(std::string(name)); }
+LispList_ptr LispParser::parse_module(std::string name)
+{
+  debug_message("in module parse");
+  std::string path = this->search_module(name);
+  debug_message(Formatter() << "found path " << path);
+  return this->parse_file(path);
+}
+
+
 int LispParser::count_parens(char * s) {return this->count_parens(std::string(s)); }
 int LispParser::count_parens(std::string s)
 {
