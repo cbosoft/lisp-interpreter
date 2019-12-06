@@ -17,7 +17,7 @@ LispObject_ptr lisp_if(LispList_ptr arg, LispEnvironment_ptr env)
     throw ArgumentError(Formatter() << "In " << FUNC << ": Wrong number of arguments supplied. Got " << nargs << ", expected 3.");
 
 
-  LispObject_ptr condition = arg->next(true);
+  LispObject_ptr condition = arg->next(true)->eval(env);
   LispObject_ptr value_true = arg->next();
   LispObject_ptr value_else = arg->next();
 
