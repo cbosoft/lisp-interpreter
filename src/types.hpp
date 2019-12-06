@@ -258,6 +258,8 @@ class LispParser {
     std::regex string_is_float_re;
     std::regex string_is_string_re;
     LispObject_ptr new_object_guess_type(LispToken_ptr t);
+    std::list<std::string> module_paths;
+    std::string search_module(std::string name);
   public:
     LispParser();
 
