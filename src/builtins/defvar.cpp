@@ -22,7 +22,8 @@ LispObject_ptr defvar(LispList_ptr arg, LispEnvironment_ptr env)
   LispObject_ptr name = arg->next(true);
   if (name->get_type() != LISPOBJECT_SYMBOL) throw std::runtime_error(Formatter() << "Argument has wrong type: name should be a Symbol, not " << name->repr_type() << ".");
 
-  LispObject_ptr value = arg->next();
+  LispObject_ptr value = arg->next()->eval(env);
   env->add_something(name->get_value_symbol()->get_name(), value, NULL, NULL);
   return name;
 }
+LispBuiltin_ptr defvar_obj = std::make_shared<LispBuiltin>(LispBuiltin(&defvar, true));
