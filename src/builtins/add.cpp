@@ -23,4 +23,3 @@ LispObject_ptr add(LispList_ptr arg, LispEnvironment_ptr env)
   LispAtom_ptr right_atom = right->get_value_atom();
   return std::make_shared<LispObject>(LispObject(left_atom->add(right_atom)));
 }
-
