@@ -35,6 +35,9 @@ struct environment_table_row builtin_functions[] = {
 	{ "or", "||", NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&lisp_or)), NULL },
 	{ "not", "!", NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&lisp_not)), NULL },
 
+  // List operations
+	{ "rest", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&rest)), NULL },
+	{ "pop", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&pop)), NULL },
   // Misc
 	{ "quote", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&quote, true)), NULL },
 	{ "exit", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&exit)), NULL },
