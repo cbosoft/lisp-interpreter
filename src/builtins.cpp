@@ -38,6 +38,11 @@ struct environment_table_row builtin_functions[] = {
   // List operations
 	{ "rest", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&rest)), NULL },
 	{ "pop", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&pop)), NULL },
+
+  // Modules and other files
+	{ "eval-file", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&eval_file)), NULL },
+	{ "import", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&import)), NULL },
+
   // Misc
 	{ "quote", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&quote, true)), NULL },
 	{ "exit", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&exit)), NULL },

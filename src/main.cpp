@@ -30,6 +30,9 @@ extern int DEBUG_MODE;
 int INTERACTIVE_MODE = 0;
 int EXECUTED_FILE_OR_CLI_STRING = 0;
 
+// BOO: GLOBALS
+LispParser parser;
+
 
 int main(int argc, char **argv)
 {
@@ -50,7 +53,6 @@ int main(int argc, char **argv)
   }
 
 
-  LispParser parser = LispParser();
   LispEnvironment_ptr env = std::make_shared<LispEnvironment>(LispEnvironment());
   LispList_ptr root = NULL;
   LispObject_ptr result = NULL;
@@ -156,7 +158,7 @@ int main(int argc, char **argv)
       ex.pretty_print();
     }
 
-    //eval, print, loop
+    // eval, print, loop
   }
 
   return 0;

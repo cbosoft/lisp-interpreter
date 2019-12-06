@@ -37,6 +37,8 @@ LispObject_ptr eq(LispList_ptr arg, LispEnvironment_ptr env);
 
 LispObject_ptr rest(LispList_ptr arg, LispEnvironment_ptr env);
 LispObject_ptr pop(LispList_ptr arg, LispEnvironment_ptr env);
+LispObject_ptr eval_file(LispList_ptr arg, LispEnvironment_ptr env);
+LispObject_ptr import(LispList_ptr arg, LispEnvironment_ptr env);
 
 // misc
 LispObject_ptr quote(LispList_ptr arg, LispEnvironment_ptr env);
