@@ -21,4 +21,3 @@ LispObject_ptr rest(LispList_ptr arg, LispEnvironment_ptr env)
   LispList_ptr list_var = list_arg->get_value_list();
   return std::make_shared<LispObject>(LispObject(list_var->rest()));
 }
-LispBuiltin_ptr rest_obj = std::make_shared<LispBuiltin>(LispBuiltin(&rest));
