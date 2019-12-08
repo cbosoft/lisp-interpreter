@@ -50,6 +50,7 @@ OBJ = \
 			obj/builtins/eval_file.o \
 			obj/builtins/import.o \
 			obj/singletons.o \
+			obj/fileio.o \
 			obj/search.o \
 			obj/atom.o \
 			obj/help.o \
