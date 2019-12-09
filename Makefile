@@ -38,13 +38,17 @@ OBJ = \
 			obj/atom.o \
 			obj/help.o \
 			obj/builtins/exit.o
+HDRS = \
+  		src/types.hpp \
+			src/exception.hpp
+
 LINK = -ledit -lncurses -lgc -lpcre
 
-obj/%.o: src/%.cpp src/types.hpp
+obj/%.o: src/%.cpp $(HDRS)
 	mkdir -p `dirname $@`
 	$(CXX) $(CFLAGS) $< -c -o $@
 
-crisp: obj/main.o $(OBJ) src/types.hpp
+crisp: obj/main.o $(OBJ) $(HDRS)
 	$(CXX) $(CFLAGS) obj/main.o $(OBJ) -o $@ $(LINK)
 
 #tests: obj/tests.o $(OBJ)
