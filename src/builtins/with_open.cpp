@@ -10,6 +10,7 @@
 
 #define FUNC "with-open"
 
+// (with-open "path" "mode" name &rest body)
 LispObject_ptr with_open(LispList_ptr arg, LispEnvironment_ptr env)
 {
   debug_message(Formatter() << "builtin function " << FUNC);
