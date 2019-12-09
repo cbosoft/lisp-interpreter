@@ -213,8 +213,10 @@ class LispList : virtual public Printable {
       return (*this->it);
     }
 
-    LispList_ptr rest() { 
-      return std::make_shared<LispList>(LispList(++this->begin(), this->end())); 
+    LispList_ptr rest(int n = 1) { 
+      auto it = this->begin();
+      for (int i = 0; i < n; i++, ++it);
+      return std::make_shared<LispList>(LispList(it, this->end())); 
     }
 
     int count() { return this->obj_list.size(); }
@@ -290,11 +292,16 @@ class LispEnvironment {
     std::map<std::string, LispObject_ptr> objects_map;
     std::map<std::string, LispBuiltin_ptr> builtin_functions_map;
     std::map<std::string, LispFunction_ptr> lisp_functions_map;
+    bool readonly = false;
     LispEnvironment_ptr parent;
 
   public:
     LispEnvironment();
-    LispEnvironment(LispEnvironment_ptr parent) { this->parent = parent; }
+    LispEnvironment(LispEnvironment_ptr parent, bool readonly = false) 
+    { 
+      this->parent = parent; 
+      this->readonly = readonly; 
+    }
 
     void add(std::string name, LispObject_ptr obj);
     void add(std::string name, LispBuiltin_ptr val);
