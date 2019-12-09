@@ -60,14 +60,15 @@ class LispAtom : virtual public Printable {
       this->type = LISPATOM_INT;
       this->value_int = value; 
     }
-    LispAtom(bool value) {
-      this->type = LISPATOM_INT;
-      this->value_int = (long)value; 
-    }
+    LispAtom(bool value) : LispAtom((long)value) {};
+    LispAtom(int value) : LispAtom((long)value) {};
+
     LispAtom(double value) { 
       this->type = LISPATOM_FLOAT;
       this->value_float = value; 
     }
+    LispAtom(float value) : LispAtom((double)value) {};
+
     LispAtom(std::string value) { 
       this->type = LISPATOM_STRING;
       this->value_string = value; 
