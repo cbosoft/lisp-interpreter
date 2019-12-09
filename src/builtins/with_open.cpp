@@ -65,7 +65,7 @@ LispObject_ptr with_open(LispList_ptr arg, LispEnvironment_ptr env)
   if (fd < 0)
     throw IOError(Formatter() << "Could not open file \"" << path_atom->get_value_string() << "\" (" << errno << ") " << strerror(errno));
 
-  LispEnvironment_ptr subenv = std::make_shared<LispEnvironment>(LispEnvironment(env));
+  LispEnvironment_ptr subenv = std::make_shared<LispEnvironment>(LispEnvironment(env, true));
   subenv->add(name_symb->get_name(), std::make_shared<LispObject>(LispObject((long)fd)));
 
   LispList_ptr body = arg->rest(3);
