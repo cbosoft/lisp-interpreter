@@ -32,6 +32,7 @@ OBJ = \
 			obj/builtins/pop.o \
 			obj/builtins/eval_file.o \
 			obj/builtins/import.o \
+			obj/builtins/with_open.o \
 			obj/singletons.o \
 			obj/search.o \
 			obj/atom.o \
