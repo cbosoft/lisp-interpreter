@@ -64,3 +64,7 @@ struct environment_table_row builtin_functions[] = {
 std::string LispBuiltin::repr() {
   return "TODO";
 }
+
+std::string LispBuiltin::str() {
+  return "TODO";
+}
