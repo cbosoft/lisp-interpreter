@@ -13,6 +13,8 @@ struct environment_table_row builtin_functions[] = {
   // Input/Output
 	{ "print", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&print)), NULL },
 	{ "with-open", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&with_open, true)), NULL },
+	{ "read", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&lisp_read)), NULL },
+	{ "write", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&lisp_write)), NULL },
 
   // Maths
 	{ "add", "+", NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&add)), NULL },
