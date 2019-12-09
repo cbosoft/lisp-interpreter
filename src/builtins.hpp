@@ -8,6 +8,7 @@ LispObject_ptr defvar(LispList_ptr arg, LispEnvironment_ptr env);
 // Output
 LispObject_ptr print(LispList_ptr arg, LispEnvironment_ptr env);
 //LispObject_ptr print_formatted(LispList_ptr arg, LispEnvironment_ptr env);
+LispObject_ptr with_open(LispList_ptr arg, LispEnvironment_ptr env);
 
 
 
