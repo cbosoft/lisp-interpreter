@@ -392,20 +392,3 @@ struct environment_table_row {
   LispBuiltin_ptr bfunc;
   LispFunction_ptr lfunc;
 };
-
-
-
-
-class LispFileIO {
-  private:
-    std::fstream fstr;
-    bool is_file;
-  public:
-    LispFileIO(){this->is_file = false; }
-    LispFileIO(std::string path, std::ios_base::openmode);
-
-    void write(std::string towrite);
-    void writeline(std::string towrite);
-    std::string read();
-    std::string readline();
-};
