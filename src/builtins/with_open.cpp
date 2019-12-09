@@ -8,9 +8,9 @@
 #include "../exception.hpp"
 #include "../builtins.hpp"
 
-#define FUNC "while_open"
+#define FUNC "with-open"
 
-LispObject_ptr while_open(LispList_ptr arg, LispEnvironment_ptr env)
+LispObject_ptr with_open(LispList_ptr arg, LispEnvironment_ptr env)
 {
   debug_message(Formatter() << "builtin function " << FUNC);
   (void) env;
