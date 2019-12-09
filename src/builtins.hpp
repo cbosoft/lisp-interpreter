@@ -37,8 +37,12 @@ LispObject_ptr eq(LispList_ptr arg, LispEnvironment_ptr env);
 //LispObject_ptr unless(LispList_ptr arg, LispEnvironment_ptr env);
 //LispObject_ptr lisp_while(LispList_ptr arg, LispEnvironment_ptr env);
 
+// List operations
 LispObject_ptr rest(LispList_ptr arg, LispEnvironment_ptr env);
 LispObject_ptr pop(LispList_ptr arg, LispEnvironment_ptr env);
+LispObject_ptr list(LispList_ptr arg, LispEnvironment_ptr env);
+
+
 LispObject_ptr eval_file(LispList_ptr arg, LispEnvironment_ptr env);
 LispObject_ptr import(LispList_ptr arg, LispEnvironment_ptr env);
 

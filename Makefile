@@ -35,6 +35,7 @@ OBJ = \
 			obj/builtins/with_open.o \
 			obj/builtins/write.o \
 			obj/builtins/read.o \
+			obj/builtins/list.o \
 			obj/singletons.o \
 			obj/search.o \
 			obj/atom.o \
