@@ -39,9 +39,9 @@ struct environment_table_row builtin_functions[] = {
 	{ "not", "!", NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&lisp_not)), NULL },
 
   // List operations
-	{ "rest", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&rest)), NULL },
-	{ "pop", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&pop)), NULL },
 	{ "list", NULL, "(list &rest elements)\nReturns list of ELEMENTS.", NULL, std::make_shared<LispBuiltin>(LispBuiltin(&list)), NULL },
+	{ "rest", NULL, "(rest list)\nReturns list with all but first element of LIST.", NULL, std::make_shared<LispBuiltin>(LispBuiltin(&rest)), NULL },
+	{ "pop", NULL, "(pop list)\nReturns first element of LIST.", NULL, std::make_shared<LispBuiltin>(LispBuiltin(&pop)), NULL },
 
   // Modules and other files
 	{ "eval-file", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&eval_file)), NULL },
