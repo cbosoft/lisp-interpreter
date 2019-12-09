@@ -27,7 +27,7 @@ LispObject_ptr with_open(LispList_ptr arg, LispEnvironment_ptr env)
     throw TypeError(Formatter() << "In " << FUNC << ": Argument \"path\" should be Atomistic (String). Got " << path_atom->repr_type() << ".");
   const char* path_cstr = path_atom->get_value_string().c_str();
 
-  LispObject_ptr mode_obj = arg->next(true);
+  LispObject_ptr mode_obj = arg->next();
   if (mode_obj->get_type() != LISPOBJECT_ATOM)
     throw TypeError(Formatter() << "In " << FUNC << ": Argument \"mode\" should be Atomistic (String): \"r\", \"w\", or \"a\". Got " << mode_obj->repr_type() << ".");
 
@@ -56,13 +56,10 @@ LispObject_ptr with_open(LispList_ptr arg, LispEnvironment_ptr env)
 
 
   LispObject_ptr name_obj = arg->next();
-  if (path_obj->get_type() != LISPOBJECT_SYMBOL)
-    throw TypeError(Formatter() << "In " << FUNC << ": Argument \"name\" should be a Symbol. Got " << path_obj->repr_type() << ".");
+  if (name_obj->get_type() != LISPOBJECT_SYMBOL)
+    throw TypeError(Formatter() << "In " << FUNC << ": Argument \"name\" should be a Symbol. Got " << name_obj->repr_type() << ".");
 
   LispSymbol_ptr name_symb = name_obj->get_value_symbol();
-
-  LispList_ptr body = arg->rest()->rest();
-
   int fd = open(path_cstr, oflags);
   if (fd < 0)
     throw IOError(Formatter() << "Could not open file \"" << path_atom->get_value_string() << "\" (" << errno << ") " << strerror(errno));
@@ -70,6 +67,7 @@ LispObject_ptr with_open(LispList_ptr arg, LispEnvironment_ptr env)
   LispEnvironment_ptr subenv = std::make_shared<LispEnvironment>(LispEnvironment(env));
   subenv->add(name_symb->get_name(), std::make_shared<LispObject>(LispObject((long)fd)));
 
+  LispList_ptr body = arg->rest(3);
   LispObject_ptr rv = body->eval_each(subenv);
   close(fd);
   return rv;
