@@ -23,10 +23,10 @@ LispObject_ptr print(LispList_ptr arg, LispEnvironment_ptr env)
 
   std::stringstream ss;
   auto it = arg->begin();
-  ss << (*it)->repr();
+  ss << (*it)->str();
   ++it;
   for (; it != arg->end(); ++it) {
-    ss << " " << (*it)->repr();
+    ss << (*it)->str();
   }
 
   std::cout << ss.str() << std::endl;

@@ -23,6 +23,7 @@ class Printable {
   public:
     Printable(){};
     virtual std::string repr(){ throw NotImplementedError("In Printable::repr(): virtual function not implemented: intended to be used by sub class."); }
+    virtual std::string str(){ throw NotImplementedError("In Printable::str(): virtual function not implemented: intended to be used by sub class."); }
     void print(){ this->_print(); std::cout << std::endl; };
     virtual void _print() { std::cout << this->repr() << " "; }
 };
@@ -69,12 +70,10 @@ class LispAtom : virtual public Printable {
     }
     LispAtom(float value) : LispAtom((double)value) {};
 
-    LispAtom(std::string value) { 
-      this->type = LISPATOM_STRING;
-      this->value_string = value; 
-    }
+    LispAtom(std::string value);
 
     int get_type() { return this->type; }
+    std::string str();
     std::string repr();
     std::string repr_type();
     long get_value_int(){ return this->value_int; }
@@ -116,6 +115,7 @@ class LispSymbol : virtual public Printable{
     LispSymbol(std::string name){ this->name = name; }
     std::string get_name(){ return this->name; }
     std::string repr() { return this->name; }
+    std::string str() {return this->name; }
 };
 
 
@@ -157,6 +157,7 @@ class LispObject : virtual public Printable {
       this->value_list = o.value_list;
     }
 
+    std::string str();
     std::string repr();
     std::string repr_type();
 
@@ -222,6 +223,7 @@ class LispList : virtual public Printable {
     int count() { return this->obj_list.size(); }
     void append(LispObject_ptr next_value) { this->obj_list.push_back(next_value); }
     std::string repr();
+    std::string str();
 
     LispObject_ptr eval_each(LispEnvironment_ptr env);
 };
@@ -352,6 +354,7 @@ class LispBuiltin : virtual public Printable, virtual public Executable {
     }
     LispObject_ptr eval(LispList_ptr arg, LispEnvironment_ptr env) { return this->func(arg, env); }
     std::string repr();
+    std::string str();
 };
 
 
@@ -385,6 +388,7 @@ class LispFunction : virtual public Printable, virtual public Executable {
     void set_body(LispObject_ptr body){ this->body = body; }
     LispObject_ptr eval(LispList_ptr arg, LispEnvironment_ptr env);
     std::string repr() { return this->body->repr(); }
+    std::string str() {return this->body->str(); }
 };
 
 
