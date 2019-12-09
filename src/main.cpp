@@ -122,11 +122,15 @@ int main(int argc, char **argv)
         buf = readline("> "); 
       } while (buf ==  NULL);
       
-      if (!strlen(buf)) continue;
+      if (!strlen(buf)) {
+        free(buf);
+        continue;
+      }
 
       input_ss << buf;
-
       int parens_tally = parser.count_parens(buf);
+      free(buf);
+
       while (parens_tally > 0) {
         input_ss << " ";
 
@@ -142,6 +146,7 @@ int main(int argc, char **argv)
 
         input_ss << buf;
         parens_tally += parser.count_parens(buf);
+        free(buf);
       }
 
       if (parens_tally < 0) {
