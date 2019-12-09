@@ -4,6 +4,80 @@
 #include "exception.hpp"
 #include "formatter.hpp"
 
+LispAtom::LispAtom(std::string s)
+{
+  this->type = LISPATOM_STRING;
+
+  std::stringstream ss;
+  bool escape = false;
+
+  for (char ch : s) {
+
+    if (!escape) {
+      if (ch == '\\') {
+        escape = true;
+      }
+      else {
+        ss << ch;
+      }
+    }
+    else {
+      switch (ch) {
+        case 'n':
+          ss << "\n";
+          break;
+
+        case 't':
+          ss << "\t";
+          break;
+
+        case 'r':
+          ss << "\r";
+          break;
+
+        case '\\':
+          ss << "\\";
+          break;
+
+        default:
+          ss << "\\" << ch;
+          break;
+      }
+      escape = false;
+    }
+
+  }
+
+  this->value_string = ss.str();
+}
+
+
+
+
+std::string LispAtom::str()
+{
+  std::stringstream ss;
+  switch (this->type) {
+
+    case LISPATOM_INT:
+      ss << this->value_int;
+      break;
+
+    case LISPATOM_FLOAT:
+      ss << this->value_float;
+      break;
+
+    case LISPATOM_STRING:
+      ss << this->value_string;
+      break;
+
+    default:
+      throw AuthorError("Unknown type encountered in LispAtom::str()!");
+
+  }
+  return ss.str();
+}
+
 
 
 
