@@ -49,19 +49,23 @@ LispObject_ptr with_open(LispList_ptr arg, LispEnvironment_ptr env)
 
     case 'a':
       oflags = O_APPEND;
-      // fall through
-    case 'w':
       oflags |= O_WRONLY;
+      oflags |= O_CREAT;
+      break;
+
+    case 'w':
+      oflags = O_TRUNC;
+      oflags |= O_WRONLY;
+      oflags |= O_CREAT;
       break;
   }
-
 
   LispObject_ptr name_obj = arg->next();
   if (name_obj->get_type() != LISPOBJECT_SYMBOL)
     throw TypeError(Formatter() << "In " << FUNC << ": Argument \"name\" should be a Symbol. Got " << name_obj->repr_type() << ".");
 
   LispSymbol_ptr name_symb = name_obj->get_value_symbol();
-  int fd = open(path_cstr, oflags);
+  int fd = open(path_cstr, oflags, S_IRUSR | S_IWUSR);
   if (fd < 0)
     throw IOError(Formatter() << "Could not open file \"" << path_atom->get_value_string() << "\" (" << errno << ") " << strerror(errno));
 
