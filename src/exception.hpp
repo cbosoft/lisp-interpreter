@@ -47,3 +47,4 @@ EXCEPTION(DivideByZeroError, "DivideByZeroError");
 EXCEPTION(AuthorError, "AuthorError");
 EXCEPTION(IOError, "IOError");
 EXCEPTION(ImportError, "ImportError");
+EXCEPTION(EnvironmentError, "EnvironmentError");
