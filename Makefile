@@ -39,6 +39,7 @@ OBJ = \
 			obj/builtins/read.o \
 			obj/builtins/list.o \
 			obj/builtins/append.o \
+			obj/builtins/random.o \
 			obj/singletons.o \
 			obj/search.o \
 			obj/atom.o \

@@ -17,6 +17,8 @@ LispObject_ptr subtract(LispList_ptr arg, LispEnvironment_ptr env);
 LispObject_ptr multiply(LispList_ptr arg, LispEnvironment_ptr env);
 LispObject_ptr divide(LispList_ptr arg, LispEnvironment_ptr env);
 LispObject_ptr modulo(LispList_ptr arg, LispEnvironment_ptr env);
+LispObject_ptr random(LispList_ptr arg, LispEnvironment_ptr env);
+LispObject_ptr randint(LispList_ptr arg, LispEnvironment_ptr env);
 
 
 // Boolean logic, conditionals, flow control
@@ -42,6 +44,7 @@ LispObject_ptr list(LispList_ptr arg, LispEnvironment_ptr env);
 LispObject_ptr append(LispList_ptr arg, LispEnvironment_ptr env);
 
 
+LispObject_ptr eval(LispList_ptr arg, LispEnvironment_ptr env);
 LispObject_ptr eval_file(LispList_ptr arg, LispEnvironment_ptr env);
 LispObject_ptr import(LispList_ptr arg, LispEnvironment_ptr env);
 
