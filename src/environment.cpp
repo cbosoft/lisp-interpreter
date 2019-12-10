@@ -22,9 +22,12 @@ void LispEnvironment::add_something(std::string name, LispObject_ptr obj, LispBu
     debug_message(Formatter() << "adding var \"" << name << "\" to environment as function (builtin)");
     this->add(name, bfunc);
   }
-  else {
+  else if (lfunc != NULL) {
     debug_message(Formatter() << "adding var \"" << name << "\" to environment as function (lisp)");
     this->add(name, lfunc);
+  }
+  else {
+    throw EnvironmentError("Tried to add nothing to environment.");
   }
 }
 
