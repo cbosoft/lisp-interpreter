@@ -38,7 +38,7 @@ LispObject_ptr LispObject::eval(LispEnvironment_ptr env)
     if (list_obj->count() == 0)
       return std::make_shared<LispObject>(nil); // TODO use the same shared ptr for all nil?
 
-    debug_message(Formatter() << "list child is " << list_obj->first()->repr_type());
+    //debug_message(Formatter() << "list child is " << list_obj->first()->repr_type()); // invalid: child is eval'd before checking
 
     fn = list_obj->first();
 
@@ -55,6 +55,11 @@ LispObject_ptr LispObject::eval(LispEnvironment_ptr env)
     // otherwise, list is not list of lists, is function call
 
 
+    if (fn->get_type() != LISPOBJECT_SYMBOL) {
+      debug_message(Formatter() << "evaluating name.");
+      fn = fn->eval(env);
+      debug_message(Formatter() << "AFTER");
+    }
     if (fn->get_type() != LISPOBJECT_SYMBOL) throw SyntaxError(Formatter() << "List called as a function must start with a Symbol.");
     fname = fn->get_value_symbol()->get_name();
 
