@@ -17,12 +17,13 @@ struct environment_table_row builtin_functions[] = {
 	{ "write", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&lisp_write)), NULL },
 
   // Maths
-	{ "add", "+", NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&add)), NULL },
-	{ "subtract", "-", NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&subtract)), NULL },
-	{ "multiply", "*", NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&multiply)), NULL },
-	{ "×", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&multiply)), NULL },
-	{ "divide", "/", NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&divide)), NULL },
-	{ "÷", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&divide)), NULL },
+	{ "add", "+", "(add left right)\nReturns left + right", NULL, std::make_shared<LispBuiltin>(LispBuiltin(&add)), NULL },
+	{ "subtract", "-", "(subtract left right)\nReturns left - right", NULL, std::make_shared<LispBuiltin>(LispBuiltin(&subtract)), NULL },
+	{ "multiply", "*", "(multiply left right)\nReturns left * right", NULL, std::make_shared<LispBuiltin>(LispBuiltin(&multiply)), NULL },
+	{ "divide", "/", "(divide left right)\nReturns left / right", NULL, std::make_shared<LispBuiltin>(LispBuiltin(&divide)), NULL },
+	{ "modulo", NULL, "(modulo left right)\nReturns left % right", NULL, std::make_shared<LispBuiltin>(LispBuiltin(&modulo)), NULL },
+	{ "random", NULL, "(random) returns uniform random float in range (0 1)", NULL, std::make_shared<LispBuiltin>(LispBuiltin(&random)), NULL },
+	{ "randint", NULL, "(randint) returns uniform random integer in range (0, RAND_MAX)", NULL, std::make_shared<LispBuiltin>(LispBuiltin(&randint)), NULL },
 
   // Comparison
 	{ "greather-than", ">", NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&gt)), NULL },
@@ -45,7 +46,8 @@ struct environment_table_row builtin_functions[] = {
 	{ "append", NULL, "(append list &rest elements)\nAdds ELEMENTS to LIST.", NULL, std::make_shared<LispBuiltin>(LispBuiltin(&append)), NULL },
 
   // Modules and other files
-	{ "eval-file", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&eval_file)), NULL },
+	{ "eval", NULL, "(eval obj)\nEvaluates object, returns result.", NULL, std::make_shared<LispBuiltin>(LispBuiltin(&eval)), NULL },
+	{ "eval-file", NULL, "(eval-file path)\nReads in file at PATH, parses and evaluates, returning result.", NULL, std::make_shared<LispBuiltin>(LispBuiltin(&eval_file)), NULL },
 	{ "import", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&import)), NULL },
 
   // Misc
