@@ -11,8 +11,6 @@ LispObject_ptr with_open(LispList_ptr arg, LispEnvironment_ptr env);
 LispObject_ptr lisp_write(LispList_ptr arg, LispEnvironment_ptr env);
 LispObject_ptr lisp_read(LispList_ptr arg, LispEnvironment_ptr env);
 
-
-
 // maths
 LispObject_ptr add(LispList_ptr arg, LispEnvironment_ptr env);
 LispObject_ptr subtract(LispList_ptr arg, LispEnvironment_ptr env);
@@ -41,6 +39,7 @@ LispObject_ptr eq(LispList_ptr arg, LispEnvironment_ptr env);
 LispObject_ptr rest(LispList_ptr arg, LispEnvironment_ptr env);
 LispObject_ptr pop(LispList_ptr arg, LispEnvironment_ptr env);
 LispObject_ptr list(LispList_ptr arg, LispEnvironment_ptr env);
+LispObject_ptr append(LispList_ptr arg, LispEnvironment_ptr env);
 
 
 LispObject_ptr eval_file(LispList_ptr arg, LispEnvironment_ptr env);

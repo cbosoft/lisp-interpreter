@@ -42,6 +42,7 @@ struct environment_table_row builtin_functions[] = {
 	{ "list", NULL, "(list &rest elements)\nReturns list of ELEMENTS.", NULL, std::make_shared<LispBuiltin>(LispBuiltin(&list)), NULL },
 	{ "rest", NULL, "(rest list)\nReturns list with all but first element of LIST.", NULL, std::make_shared<LispBuiltin>(LispBuiltin(&rest)), NULL },
 	{ "pop", NULL, "(pop list)\nReturns first element of LIST.", NULL, std::make_shared<LispBuiltin>(LispBuiltin(&pop)), NULL },
+	{ "append", NULL, "(append list &rest elements)\nAdds ELEMENTS to LIST.", NULL, std::make_shared<LispBuiltin>(LispBuiltin(&append)), NULL },
 
   // Modules and other files
 	{ "eval-file", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&eval_file)), NULL },
