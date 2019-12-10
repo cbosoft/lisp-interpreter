@@ -25,7 +25,7 @@
   }
 
 
-
+extern LispObject nil;
 extern int DEBUG_MODE;
 int INTERACTIVE_MODE = 0;
 int EXECUTED_FILE_OR_CLI_STRING = 0;
@@ -52,8 +52,15 @@ int main(int argc, char **argv)
 
   }
 
+  LispEnvironment_ptr env;
+  try {
+    env = std::make_shared<LispEnvironment>(LispEnvironment());
+  }
+  catch (const Exception& ex) {
+    ex.pretty_print();
+    exit(1);
+  }
 
-  LispEnvironment_ptr env = std::make_shared<LispEnvironment>(LispEnvironment());
   LispList_ptr root = NULL;
   LispObject_ptr result = NULL;
 
@@ -64,7 +71,6 @@ int main(int argc, char **argv)
       try {
         root = parser.parse_file(argv[++i]);
         result = root->eval_each(env);
-        result->print();
       }
       catch (const Exception& ex) {
         ex.pretty_print();
@@ -75,7 +81,6 @@ int main(int argc, char **argv)
       try {
         root = parser.parse_string(argv[++i]);
         result = root->eval_each(env);
-        result->print();
       }
       catch (const Exception& ex) {
         ex.pretty_print();
@@ -92,7 +97,6 @@ int main(int argc, char **argv)
       try {
         root = parser.parse_file(argv[i]);
         result = root->eval_each(env);
-        result->print();
       }
       catch (const Exception& ex) {
         ex.pretty_print();
@@ -157,6 +161,7 @@ int main(int argc, char **argv)
       add_history(input_str.c_str());
       root = parser.parse_string(input_str);
       result = root->eval_each(env);
+      std::cout << ": ";
       result->print();
     }
     catch (const Exception& ex) {
