@@ -109,8 +109,9 @@ LispObject_ptr LispObject::eval(LispEnvironment_ptr env)
 // 
 LispObject_ptr LispFunction::eval(LispList_ptr arg, LispEnvironment_ptr env)
 {
-  unsigned long n_args_supplied = arg->count();
-  if (n_args_supplied != this->arg_names.size()) throw "argument count doesn't match requirement";
+  unsigned long n_args_supplied = arg->count(), n_args_expected = this->arg_names.size();
+  if (n_args_supplied != n_args_expected)
+    throw ArgumentError(Formatter() << "In " << this->name << ": argument count doesn't match requirement. Got " << n_args_supplied << " expected " << n_args_expected << ".");
   debug_message(Formatter() << "lisp function called with " << n_args_supplied << " args.");
 
   LispEnvironment_ptr subenv = std::make_shared<LispEnvironment>(LispEnvironment(env));
