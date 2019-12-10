@@ -5,6 +5,8 @@
 
 
 #include "tokenise.hpp"
+#include "exception.hpp"
+#include "formatter.hpp"
 
 #define IS_WHITESPACE(C) ((C == '\n') || (C == ' ') || (C == '\t'))
 
@@ -51,8 +53,8 @@ LispToken_ptr tokenise(std::string input)
   unsigned long i = 0;
 
   std::stringstream kw_or_name_builder;
-  bool in_quote = 0, add_close_parens_on_break = 0, add_close_parens_on_parens = 0;
-  int parens_level = 0;
+  bool in_quote = false, add_close_parens_on_break = false;
+  int parens_level = 0, add_close_parens_on_parens = -1;
 
   LispToken_ptr rv, current_token, new_token;
 
@@ -87,8 +89,8 @@ LispToken_ptr tokenise(std::string input)
         ADD_TO_TOKENS(")");
         parens_level--;
 
-        if (add_close_parens_on_parens) {
-          add_close_parens_on_parens = 0;
+        if (add_close_parens_on_parens >= 0 && (parens_level == add_close_parens_on_parens)) {
+          add_close_parens_on_parens = -1;
           ADD_TO_TOKENS(")");
         }
       }
@@ -99,15 +101,17 @@ LispToken_ptr tokenise(std::string input)
 
         if (nch == '('){
           //debug_message("NEXT CHAR IS '('; quote list\n");
-          add_close_parens_on_parens = 1;
+          add_close_parens_on_parens = parens_level;
+          debug_message(Formatter() << parens_level << "\n");
         }
         else if (IS_WHITESPACE(nch)) {
           //error
           //debug_message("NEXT CHAR IS WHITE SPACE! ERROR");
           //Exception_raise("SyntaxError", "tokenise", NULL, "single quote should be before a list or other object.");
+          throw SyntaxError(Formatter() << "Single quote ' should be before an object: 'object = (quote object)");
         }
         else {
-          add_close_parens_on_break = 1;
+          add_close_parens_on_break = true;
           //debug_message("NEXT CHAR IS '('; quote kw\n");
         }
       }
