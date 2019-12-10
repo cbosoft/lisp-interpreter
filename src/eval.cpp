@@ -42,16 +42,16 @@ LispObject_ptr LispObject::eval(LispEnvironment_ptr env)
 
     fn = list_obj->first();
 
-    if (fn->get_type() == LISPOBJECT_LIST) {
-      list_iter = list_obj->begin();
-      debug_message(Formatter() << "eval items in list, discard result");
-      for (; list_iter != --list_obj->end(); ++list_iter) {
-        debug_message(Formatter() << " ITEM TYPE: " << (*list_iter)->repr_type());
-        (*list_iter)->eval(env);
-      }
-      debug_message(Formatter() << "eval final item in List");
-      return (*(list_iter))->eval(env);
-    }
+    // if (fn->get_type() == LISPOBJECT_LIST) {
+    //   list_iter = list_obj->begin();
+    //   debug_message(Formatter() << "eval items in list, discard result");
+    //   for (; list_iter != --list_obj->end(); ++list_iter) {
+    //     debug_message(Formatter() << " ITEM TYPE: " << (*list_iter)->repr_type());
+    //     (*list_iter)->eval(env);
+    //   }
+    //   debug_message(Formatter() << "eval final item in List");
+    //   return (*(list_iter))->eval(env);
+    // }
     // otherwise, list is not list of lists, is function call
 
 
@@ -119,7 +119,7 @@ LispObject_ptr LispFunction::eval(LispList_ptr arg, LispEnvironment_ptr env)
   for (; arg_iter != arg->end(); ++arg_iter, ++argname_iter)
     subenv->add((*argname_iter), (*arg_iter));
 
-  return this->body->eval(subenv);
+  return this->body->eval_each(subenv);
 }
 
 
