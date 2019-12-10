@@ -17,6 +17,7 @@ OBJ = \
 			obj/builtins/subtract.o \
 			obj/builtins/multiply.o \
 			obj/builtins/divide.o \
+			obj/builtins/modulo.o \
 			obj/builtins/and.o \
 			obj/builtins/or.o \
 			obj/builtins/not.o \
