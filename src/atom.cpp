@@ -148,7 +148,7 @@ long LispAtom::cast_to_int()
 
   }
 
-  throw "Unknown type encountered in cast";
+  throw AuthorError("Unknown type encountered in LispAtom::cast_to_int()!");
 }
 
 
@@ -223,7 +223,7 @@ bool LispAtom::is_truthy()
 
   }
 
-  throw "Unknown type encountered in cast";
+  throw AuthorError("Unknown type encountered in LispAtom::is_truthy()!");
 }
 
 
