@@ -364,18 +364,20 @@ class LispBuiltin : virtual public Printable, virtual public Executable {
 class LispFunction : virtual public Printable, virtual public Executable {
   private:
     std::vector<std::string> arg_names;
-    LispObject_ptr body;
+    LispList_ptr body;
+    std::string name;
   public:
     LispFunction() : Executable() {};
-    LispFunction(LispList_ptr arglist, LispObject_ptr body)
+  LispFunction(LispList_ptr arglist, LispList_ptr body, std::string name)
       : Executable()
     {
       this->body = body;
+      this->name = name;
       for (auto iter = arglist->begin(); iter != arglist->end(); ++iter) {
         this->add_arg( (*iter)->get_value_symbol()->get_name() );
       }
     };
-    LispFunction(LispList_ptr arglist, LispObject_ptr body, bool is_macro)
+    LispFunction(LispList_ptr arglist, LispList_ptr body, bool is_macro)
       : Executable()
     {
       this->body = body;
@@ -385,7 +387,7 @@ class LispFunction : virtual public Printable, virtual public Executable {
       if (is_macro) this->set_macro();
     };
     void add_arg(std::string arg){ this->arg_names.push_back(arg); }
-    void set_body(LispObject_ptr body){ this->body = body; }
+    void set_body(LispList_ptr body){ this->body = body; }
     LispObject_ptr eval(LispList_ptr arg, LispEnvironment_ptr env);
     std::string repr() { return this->body->repr(); }
     std::string str() {return this->body->str(); }

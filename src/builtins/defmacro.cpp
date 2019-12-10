@@ -34,8 +34,9 @@ LispObject_ptr defmacro(LispList_ptr arg, LispEnvironment_ptr env)
   }
   debug_message("after arglist_items check");
 
+  std::string name_str = name->get_value_symbol()->get_name();
   LispList_ptr body = arg->rest()->rest();
-  LispFunction_ptr lfunc = std::make_shared<LispFunction>(LispFunction(argnames_list, std::make_shared<LispObject>(LispObject(body)), true));
-  env->add_something(name->get_value_symbol()->get_name(), NULL, NULL, lfunc);
+  LispFunction_ptr lfunc = std::make_shared<LispFunction>(LispFunction(argnames_list, body, name_str));
+  env->add_something(name_str, NULL, NULL, lfunc);
   return name;
 }
