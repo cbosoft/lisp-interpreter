@@ -31,6 +31,7 @@ OBJ = \
 			obj/builtins/print.o \
 			obj/builtins/rest.o \
 			obj/builtins/pop.o \
+			obj/builtins/eval.o \
 			obj/builtins/eval_file.o \
 			obj/builtins/import.o \
 			obj/builtins/with_open.o \
