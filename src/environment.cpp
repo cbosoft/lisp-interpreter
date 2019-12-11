@@ -73,13 +73,14 @@ void LispEnvironment::add(std::string name, LispFunction_ptr val)
 
 
 
-extern struct environment_table_row builtin_functions[];
+extern struct environment_table_row builtins[];
 LispEnvironment::LispEnvironment()
 {
   this->parent = NULL;
   int i = 0;
-  struct environment_table_row row_i = builtin_functions[0];
-  for (i = 0, row_i = builtin_functions[i]; row_i.name != NULL; i++, row_i = builtin_functions[i]) {
+  struct environment_table_row row_i = builtins[0];
+  for (i = 0, row_i = builtins[i]; row_i.name != NULL; i++, row_i = builtins[i]) {
+    debug_message(Formatter() << row_i.name << row_i.obj << row_i.bfunc << row_i.lfunc);
     this->add_something(row_i.name, row_i.obj, row_i.bfunc, row_i.lfunc);
     if (row_i.alias != NULL) this->add_something(row_i.alias, row_i.obj, row_i.bfunc, row_i.lfunc);
   }
