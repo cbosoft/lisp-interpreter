@@ -341,24 +341,26 @@ class Executable {
 typedef LispObject_ptr (LispCppFunc)(LispList_ptr arg, LispEnvironment_ptr env);
 class LispBuiltin : virtual public Printable, virtual public Executable {
   private:
-    LispCppFunc *func;
+    std::string doc = "UNSET";
+    LispCppFunc * func = NULL;
   public:
-    LispBuiltin() : Executable () {}
-    LispBuiltin(LispCppFunc *func) : Executable() { 
-      debug_message("Constructing new lisp function.");
-      this->func = func; 
+
+    LispBuiltin() : Executable () {
+      this->func = NULL;
     }
-    LispBuiltin(LispCppFunc *func, bool is_macro) : Executable() { 
+
+    LispBuiltin(LispCppFunc * func, std::string doc, bool is_macro) : Executable() { 
       this->func = func; 
-      if (is_macro) {
-        debug_message("Constructing new lisp mecro.");
+      this->doc = doc;
+
+      if (is_macro)
         this->set_macro(); 
-      }
-      else {
-        debug_message("Constructing new lisp function.");
-      }
     }
-    LispObject_ptr eval(LispList_ptr arg, LispEnvironment_ptr env) { return this->func(arg, env); }
+
+    LispObject_ptr eval(LispList_ptr arg, LispEnvironment_ptr env) { 
+      return this->func(arg, env); 
+    }
+
     std::string repr();
     std::string str();
 };
@@ -372,28 +374,21 @@ class LispFunction : virtual public Printable, virtual public Executable {
     std::vector<std::string> arg_names;
     LispList_ptr body;
     std::string name;
+    std::string doc;
+    void add_arg(std::string arg){ this->arg_names.push_back(arg); }
   public:
     LispFunction() : Executable() {};
-  LispFunction(LispList_ptr arglist, LispList_ptr body, std::string name)
+    LispFunction(LispList_ptr arglist, LispList_ptr body, std::string name, std::string doc, bool is_macro = false)
       : Executable()
     {
       this->body = body;
       this->name = name;
-      for (auto iter = arglist->begin(); iter != arglist->end(); ++iter) {
-        this->add_arg( (*iter)->get_value_symbol()->get_name() );
-      }
-    };
-    LispFunction(LispList_ptr arglist, LispList_ptr body, bool is_macro)
-      : Executable()
-    {
-      this->body = body;
+      this->doc = doc;
       for (auto iter = arglist->begin(); iter != arglist->end(); ++iter) {
         this->add_arg( (*iter)->get_value_symbol()->get_name() );
       }
       if (is_macro) this->set_macro();
     };
-    void add_arg(std::string arg){ this->arg_names.push_back(arg); }
-    void set_body(LispList_ptr body){ this->body = body; }
     LispObject_ptr eval(LispList_ptr arg, LispEnvironment_ptr env);
     std::string repr() { return this->body->repr(); }
     std::string str() {return this->body->str(); }
