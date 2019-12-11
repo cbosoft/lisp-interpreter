@@ -10,6 +10,7 @@
 #include "colour.hpp"
 #include "debug.hpp"
 #include "exception.hpp"
+#include "pointer.hpp"
 
 
 enum LispAtom_Type {
@@ -218,6 +219,10 @@ class LispList : virtual public Printable {
     LispList_ptr rest(int n = 1) { 
       auto it = this->begin();
       for (int i = 0; i < n; i++, ++it);
+
+      if (it == this->end())
+        return make_ptr(LispList());
+
       return std::make_shared<LispList>(LispList(it, this->end())); 
     }
 
