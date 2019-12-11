@@ -83,12 +83,15 @@ LispObject_ptr LispObject::eval(LispEnvironment_ptr env)
       return var_lfunc->eval(list_args, env);
     }
     else if (var_bfunc != NULL) {
-      debug_message(Formatter() << "symbol " << fn->value_symbol << " is builtin");
       
       if (var_bfunc->is_macro()) {
+        debug_message(Formatter() << "symbol " << fn->value_symbol << " is builtin (macro)");
+
         list_args = list_obj->rest();
       }
       else {
+        debug_message(Formatter() << "symbol " << fn->value_symbol << " is builtin");
+
         list_args = std::make_shared<LispList>(LispList());
         for (list_iter = ++list_obj->begin(); list_iter != list_obj->end(); ++list_iter) {
           list_args->append((*list_iter)->eval(env));
