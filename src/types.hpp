@@ -161,6 +161,7 @@ class LispObject : virtual public Printable {
     std::string str();
     std::string repr();
     std::string repr_type();
+    std::string static repr_type(LispObject_Type type);
 
     int get_type(){ return this->type; }
     LispObject_ptr eval(LispEnvironment_ptr env);

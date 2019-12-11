@@ -48,8 +48,13 @@ std::string LispObject::repr()
 // Gets a string representation of the object's type (Atom, Symbol or List)
 std::string LispObject::repr_type()
 {
+  return this->repr_type(this->type);
+}
 
-  switch (this->type) {
+std::string LispObject::repr_type(LispObject_Type type)
+{
+
+  switch (type) {
     case LISPOBJECT_ATOM:
       return "Atom";
 
