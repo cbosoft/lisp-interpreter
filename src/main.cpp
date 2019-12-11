@@ -136,8 +136,8 @@ int main(int argc, char **argv)
       while (parens_tally > 0) {
         input_ss << " ";
 
-        prompt_ss.str(": ");
-        for (int tallyi = 0; tallyi < parens_tally; tallyi++)
+        prompt_ss.str("--> ");
+        for (int tallyi = 0; tallyi < parens_tally+2; tallyi++)
           prompt_ss << "  ";
         prompt_str = prompt_ss.str();
         prompt_cstr = prompt_str.c_str();
@@ -159,7 +159,7 @@ int main(int argc, char **argv)
       add_history(input_str.c_str());
       root = parser.parse_string(input_str);
       result = root->eval_each(env);
-      std::cout << ": ";
+      std::cout << "--> ";
       result->print();
     }
     catch (const Exception& ex) {
