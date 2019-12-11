@@ -102,6 +102,9 @@ LispObject_ptr LispObject::eval(LispEnvironment_ptr env)
     }
     
     break;
+
+  default:
+    break;
   }
   
   // default: root is atom (float, int, string, bool...)
