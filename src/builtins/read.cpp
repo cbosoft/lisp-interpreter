@@ -4,8 +4,8 @@
 #include "../types.hpp"
 #include "../formatter.hpp"
 #include "../debug.hpp"
-#include "../exception.hpp"
-#include "../builtins.hpp"
+#include "../exception_check.hpp"
+#include "../pointer.hpp"
 
 #define FUNC "read"
 
@@ -38,5 +38,13 @@ LispObject_ptr lisp_read(LispList_ptr arg, LispEnvironment_ptr env)
   if (rv < 0)
     throw IOError(Formatter() << "Error reading file descriptor " << fd << " (" << errno << ") " << strerror(errno));
 
-  return std::make_shared<LispObject>(LispObject(ss.str()));
+  return make_ptr(LispObject(ss.str()));
 }
+
+LispEnvironmentRow lisp_read_row = {
+  .name = FUNC,
+  .alias = NULL,
+  .obj = NULL,
+  .bfunc = make_ptr(LispBuiltin(&lisp_read, "(read list)", false)),
+  .lfunc = NULL
+};

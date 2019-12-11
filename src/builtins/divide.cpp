@@ -2,7 +2,7 @@
 #include "../formatter.hpp"
 #include "../debug.hpp"
 #include "../exception.hpp"
-#include "../builtins.hpp"
+#include "../pointer.hpp"
 
 #define FUNC "divide"
 
@@ -24,4 +24,10 @@ LispObject_ptr divide(LispList_ptr arg, LispEnvironment_ptr env)
   return std::make_shared<LispObject>(LispObject(left_atom->divide(right_atom)));
 }
 
-
+LispEnvironmentRow divide_row = {
+  .name = FUNC,
+  .alias = "/",
+  .obj = NULL,
+  .bfunc = make_ptr(LispBuiltin(&divide, "(divide left right)", false)),
+  .lfunc = NULL
+};

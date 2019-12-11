@@ -1,17 +1,12 @@
 #include "../debug.hpp"
 #include "../types.hpp"
 #include "../formatter.hpp"
-#include "../builtins.hpp"
+#include "../pointer.hpp"
 
 
 
+#define FUNC "defmacro"
 
-// Create an entry in the local environment's function table.
-// Usage: (defmacro name arglist &rest body)
-// Arguments:
-//   name            string or symbol name of the function
-//   arglist         list of string or symbol names of the function arguments,
-//   body            rest of the arguments make up the list of contents in the function body
 LispObject_ptr defmacro(LispList_ptr arg, LispEnvironment_ptr env)
 {
   debug_message("builtin function defmacro");
@@ -36,7 +31,15 @@ LispObject_ptr defmacro(LispList_ptr arg, LispEnvironment_ptr env)
 
   std::string name_str = name->get_value_symbol()->get_name();
   LispList_ptr body = arg->rest()->rest();
-  LispFunction_ptr lfunc = std::make_shared<LispFunction>(LispFunction(argnames_list, body, name_str));
+  LispFunction_ptr lfunc = std::make_shared<LispFunction>(LispFunction(argnames_list, body, name_str, "TODO"));
   env->add_something(name_str, NULL, NULL, lfunc);
   return name;
 }
+
+LispEnvironmentRow defmacro_row = {
+  .name = FUNC,
+  .alias = NULL,
+  .obj = NULL,
+  .bfunc = make_ptr(LispBuiltin(&defmacro, "(defmacro name arglist &rest body)", true)),
+  .lfunc = NULL
+};

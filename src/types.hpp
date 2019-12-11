@@ -398,13 +398,10 @@ class LispFunction : virtual public Printable, virtual public Executable {
 
 
 
-struct environment_table_row {
+typedef struct environment_table_row {
   const char *name;
   const char *alias;
-
-  const char *doc;
-
   LispObject_ptr obj;
   LispBuiltin_ptr bfunc;
   LispFunction_ptr lfunc;
-};
+} LispEnvironmentRow;

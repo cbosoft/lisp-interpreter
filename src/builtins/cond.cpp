@@ -2,11 +2,10 @@
 #include "../formatter.hpp"
 #include "../debug.hpp"
 #include "../exception.hpp"
-#include "../builtins.hpp"
+#include "../pointer.hpp"
+#include "../singletons.hpp"
 
 #define FUNC "cond"
-
-extern LispObject nil;
 
 // (cond (cond1 value-true1) (cond2 value-true2) ...)
 LispObject_ptr cond(LispList_ptr arg, LispEnvironment_ptr env)
@@ -35,3 +34,11 @@ LispObject_ptr cond(LispList_ptr arg, LispEnvironment_ptr env)
 
   return std::make_shared<LispObject>(nil);
 }
+
+LispEnvironmentRow cond_row = {
+  .name = FUNC,
+  .alias = NULL,
+  .obj = NULL,
+  .bfunc = make_ptr(LispBuiltin(&cond, "(cond (cond then) ...)", true)),
+  .lfunc = NULL
+};

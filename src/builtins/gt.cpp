@@ -2,7 +2,7 @@
 #include "../formatter.hpp"
 #include "../debug.hpp"
 #include "../exception.hpp"
-#include "../builtins.hpp"
+#include "../pointer.hpp"
 
 #define FUNC "greater-than"
 
@@ -23,3 +23,11 @@ LispObject_ptr gt(LispList_ptr arg, LispEnvironment_ptr env)
   LispAtom_ptr right_atom = right->get_value_atom();
   return std::make_shared<LispObject>(LispObject(left_atom->gt(right_atom)));
 }
+
+LispEnvironmentRow gt_row = {
+  .name = FUNC,
+  .alias = NULL,
+  .obj = NULL,
+  .bfunc = make_ptr(LispBuiltin(&gt, "(gt left right)", false)),
+  .lfunc = NULL
+};

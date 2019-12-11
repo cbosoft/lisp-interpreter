@@ -6,7 +6,8 @@
 #include "../formatter.hpp"
 #include "../debug.hpp"
 #include "../exception.hpp"
-#include "../builtins.hpp"
+#include "../exception_check.hpp"
+#include "../pointer.hpp"
 
 #define FUNC "with-open"
 
@@ -16,26 +17,16 @@ LispObject_ptr with_open(LispList_ptr arg, LispEnvironment_ptr env)
   debug_message(Formatter() << "builtin function " << FUNC);
   (void) env;
 
-  int nargs = arg->count();
-  if (nargs < 3) throw ArgumentError(Formatter() << "In " << FUNC << ": Wrong number of arguments supplied. Got " << nargs << ", expected at least 4 (\"path\", \"mode\", \"name\", \"body\")).");
+  narg_check_min(arg, 4, FUNC, "path mode name &rest body");
 
   LispObject_ptr path_obj = arg->next(true);
-  if (path_obj->get_type() != LISPOBJECT_ATOM)
-    throw TypeError(Formatter() << "In " << FUNC << ": Argument \"path\" should be Atomistic (String). Got " << path_obj->repr_type() << ".");
-
+  type_check_atom(path_obj, LISPATOM_STRING, FUNC, "path");
   LispAtom_ptr path_atom = path_obj->get_value_atom();
-  if (path_atom->get_type() != LISPATOM_STRING)
-    throw TypeError(Formatter() << "In " << FUNC << ": Argument \"path\" should be Atomistic (String). Got " << path_atom->repr_type() << ".");
   const char* path_cstr = path_atom->get_value_string().c_str();
 
   LispObject_ptr mode_obj = arg->next();
-  if (mode_obj->get_type() != LISPOBJECT_ATOM)
-    throw TypeError(Formatter() << "In " << FUNC << ": Argument \"mode\" should be Atomistic (String): \"r\", \"w\", or \"a\". Got " << mode_obj->repr_type() << ".");
-
+  type_check_atom(mode_obj, LISPATOM_STRING, FUNC, "mode");
   LispAtom_ptr mode_atom = mode_obj->get_value_atom();
-  if (mode_atom->get_type() != LISPATOM_STRING)
-    throw TypeError(Formatter() << "In " << FUNC << ": Argument \"mode\" should be Atomistic (String): \"r\", \"w\", or \"a\". Got " << mode_atom->repr_type() << ".");
-
   std::string mode_str = mode_atom->get_value_string();
   if (mode_str.size() != 1)
     throw ArgumentError(Formatter() << "In " << FUNC << ": Argument \"mode\" should be Atomistic (String): \"r\", \"w\", or \"a\". Got " << mode_atom->repr() << ".");
@@ -61,19 +52,27 @@ LispObject_ptr with_open(LispList_ptr arg, LispEnvironment_ptr env)
   }
 
   LispObject_ptr name_obj = arg->next();
-  if (name_obj->get_type() != LISPOBJECT_SYMBOL)
-    throw TypeError(Formatter() << "In " << FUNC << ": Argument \"name\" should be a Symbol. Got " << name_obj->repr_type() << ".");
+  type_check_one(name_obj, LISPOBJECT_SYMBOL, FUNC, "name");
 
   LispSymbol_ptr name_symb = name_obj->get_value_symbol();
   int fd = open(path_cstr, oflags, S_IRUSR | S_IWUSR);
   if (fd < 0)
     throw IOError(Formatter() << "Could not open file \"" << path_atom->get_value_string() << "\" (" << errno << ") " << strerror(errno));
 
-  LispEnvironment_ptr subenv = std::make_shared<LispEnvironment>(LispEnvironment(env, true));
-  subenv->add(name_symb->get_name(), std::make_shared<LispObject>(LispObject((long)fd)));
+  LispEnvironment_ptr subenv = make_ptr(LispEnvironment(env, true));
+  subenv->add(name_symb->get_name(), make_ptr(LispObject((long)fd)));
 
   LispList_ptr body = arg->rest(3);
   LispObject_ptr rv = body->eval_each(subenv);
   close(fd);
   return rv;
 }
+
+
+LispEnvironmentRow with_open_row = {
+  .name = FUNC,
+  .alias = NULL,
+  .obj = NULL,
+  .bfunc = make_ptr(LispBuiltin(&with_open, "(with-open path mode name &rest body)\nOpens a file at PATH with mode MODE (\"r\" \"w\" \"a\"). The resulting fildes is saved as a variable in a sub environment with name NAME. BODY is evaluated with this subenvironment, afterwards file is closed.", false)),
+  .lfunc = NULL
+};

@@ -2,7 +2,7 @@
 #include "../formatter.hpp"
 #include "../debug.hpp"
 #include "../exception.hpp"
-#include "../builtins.hpp"
+#include "../pointer.hpp"
 
 #define FUNC "import"
 
@@ -48,3 +48,11 @@ LispObject_ptr import(LispList_ptr arg, LispEnvironment_ptr env)
   LispList_ptr root = parser.parse_module(path);
   return root->eval_each(env);
 }
+
+LispEnvironmentRow import_row = {
+  .name = FUNC,
+  .alias = NULL,
+  .obj = NULL,
+  .bfunc = make_ptr(LispBuiltin(&import, "(import path)", false)),
+  .lfunc = NULL
+};

@@ -2,7 +2,8 @@
 #include "../formatter.hpp"
 #include "../debug.hpp"
 #include "../exception.hpp"
-#include "../builtins.hpp"
+#include "../exception_check.hpp"
+#include "../pointer.hpp"
 
 #define FUNC "multiply"
 
@@ -21,7 +22,13 @@ LispObject_ptr multiply(LispList_ptr arg, LispEnvironment_ptr env)
 
   LispAtom_ptr left_atom = left->get_value_atom();
   LispAtom_ptr right_atom = right->get_value_atom();
-  return std::make_shared<LispObject>(LispObject(left_atom->multiply(right_atom)));
+  return make_ptr(LispObject(left_atom->multiply(right_atom)));
 }
 
-
+LispEnvironmentRow multiply_row = {
+  .name = FUNC,
+  .alias = "*",
+  .obj = NULL,
+  .bfunc = make_ptr(LispBuiltin(&multiply, "(multiply left right)", false)),
+  .lfunc = NULL
+};

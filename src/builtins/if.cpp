@@ -2,7 +2,7 @@
 #include "../formatter.hpp"
 #include "../debug.hpp"
 #include "../exception.hpp"
-#include "../builtins.hpp"
+#include "../pointer.hpp"
 
 #define FUNC "if"
 
@@ -28,3 +28,11 @@ LispObject_ptr lisp_if(LispList_ptr arg, LispEnvironment_ptr env)
     return value_else->eval(env);
   }
 }
+
+LispEnvironmentRow lisp_if_row = {
+  .name = FUNC,
+  .alias = NULL,
+  .obj = NULL,
+  .bfunc = make_ptr(LispBuiltin(&lisp_if, "(if cond value-true value-else)", true)),
+  .lfunc = NULL
+};

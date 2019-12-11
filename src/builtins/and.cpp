@@ -2,11 +2,10 @@
 #include "../formatter.hpp"
 #include "../debug.hpp"
 #include "../exception.hpp"
-#include "../builtins.hpp"
+#include "../pointer.hpp"
+#include "../singletons.hpp"
 
 #define FUNC "and"
-
-extern LispObject nil;
 
 // (and value-1 value-2)
 LispObject_ptr lisp_and(LispList_ptr arg, LispEnvironment_ptr env)
@@ -22,5 +21,13 @@ LispObject_ptr lisp_and(LispList_ptr arg, LispEnvironment_ptr env)
   LispObject_ptr left = arg->next(true);
   LispObject_ptr right = arg->next();
   bool rv = left->is_truthy() && right->is_truthy();
-  return std::make_shared<LispObject>(LispObject(rv));
+  return make_ptr(LispObject(rv));
 }
+
+LispEnvironmentRow lisp_and_row = {
+  .name = FUNC,
+  .alias = NULL,
+  .obj = NULL,
+  .bfunc = make_ptr(LispBuiltin(&lisp_and, "(and left right)", false)),
+  .lfunc = NULL
+};

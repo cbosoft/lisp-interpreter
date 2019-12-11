@@ -2,7 +2,8 @@
 #include "../formatter.hpp"
 #include "../debug.hpp"
 #include "../exception.hpp"
-#include "../builtins.hpp"
+#include "../exception_check.hpp"
+#include "../pointer.hpp"
 
 #define FUNC "modulo"
 
@@ -21,5 +22,13 @@ LispObject_ptr modulo(LispList_ptr arg, LispEnvironment_ptr env)
 
   LispAtom_ptr left_atom = left->get_value_atom();
   LispAtom_ptr right_atom = right->get_value_atom();
-  return std::make_shared<LispObject>(LispObject(left_atom->modulo(right_atom)));
+  return make_ptr(LispObject(left_atom->modulo(right_atom)));
 }
+
+LispEnvironmentRow modulo_row = {
+  .name = FUNC,
+  .alias = "%",
+  .obj = NULL,
+  .bfunc = make_ptr(LispBuiltin(&modulo, "(modulo left right)", false)),
+  .lfunc = NULL
+};

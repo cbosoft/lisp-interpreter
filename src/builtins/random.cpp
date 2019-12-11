@@ -4,7 +4,8 @@
 #include "../formatter.hpp"
 #include "../debug.hpp"
 #include "../exception.hpp"
-#include "../builtins.hpp"
+#include "../exception_check.hpp"
+#include "../pointer.hpp"
 
 
 static std::random_device rd;
@@ -22,8 +23,16 @@ LispObject_ptr random(LispList_ptr arg, LispEnvironment_ptr env)
   int nargs = arg->count();
   if (nargs != 0) throw ArgumentError(Formatter() << "In " << FUNC << ": Wrong number of arguments supplied. Got " << nargs << ", expected 0.");
   
-  return std::make_shared<LispObject>(LispObject( float_dist(randgen) ));
+  return make_ptr(LispObject( float_dist(randgen) ));
 }
+
+LispEnvironmentRow random_row = {
+  .name = FUNC,
+  .alias = NULL,
+  .obj = NULL,
+  .bfunc = make_ptr(LispBuiltin(&random, "(random)", false)),
+  .lfunc = NULL
+};
 
 #undef FUNC
 #define FUNC "randint"
@@ -36,5 +45,13 @@ LispObject_ptr randint(LispList_ptr arg, LispEnvironment_ptr env)
   int nargs = arg->count();
   if (nargs != 0) throw ArgumentError(Formatter() << "In " << FUNC << ": Wrong number of arguments supplied. Got " << nargs << ", expected 0.");
   
-  return std::make_shared<LispObject>(LispObject( integer_dist(randgen) ));
+  return make_ptr(LispObject( integer_dist(randgen) ));
 }
+
+LispEnvironmentRow randint_row = {
+  .name = FUNC,
+  .alias = NULL,
+  .obj = NULL,
+  .bfunc = make_ptr(LispBuiltin(&randint, "(randint)", false)),
+  .lfunc = NULL
+};

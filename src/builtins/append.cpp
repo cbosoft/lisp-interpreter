@@ -2,7 +2,7 @@
 #include "../formatter.hpp"
 #include "../debug.hpp"
 #include "../exception.hpp"
-#include "../builtins.hpp"
+#include "../pointer.hpp"
 
 #define FUNC "append"
 
@@ -30,3 +30,11 @@ LispObject_ptr append(LispList_ptr arg, LispEnvironment_ptr env)
   debug_message(Formatter() << "after copy in new elements");
   return std::make_shared<LispObject>(LispObject(rv_list));
 }
+
+LispEnvironmentRow append_row = {
+  .name = FUNC,
+  .alias = NULL,
+  .obj = NULL,
+  .bfunc = make_ptr(LispBuiltin(&append, "(append list val)", false)),
+  .lfunc = NULL
+};

@@ -1,58 +1,58 @@
 #include "types.hpp"
+#include "singletons.hpp"
 #include "debug.hpp"
 #include "formatter.hpp"
 #include "builtins.hpp"
+#include "pointer.hpp"
+#include "version.hpp"
+
+LispEnvironmentRow sentinal = {NULL, NULL, NULL, NULL, NULL};
 
 // builtins are enumerated here, and referred to in the global env setup
-struct environment_table_row builtin_functions[] = {
-  // Defining stuff
-	{ "defun", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&defun, true)), NULL },
-	{ "defmacro", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&defmacro, true)), NULL },
-	{ "defvar", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&defvar, true)), NULL },
+LispEnvironmentRow builtins[] = {
+
+  // Function, macro, variable
+  defun_row, defmacro_row, defvar_row,
 
   // Input/Output
-	{ "print", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&print)), NULL },
-	{ "with-open", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&with_open, true)), NULL },
-	{ "read", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&lisp_read)), NULL },
-	{ "write", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&lisp_write)), NULL },
+  print_row, with_open_row, lisp_read_row, lisp_write_row,
 
   // Maths
-	{ "add", "+", "(add left right)\nReturns left + right", NULL, std::make_shared<LispBuiltin>(LispBuiltin(&add)), NULL },
-	{ "subtract", "-", "(subtract left right)\nReturns left - right", NULL, std::make_shared<LispBuiltin>(LispBuiltin(&subtract)), NULL },
-	{ "multiply", "*", "(multiply left right)\nReturns left * right", NULL, std::make_shared<LispBuiltin>(LispBuiltin(&multiply)), NULL },
-	{ "divide", "/", "(divide left right)\nReturns left / right", NULL, std::make_shared<LispBuiltin>(LispBuiltin(&divide)), NULL },
-	{ "modulo", NULL, "(modulo left right)\nReturns left % right", NULL, std::make_shared<LispBuiltin>(LispBuiltin(&modulo)), NULL },
-	{ "random", NULL, "(random) returns uniform random float in range (0 1)", NULL, std::make_shared<LispBuiltin>(LispBuiltin(&random)), NULL },
-	{ "randint", NULL, "(randint) returns uniform random integer in range (0, RAND_MAX)", NULL, std::make_shared<LispBuiltin>(LispBuiltin(&randint)), NULL },
+  add_row, subtract_row, multiply_row, divide_row, modulo_row, random_row, randint_row,
 
   // Comparison
-	{ "greather-than", ">", NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&gt)), NULL },
-	{ "greather-than-or-equal-to", ">=", NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&ge)), NULL },
-	{ "less-than", "<", NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&lt)), NULL },
-	{ "less-than-or-equal-to", "<=", NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&le)), NULL },
-	{ "equal-to", "=", NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&eq)), NULL },
+  gt_row, ge_row, lt_row, le_row, eq_row,
+
+  // Type checking
+  is_list_row, is_symbol_row, is_atom_row, is_int_row, is_float_row, is_string_row,
 
   // Boolean logic and flow control
-	{ "cond", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&cond, true)), NULL },
-	{ "if", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&lisp_if, true)), NULL },
-	{ "and", "&&", NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&lisp_and)), NULL },
-	{ "or", "||", NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&lisp_or)), NULL },
-	{ "not", "!", NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&lisp_not)), NULL },
+  cond_row, lisp_if_row, lisp_and_row, lisp_or_row, lisp_not_row,
 
   // List operations
-	{ "list", NULL, "(list &rest elements)\nReturns list of ELEMENTS.", NULL, std::make_shared<LispBuiltin>(LispBuiltin(&list)), NULL },
-	{ "rest", NULL, "(rest list)\nReturns list with all but first element of LIST.", NULL, std::make_shared<LispBuiltin>(LispBuiltin(&rest)), NULL },
-	{ "pop", NULL, "(pop list)\nReturns first element of LIST.", NULL, std::make_shared<LispBuiltin>(LispBuiltin(&pop)), NULL },
-	{ "append", NULL, "(append list &rest elements)\nAdds ELEMENTS to LIST.", NULL, std::make_shared<LispBuiltin>(LispBuiltin(&append)), NULL },
+  list_row, rest_row, pop_row, append_row,
 
-  // Modules and other files
-	{ "eval", NULL, "(eval obj)\nEvaluates object, returns result.", NULL, std::make_shared<LispBuiltin>(LispBuiltin(&eval)), NULL },
-	{ "eval-file", NULL, "(eval-file path)\nReads in file at PATH, parses and evaluates, returning result.", NULL, std::make_shared<LispBuiltin>(LispBuiltin(&eval_file)), NULL },
-	{ "import", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&import)), NULL },
+  // Eval modules and other files
+  eval_row, eval_file_row, import_row,
 
-  // Misc
-	{ "quote", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&quote, true)), NULL },
-	{ "exit", NULL, NULL, NULL, std::make_shared<LispBuiltin>(LispBuiltin(&exit)), NULL },
+  // Misc functions
+  lisp_exit_row,
+  quote_row,
+
+
+
+  // Variables
+  // Standard file descriptors
+	{ "stdin", NULL, make_ptr(LispObject((int)0)), NULL, NULL },
+	{ "stdout", NULL, make_ptr(LispObject((int)1)), NULL, NULL },
+	{ "stderr", NULL, make_ptr(LispObject((int)2)), NULL, NULL },
+
+  // True/false
+	{ "nil", "false", make_ptr(nil), NULL, NULL },
+	{ "t", "true", make_ptr(t), NULL, NULL },
+
+  // Meta
+	{ "_crisp_version", NULL, make_ptr(LispObject(VERSION)), NULL, NULL },
 
 
 
@@ -60,12 +60,12 @@ struct environment_table_row builtin_functions[] = {
 
 
   // Sentinel
-  { NULL, NULL, NULL, NULL, NULL, NULL }
+  sentinal
 };
 
 
 std::string LispBuiltin::repr() {
-  return "TODO";
+  return this->doc;
 }
 
 std::string LispBuiltin::str() {

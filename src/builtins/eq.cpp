@@ -2,7 +2,7 @@
 #include "../formatter.hpp"
 #include "../debug.hpp"
 #include "../exception.hpp"
-#include "../builtins.hpp"
+#include "../pointer.hpp"
 
 #define FUNC "equal"
 
@@ -23,3 +23,11 @@ LispObject_ptr eq(LispList_ptr arg, LispEnvironment_ptr env)
   LispAtom_ptr right_atom = right->get_value_atom();
   return std::make_shared<LispObject>(LispObject(left_atom->eq(right_atom)));
 }
+
+LispEnvironmentRow eq_row = {
+  .name = FUNC,
+  .alias = NULL,
+  .obj = NULL,
+  .bfunc = make_ptr(LispBuiltin(&eq, "(equal left right)", false)),
+  .lfunc = NULL
+};

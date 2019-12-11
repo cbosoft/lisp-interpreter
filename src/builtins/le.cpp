@@ -2,9 +2,10 @@
 #include "../formatter.hpp"
 #include "../debug.hpp"
 #include "../exception.hpp"
-#include "../builtins.hpp"
+#include "../exception_check.hpp"
+#include "../pointer.hpp"
 
-#define FUNC "less-then-or-equal"
+#define FUNC "less-than-or-equal"
 
 LispObject_ptr le(LispList_ptr arg, LispEnvironment_ptr env)
 {
@@ -21,5 +22,13 @@ LispObject_ptr le(LispList_ptr arg, LispEnvironment_ptr env)
 
   LispAtom_ptr left_atom = left->get_value_atom();
   LispAtom_ptr right_atom = right->get_value_atom();
-  return std::make_shared<LispObject>(LispObject(left_atom->le(right_atom)));
+  return make_ptr(LispObject(left_atom->le(right_atom)));
 }
+
+LispEnvironmentRow le_row = {
+  .name = FUNC,
+  .alias = NULL,
+  .obj = NULL,
+  .bfunc = make_ptr(LispBuiltin(&le, "(less-than-or-equal &rest elements)", false)),
+  .lfunc = NULL
+};

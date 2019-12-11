@@ -5,7 +5,8 @@
 #include "../formatter.hpp"
 #include "../debug.hpp"
 #include "../exception.hpp"
-#include "../builtins.hpp"
+#include "../exception_check.hpp"
+#include "../pointer.hpp"
 
 #define FUNC "print"
 
@@ -31,5 +32,13 @@ LispObject_ptr print(LispList_ptr arg, LispEnvironment_ptr env)
 
   std::cout << ss.str() << std::endl;
 
-  return std::make_shared<LispObject>(nil);
+  return make_ptr(nil);
 }
+
+LispEnvironmentRow print_row = {
+  .name = FUNC,
+  .alias = NULL,
+  .obj = NULL,
+  .bfunc = make_ptr(LispBuiltin(&print, "(print &rest obj)", false)),
+  .lfunc = NULL
+};

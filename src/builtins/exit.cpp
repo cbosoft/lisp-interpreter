@@ -2,9 +2,12 @@
 #include "../formatter.hpp"
 #include "../debug.hpp"
 #include "../exception.hpp"
-#include "../builtins.hpp"
+#include "../pointer.hpp"
 
-LispObject_ptr exit(LispList_ptr arg, LispEnvironment_ptr env)
+
+#define FUNC "exit"
+
+LispObject_ptr lisp_exit(LispList_ptr arg, LispEnvironment_ptr env)
 {
   debug_message("builtin function exit");
   (void) env;
@@ -24,3 +27,10 @@ LispObject_ptr exit(LispList_ptr arg, LispEnvironment_ptr env)
   exit(rc);
 }
 
+LispEnvironmentRow lisp_exit_row = {
+  .name = FUNC,
+  .alias = NULL,
+  .obj = NULL,
+  .bfunc = make_ptr(LispBuiltin(&lisp_exit, "(exit &optional rc)", false)),
+  .lfunc = NULL,
+};

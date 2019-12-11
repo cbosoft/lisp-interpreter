@@ -1,53 +1,61 @@
 #include "types.hpp"
 
 // Define
-LispObject_ptr defun(LispList_ptr arg, LispEnvironment_ptr env);
-LispObject_ptr defmacro(LispList_ptr arg, LispEnvironment_ptr env);
-LispObject_ptr defvar(LispList_ptr arg, LispEnvironment_ptr env);
+extern LispEnvironmentRow defun_row;
+
+extern LispEnvironmentRow defmacro_row;
+extern LispEnvironmentRow defvar_row;
 
 // Output
-LispObject_ptr print(LispList_ptr arg, LispEnvironment_ptr env);
-LispObject_ptr with_open(LispList_ptr arg, LispEnvironment_ptr env);
-LispObject_ptr lisp_write(LispList_ptr arg, LispEnvironment_ptr env);
-LispObject_ptr lisp_read(LispList_ptr arg, LispEnvironment_ptr env);
+extern LispEnvironmentRow print_row;
+extern LispEnvironmentRow with_open_row;
+extern LispEnvironmentRow lisp_write_row;
+extern LispEnvironmentRow lisp_read_row;
 
 // maths
-LispObject_ptr add(LispList_ptr arg, LispEnvironment_ptr env);
-LispObject_ptr subtract(LispList_ptr arg, LispEnvironment_ptr env);
-LispObject_ptr multiply(LispList_ptr arg, LispEnvironment_ptr env);
-LispObject_ptr divide(LispList_ptr arg, LispEnvironment_ptr env);
-LispObject_ptr modulo(LispList_ptr arg, LispEnvironment_ptr env);
-LispObject_ptr random(LispList_ptr arg, LispEnvironment_ptr env);
-LispObject_ptr randint(LispList_ptr arg, LispEnvironment_ptr env);
+extern LispEnvironmentRow add_row;
+extern LispEnvironmentRow subtract_row;
+extern LispEnvironmentRow multiply_row;
+extern LispEnvironmentRow divide_row;
+extern LispEnvironmentRow modulo_row;
+extern LispEnvironmentRow random_row;
+extern LispEnvironmentRow randint_row;
 
 
 // Boolean logic, conditionals, flow control
-LispObject_ptr cond(LispList_ptr arg, LispEnvironment_ptr env);
-LispObject_ptr lisp_if(LispList_ptr arg, LispEnvironment_ptr env);
-LispObject_ptr lisp_and(LispList_ptr arg, LispEnvironment_ptr env);
-LispObject_ptr lisp_or(LispList_ptr arg, LispEnvironment_ptr env);
-LispObject_ptr lisp_not(LispList_ptr arg, LispEnvironment_ptr env);
-LispObject_ptr gt(LispList_ptr arg, LispEnvironment_ptr env);
-LispObject_ptr ge(LispList_ptr arg, LispEnvironment_ptr env);
-LispObject_ptr lt(LispList_ptr arg, LispEnvironment_ptr env);
-LispObject_ptr le(LispList_ptr arg, LispEnvironment_ptr env);
-LispObject_ptr eq(LispList_ptr arg, LispEnvironment_ptr env);
+extern LispEnvironmentRow cond_row;
+extern LispEnvironmentRow lisp_if_row;
+extern LispEnvironmentRow lisp_and_row;
+extern LispEnvironmentRow lisp_or_row;
+extern LispEnvironmentRow lisp_not_row;
 
-//LispObject_ptr when(LispList_ptr arg, LispEnvironment_ptr env);
-//LispObject_ptr unless(LispList_ptr arg, LispEnvironment_ptr env);
-//LispObject_ptr lisp_while(LispList_ptr arg, LispEnvironment_ptr env);
+// Comparison
+extern LispEnvironmentRow gt_row;
+extern LispEnvironmentRow ge_row;
+extern LispEnvironmentRow lt_row;
+extern LispEnvironmentRow le_row;
+extern LispEnvironmentRow eq_row;
+
+// Type checking
+extern LispEnvironmentRow is_list_row;
+extern LispEnvironmentRow is_symbol_row;
+extern LispEnvironmentRow is_atom_row;
+extern LispEnvironmentRow is_int_row;
+extern LispEnvironmentRow is_float_row;
+extern LispEnvironmentRow is_string_row;
+
 
 // List operations
-LispObject_ptr rest(LispList_ptr arg, LispEnvironment_ptr env);
-LispObject_ptr pop(LispList_ptr arg, LispEnvironment_ptr env);
-LispObject_ptr list(LispList_ptr arg, LispEnvironment_ptr env);
-LispObject_ptr append(LispList_ptr arg, LispEnvironment_ptr env);
+extern LispEnvironmentRow rest_row;
+extern LispEnvironmentRow pop_row;
+extern LispEnvironmentRow list_row;
+extern LispEnvironmentRow append_row;
 
 
-LispObject_ptr eval(LispList_ptr arg, LispEnvironment_ptr env);
-LispObject_ptr eval_file(LispList_ptr arg, LispEnvironment_ptr env);
-LispObject_ptr import(LispList_ptr arg, LispEnvironment_ptr env);
+extern LispEnvironmentRow eval_row;
+extern LispEnvironmentRow eval_file_row;
+extern LispEnvironmentRow import_row;
 
 // misc
-LispObject_ptr quote(LispList_ptr arg, LispEnvironment_ptr env);
-LispObject_ptr exit(LispList_ptr arg, LispEnvironment_ptr env);
+extern LispEnvironmentRow quote_row;
+extern LispEnvironmentRow lisp_exit_row;

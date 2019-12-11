@@ -1,29 +1,32 @@
 #include "../debug.hpp"
 #include "../types.hpp"
 #include "../formatter.hpp"
-#include "../builtins.hpp"
+#include "../exception_check.hpp"
+#include "../pointer.hpp"
 
 
 
 
-// Create an entry in the local environment's function table.
-// Usage: (defvar name arglist &rest body)
-// Arguments:
-//   name            string or symbol name of the function
-//   arglist         list of string or symbol names of the function arguments,
-//   body            rest of the arguments make up the list of contents in the function body
+#define FUNC "defvar"
 LispObject_ptr defvar(LispList_ptr arg, LispEnvironment_ptr env)
 {
   debug_message("builtin function defvar");
 
-  int nargs = arg->count();
-  if (nargs != 2) throw ArgumentError(Formatter() << "Wrong number of arguments supplied. In defvar: got " << nargs << ", expected 2.");
+  narg_check(arg, 2, FUNC, "name value");
  
   LispObject_ptr name = arg->next(true);
-  if (name->get_type() != LISPOBJECT_SYMBOL) throw std::runtime_error(Formatter() << "Argument has wrong type: name should be a Symbol, not " << name->repr_type() << ".");
+  type_check_one(name, LISPOBJECT_SYMBOL, FUNC, "name");
 
   LispObject_ptr value_raw = arg->next();
   LispObject_ptr value = value_raw->eval(env);
   env->add_something(name->get_value_symbol()->get_name(), value, NULL, NULL);
   return name;
 }
+
+LispEnvironmentRow defvar_row = {
+  .name = FUNC,
+  .alias = NULL,
+  .obj = NULL,
+  .bfunc = make_ptr(LispBuiltin(&defvar, "(defvar name value)\nDefines a variable NAME with value VALUE.", true)),
+  .lfunc = NULL
+};

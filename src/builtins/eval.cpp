@@ -2,7 +2,7 @@
 #include "../formatter.hpp"
 #include "../debug.hpp"
 #include "../exception.hpp"
-#include "../builtins.hpp"
+#include "../pointer.hpp"
 
 #define FUNC "eval"
 
@@ -20,3 +20,10 @@ LispObject_ptr eval(LispList_ptr arg, LispEnvironment_ptr env)
   return obj->eval(env);
 }
 
+LispEnvironmentRow eval_row = {
+  .name = FUNC,
+  .alias = NULL,
+  .obj = NULL,
+  .bfunc = make_ptr(LispBuiltin(&eval, "(eval obj)", false)),
+  .lfunc = NULL
+};

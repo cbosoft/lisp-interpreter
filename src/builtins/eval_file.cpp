@@ -2,7 +2,7 @@
 #include "../formatter.hpp"
 #include "../debug.hpp"
 #include "../exception.hpp"
-#include "../builtins.hpp"
+#include "../pointer.hpp"
 
 #define FUNC "eval-file"
 
@@ -25,3 +25,11 @@ LispObject_ptr eval_file(LispList_ptr arg, LispEnvironment_ptr env)
   LispList_ptr root = parser.parse_file(path_atom->get_value_string());
   return root->eval_each(env);
 }
+
+LispEnvironmentRow eval_file_row = {
+  .name = FUNC,
+  .alias = NULL,
+  .obj = NULL,
+  .bfunc = make_ptr(LispBuiltin(&eval_file, "(eval-file path)", false)),
+  .lfunc = NULL
+};

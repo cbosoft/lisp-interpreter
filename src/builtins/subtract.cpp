@@ -2,7 +2,8 @@
 #include "../formatter.hpp"
 #include "../debug.hpp"
 #include "../exception.hpp"
-#include "../builtins.hpp"
+#include "../exception_check.hpp"
+#include "../pointer.hpp"
 
 #define FUNC "subtract"
 
@@ -11,17 +12,23 @@ LispObject_ptr subtract(LispList_ptr arg, LispEnvironment_ptr env)
   debug_message(Formatter() << "builtin function " << FUNC);
   (void) env;
 
-  int nargs = arg->count();
-  if (nargs != 2) throw ArgumentError(Formatter() << "In " << FUNC << ": Wrong number of arguments supplied. Got " << nargs << ", expected 2.");
+  narg_check(arg, 2, FUNC, "left right");
 
   LispObject_ptr left = arg->next(true);
-  if (left->get_type() != LISPOBJECT_ATOM) throw ArgumentError(Formatter() << "In " << FUNC << ": Argument \"left\" should be Atomistic. Got " << left->repr_type() << ".");
-  LispObject_ptr right = arg->next();
-  if (right->get_type() != LISPOBJECT_ATOM) throw ArgumentError(Formatter() << "In " << FUNC << ": Argument \"right\" should be Atomistic. Got " << right->repr_type() << ".");
-
+  type_check_one(left, LISPOBJECT_ATOM, FUNC, "left");
   LispAtom_ptr left_atom = left->get_value_atom();
+
+  LispObject_ptr right = arg->next();
+  type_check_one(right, LISPOBJECT_ATOM, FUNC, "right");
   LispAtom_ptr right_atom = right->get_value_atom();
-  return std::make_shared<LispObject>(LispObject(left_atom->subtract(right_atom)));
+
+  return make_ptr(LispObject(left_atom->subtract(right_atom)));
 }
 
-
+LispEnvironmentRow subtract_row = {
+  .name = "subtract",
+  .alias = "-",
+  .obj = NULL,
+  .bfunc = make_ptr(LispBuiltin(&subtract, "(subtract left right)", false)),
+  .lfunc = NULL
+};
