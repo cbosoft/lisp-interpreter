@@ -88,3 +88,8 @@ bool LispObject::is_truthy()
 
   throw AuthorError("Unknown type encountered in LispObject::is_truthy()!");
 }
+
+LispObject::LispObject() {
+  this->type = LISPOBJECT_LIST;
+  this->value_list = make_ptr(LispList());
+}
