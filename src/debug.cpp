@@ -14,6 +14,6 @@ void debug_message(std::string s)
   if (!DEBUG_MODE)
     return;
 
-  std::cerr << DIM << s << RESET << std::endl;
+  std::cerr << DIM << FG_YELLOW << s << RESET << std::endl;
 
 }
