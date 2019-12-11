@@ -77,6 +77,7 @@ class LispAtom : virtual public Printable {
     std::string str();
     std::string repr();
     std::string repr_type();
+    static std::string repr_type(LispAtom_Type& type);
     long get_value_int(){ return this->value_int; }
     double get_value_float(){ return this->value_float; }
     std::string get_value_string(){ return this->value_string; }
