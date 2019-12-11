@@ -71,6 +71,7 @@ class LispAtom : virtual public Printable {
     LispAtom(float value) : LispAtom((double)value) {};
 
     LispAtom(std::string value);
+    LispAtom(const char* value) : LispAtom(std::string(value)) {};
 
     int get_type() { return this->type; }
     std::string str();

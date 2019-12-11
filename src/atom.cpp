@@ -110,20 +110,28 @@ std::string LispAtom::repr()
 
 std::string LispAtom::repr_type()
 {
-  switch (this->type) {
+  return LispAtom::repr_type(this->type);
+}
+
+
+
+
+std::string LispAtom::repr_type(LispAtom_Type& type)
+{
+  switch (type) {
 
     case LISPATOM_INT:
-      return "Int";
+      return "Atom(Int)";
 
     case LISPATOM_FLOAT:
-      return "Float";
+      return "Atom(Float)";
 
     case LISPATOM_STRING:
-        return "String";
+        return "Atom(String)";
 
   }
   
-  throw TypeError("In LispAtom::repr_type(): Unknown type encountered!");
+  throw AuthorError("In LispAtom::repr_type(): Unknown type encountered!");
 }
 
 
