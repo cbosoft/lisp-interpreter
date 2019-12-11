@@ -25,14 +25,12 @@
   }
 
 
-extern LispObject nil;
 extern int DEBUG_MODE;
 int INTERACTIVE_MODE = 0;
 int EXECUTED_FILE_OR_CLI_STRING = 0;
 
 // BOO: GLOBALS
 LispParser parser;
-
 
 int main(int argc, char **argv)
 {
