@@ -1,4 +1,5 @@
 #include "types.hpp"
+#include "pointer.hpp"
 
 LispObject t = LispObject(true);
-LispObject nil = LispObject(false);
+LispObject nil = LispObject(make_ptr(LispList()));
