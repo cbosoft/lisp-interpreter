@@ -12,7 +12,7 @@
 #include "exception.hpp"
 
 
-enum LISPATOM_TYPE{
+enum LispAtom_Type {
   LISPATOM_INT,
   LISPATOM_FLOAT,
   LISPATOM_STRING
@@ -54,7 +54,7 @@ class LispAtom : virtual public Printable {
     long value_int;
     double value_float;
     std::string value_string;
-    int type;
+    LispAtom_Type type;
 
   public:
     LispAtom(long value) { 
@@ -73,7 +73,7 @@ class LispAtom : virtual public Printable {
     LispAtom(std::string value);
     LispAtom(const char* value) : LispAtom(std::string(value)) {};
 
-    int get_type() { return this->type; }
+    LispAtom_Type get_type() { return this->type; }
     std::string str();
     std::string repr();
     std::string repr_type();
@@ -133,7 +133,7 @@ class LispSymbol : virtual public Printable{
 
 
 
-enum LISPOBJECT_TYPE {
+enum LispObject_Type {
   LISPOBJECT_ATOM,
   LISPOBJECT_SYMBOL,
   LISPOBJECT_LIST
@@ -145,12 +145,10 @@ class LispObject : virtual public Printable {
     LispAtom_ptr value_atom;
     LispList_ptr value_list;
     LispSymbol_ptr value_symbol;
-    int type;
+    LispObject_Type type;
 
   public:
-    LispObject() {
-      this->type = -1;
-    };
+    LispObject();
     LispObject(const LispObject& o) {
       this->type = o.type;
       this->value_symbol = o.value_symbol;
@@ -163,7 +161,7 @@ class LispObject : virtual public Printable {
     std::string repr_type();
     std::string static repr_type(LispObject_Type type);
 
-    int get_type(){ return this->type; }
+    LispObject_Type get_type(){ return this->type; }
     LispObject_ptr eval(LispEnvironment_ptr env);
 
     template<typename T>
