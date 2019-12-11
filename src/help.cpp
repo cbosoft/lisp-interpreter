@@ -7,7 +7,7 @@
 
 void display_splash()
 {
-  std::cout << std::endl << "  " << BOLD << EXE_NAME << RESET << " v" << VERSION << std::endl << std::endl;
+  std::cout << std::endl << "  " << BOLD << EXE_NAME << RESET << " " << VERSION << std::endl << std::endl;
 }
 
 
