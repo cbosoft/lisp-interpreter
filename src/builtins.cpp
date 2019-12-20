@@ -21,8 +21,8 @@
 #include "builtins/random.hpp"
 
 #include "builtins/comparison.hpp"
-
 #include "builtins/types.hpp"
+#include "builtins/boolean.hpp"
 
 static LispFunc_defun lispfunc_defun = LispFunc_defun();
 static LispFunc_defmacro lispfunc_defmacro = LispFunc_defmacro();
@@ -53,6 +53,10 @@ static LispFunc_is_atom lispfunc_is_atom = LispFunc_is_atom();
 static LispFunc_is_int lispfunc_is_int = LispFunc_is_int();
 static LispFunc_is_float lispfunc_is_float = LispFunc_is_float();
 static LispFunc_is_string lispfunc_is_string = LispFunc_is_string();
+
+static LispFunc_or lispfunc_or = LispFunc_or();
+static LispFunc_and lispfunc_and = LispFunc_and();
+static LispFunc_not lispfunc_not = LispFunc_not();
 
 // builtins are enumerated here, and referred to in the global env setup
 LispEnvironmentRow builtins[] = {
@@ -93,7 +97,10 @@ LispEnvironmentRow builtins[] = {
   {"string?", NULL, NULL, (LispBuiltin *)(&lispfunc_is_string), NULL},
 
   // // Boolean logic and flow control
-  // cond_row, lisp_if_row, lisp_and_row, lisp_or_row, lisp_not_row,
+  {"or", "||", NULL, (LispBuiltin *)(&lispfunc_or), NULL},
+  {"and", "&&", NULL, (LispBuiltin *)(&lispfunc_and), NULL},
+  {"not", "!", NULL, (LispBuiltin *)(&lispfunc_not), NULL},
+  // cond_row, lisp_if_row
 
   // // List operations
   // list_row, rest_row, pop_row, append_row,
