@@ -9,8 +9,8 @@
 
 class LispFunc_subtract : public virtual LispBuiltin {
   private:
-    const std::string name = "";
-    const std::string doc = "";
+    inline static const std::string name = "";
+    inline static const std::string doc = "";
 
   public:
     LispFunc_subtract()

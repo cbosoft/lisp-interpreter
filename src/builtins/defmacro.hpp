@@ -8,8 +8,8 @@
 
 class LispFunc_defmacro : LispBuiltin {
   private:
-    const std::string name = "defmacro";
-    const std::string doc = \
+    inline static const std::string name = "defmacro";
+    inline static const std::string doc = \
       "(defmacro name list &rest body)\n\
       Creates a new macro with NAME in environment. ARGS is a list of symbols which \n\
       are arguments to the macro. These are NOT evaluated before the macro is run.\n\
