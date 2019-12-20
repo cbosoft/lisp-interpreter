@@ -5,12 +5,15 @@
 //#include "builtins.hpp"
 #include "builtins/defmacro.hpp"
 #include "builtins/add.hpp"
+#include "builtins/subtract.hpp"
 #include "pointer.hpp"
 #include "version.hpp"
 
 LispEnvironmentRow sentinal = {NULL, NULL, NULL, NULL, NULL};
 static LispFunc_defmacro lispfunc_defmacro = LispFunc_defmacro();
+
 static LispFunc_add lispfunc_add = LispFunc_add();
+static LispFunc_subtract lispfunc_subtract = LispFunc_subtract();
 
 // builtins are enumerated here, and referred to in the global env setup
 LispEnvironmentRow builtins[] = {
@@ -25,7 +28,8 @@ LispEnvironmentRow builtins[] = {
 
   // // Maths
   {"add", "+", NULL, (LispBuiltin *)(&lispfunc_add), NULL},
-  // subtract_row, multiply_row, divide_row, modulo_row, random_row, randint_row,
+  {"subtract", "-", NULL, (LispBuiltin *)(&lispfunc_subtract), NULL},
+  // multiply_row, divide_row, modulo_row, random_row, randint_row,
 
   // // Comparison
   // gt_row, ge_row, lt_row, le_row, eq_row,
