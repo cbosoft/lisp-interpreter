@@ -29,6 +29,7 @@
 #include "builtins/append.hpp"
 #include "builtins/list.hpp"
 #include "builtins/quote.hpp"
+#include "builtins/range.hpp"
 
 #include "builtins/eval.hpp"
 #include "builtins/import.hpp"
@@ -76,6 +77,7 @@ static LispFunc_append lispfunc_append = LispFunc_append();
 static LispFunc_list lispfunc_list = LispFunc_list();
 static LispFunc_pop lispfunc_pop = LispFunc_pop();
 static LispFunc_rest lispfunc_rest = LispFunc_rest();
+static LispFunc_range lispfunc_range = LispFunc_range();
 
 static LispFunc_eval lispfunc_eval = LispFunc_eval();
 static LispFunc_import lispfunc_import = LispFunc_import();
@@ -134,6 +136,7 @@ LispEnvironmentRow builtins[] = {
   {"list", NULL, NULL, (LispBuiltin *)(&lispfunc_list), NULL},
   {"pop", NULL, NULL, (LispBuiltin *)(&lispfunc_pop), NULL},
   {"rest", NULL, NULL, (LispBuiltin *)(&lispfunc_rest), NULL},
+  {"range", NULL, NULL, (LispBuiltin *)(&lispfunc_range), NULL},
 
   // Eval modules and other files
   {"eval", NULL, NULL, (LispBuiltin *)(&lispfunc_eval), NULL},
