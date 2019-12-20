@@ -309,12 +309,12 @@ LispAtom_ptr LispAtom::divide(LispAtom_ptr obj) {
     case LISPATOM_INT:
       longval = obj->cast_to_int();
       if (longval == 0) throw DivideByZeroError("In LispAtom::divide(): right operand cannot be zero.");
-      return std::make_shared<LispAtom>(LispAtom(this->value_int * longval));
+      return std::make_shared<LispAtom>(LispAtom(this->value_int / longval));
 
     case LISPATOM_FLOAT:
       dblval = obj->cast_to_float();
       if (dblval == 0) throw DivideByZeroError("In LispAtom::divide(): right operand cannot be zero.");
-      return std::make_shared<LispAtom>(LispAtom(this->value_float * obj->cast_to_float()));
+      return std::make_shared<LispAtom>(LispAtom(this->value_float / obj->cast_to_float()));
 
     case LISPATOM_STRING:
       throw TypeError(Formatter() << "In LispAtom::divide(): Invalid type encountered! Got " << this->repr_type() << ", expected Int or Float.");
