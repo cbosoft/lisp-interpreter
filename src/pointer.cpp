@@ -14,7 +14,7 @@ std::shared_ptr<T> make_ptr(T obj)
 }
 
 template std::shared_ptr<LispObject> make_ptr(LispObject);
-template std::shared_ptr<LispBuiltin> make_ptr(LispBuiltin);
+// template std::shared_ptr<LispBuiltin> make_ptr(LispBuiltin);
 template std::shared_ptr<LispFunction> make_ptr(LispFunction);
 template std::shared_ptr<LispAtom> make_ptr(LispAtom);
 template std::shared_ptr<LispEnvironment> make_ptr(LispEnvironment);

@@ -2,9 +2,23 @@ CXX = g++
 CFLAGS = -g -Wall -Wextra -std=c++17 -O0
 OBJ = \
 			obj/singletons.o \
+			obj/pointer.o \
+			obj/tokenise.o \
+			obj/parse.o \
+			obj/debug.o \
+			obj/object.o \
+			obj/environment.o \
+			obj/exception_check.o \
+			obj/builtins.o \
+			obj/list.o \
+			obj/eval.o \
+			obj/search.o \
+			obj/atom.o \
+			obj/help.o
+
+#\
 			obj/builtins/quote.o \
 			obj/builtins/defun.o \
-			obj/builtins/defmacro.o \
 			obj/builtins/defvar.o \
 			obj/builtins/add.o \
 			obj/builtins/subtract.o \
@@ -35,19 +49,6 @@ OBJ = \
 			obj/builtins/random.o \
 			obj/builtins/types.o \
 			obj/builtins/exit.o \
-			obj/pointer.o \
-			obj/tokenise.o \
-			obj/parse.o \
-			obj/debug.o \
-			obj/object.o \
-			obj/environment.o \
-			obj/exception_check.o \
-			obj/builtins.o \
-			obj/list.o \
-			obj/eval.o \
-			obj/search.o \
-			obj/atom.o \
-			obj/help.o
 
 HDRS = \
   		src/types.hpp \

@@ -30,7 +30,8 @@ class Printable {
 };
 
 class LispBuiltin; 
-typedef std::shared_ptr<LispBuiltin> LispBuiltin_ptr;
+//typedef std::shared_ptr<LispBuiltin> LispBuiltin_ptr;
+typedef LispBuiltin * LispBuiltin_ptr;
 
 class LispFunction; 
 typedef std::shared_ptr<LispFunction> LispFunction_ptr;
@@ -363,6 +364,7 @@ class LispBuiltin : virtual public Printable, virtual public Executable {
 
     std::string repr();
     std::string str();
+class LispBuiltin : public virtual Printable, public virtual Executable, public virtual Documented {
 };
 
 
