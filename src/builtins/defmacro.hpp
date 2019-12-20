@@ -1,3 +1,4 @@
+#pragma once
 #include "../debug.hpp"
 #include "../types.hpp"
 #include "../exception_check.hpp"
