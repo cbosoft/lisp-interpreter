@@ -2,18 +2,20 @@
 #include "singletons.hpp"
 #include "debug.hpp"
 #include "formatter.hpp"
+#include "pointer.hpp"
+#include "version.hpp"
+
 //#include "builtins.hpp"
 #include "builtins/defmacro.hpp"
 #include "builtins/add.hpp"
 #include "builtins/subtract.hpp"
-#include "pointer.hpp"
-#include "version.hpp"
+#include "builtins/multiply.hpp"
 
-LispEnvironmentRow sentinal = {NULL, NULL, NULL, NULL, NULL};
 static LispFunc_defmacro lispfunc_defmacro = LispFunc_defmacro();
 
 static LispFunc_add lispfunc_add = LispFunc_add();
 static LispFunc_subtract lispfunc_subtract = LispFunc_subtract();
+static LispFunc_multiply lispfunc_multiply = LispFunc_multiply();
 
 // builtins are enumerated here, and referred to in the global env setup
 LispEnvironmentRow builtins[] = {
@@ -29,6 +31,7 @@ LispEnvironmentRow builtins[] = {
   // // Maths
   {"add", "+", NULL, (LispBuiltin *)(&lispfunc_add), NULL},
   {"subtract", "-", NULL, (LispBuiltin *)(&lispfunc_subtract), NULL},
+  {"multiply", "*", NULL, (LispBuiltin *)(&lispfunc_multiply), NULL},
   // multiply_row, divide_row, modulo_row, random_row, randint_row,
 
   // // Comparison
@@ -71,5 +74,5 @@ LispEnvironmentRow builtins[] = {
 
 
   // Sentinel
-  sentinal
+  {NULL, NULL, NULL, NULL, NULL}
 };
