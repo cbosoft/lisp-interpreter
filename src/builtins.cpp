@@ -15,6 +15,7 @@
 #include "builtins/multiply.hpp"
 #include "builtins/divide.hpp"
 #include "builtins/modulo.hpp"
+#include "builtins/random.hpp"
 
 #include "builtins/comparison.hpp"
 
@@ -27,6 +28,8 @@ static LispFunc_subtract lispfunc_subtract = LispFunc_subtract();
 static LispFunc_multiply lispfunc_multiply = LispFunc_multiply();
 static LispFunc_divide lispfunc_divide = LispFunc_divide();
 static LispFunc_modulo lispfunc_modulo = LispFunc_modulo();
+static LispFunc_random lispfunc_random = LispFunc_random();
+static LispFunc_randint lispfunc_randint = LispFunc_randint();
 
 static LispFunc_gt lispfunc_gt = LispFunc_gt();
 static LispFunc_ge lispfunc_ge = LispFunc_ge();
@@ -45,15 +48,16 @@ LispEnvironmentRow builtins[] = {
   // Input/Output
   // print_row, with_open_row, lisp_read_row, lisp_write_row,
 
-  // // Maths
+  // Maths
   {"add", "+", NULL, (LispBuiltin *)(&lispfunc_add), NULL},
   {"subtract", "-", NULL, (LispBuiltin *)(&lispfunc_subtract), NULL},
   {"multiply", "*", NULL, (LispBuiltin *)(&lispfunc_multiply), NULL},
   {"divide", "/", NULL, (LispBuiltin *)(&lispfunc_divide), NULL},
   {"modulo", "%", NULL, (LispBuiltin *)(&lispfunc_modulo), NULL},
-  // random_row, randint_row,
+  {"random", NULL, NULL, (LispBuiltin *)(&lispfunc_random), NULL},
+  {"randint", NULL, NULL, (LispBuiltin *)(&lispfunc_randint), NULL},
 
-  // // Comparison
+  // Comparison
   {"greater-than?", ">", NULL, (LispBuiltin *)(&lispfunc_gt), NULL},
   {"greater-than-or-equal-to?", ">=", NULL, (LispBuiltin *)(&lispfunc_ge), NULL},
   {"less-than?", "<", NULL, (LispBuiltin *)(&lispfunc_lt), NULL},
