@@ -16,40 +16,6 @@ OBJ = \
 			obj/atom.o \
 			obj/help.o
 
-#\
-			obj/builtins/quote.o \
-			obj/builtins/defun.o \
-			obj/builtins/defvar.o \
-			obj/builtins/add.o \
-			obj/builtins/subtract.o \
-			obj/builtins/multiply.o \
-			obj/builtins/divide.o \
-			obj/builtins/modulo.o \
-			obj/builtins/and.o \
-			obj/builtins/or.o \
-			obj/builtins/not.o \
-			obj/builtins/gt.o \
-			obj/builtins/ge.o \
-			obj/builtins/lt.o \
-			obj/builtins/le.o \
-			obj/builtins/eq.o \
-			obj/builtins/if.o \
-			obj/builtins/cond.o \
-			obj/builtins/print.o \
-			obj/builtins/rest.o \
-			obj/builtins/pop.o \
-			obj/builtins/eval.o \
-			obj/builtins/eval_file.o \
-			obj/builtins/import.o \
-			obj/builtins/with_open.o \
-			obj/builtins/write.o \
-			obj/builtins/read.o \
-			obj/builtins/list.o \
-			obj/builtins/append.o \
-			obj/builtins/random.o \
-			obj/builtins/types.o \
-			obj/builtins/exit.o \
-
 HDRS = \
   		src/types.hpp \
 			src/exception.hpp
