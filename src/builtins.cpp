@@ -32,6 +32,7 @@
 
 #include "builtins/eval.hpp"
 #include "builtins/import.hpp"
+#include "builtins/eval_file.hpp"
 
 static LispFunc_defun lispfunc_defun = LispFunc_defun();
 static LispFunc_defmacro lispfunc_defmacro = LispFunc_defmacro();
@@ -76,6 +77,7 @@ static LispFunc_rest lispfunc_rest = LispFunc_rest();
 
 static LispFunc_eval lispfunc_eval = LispFunc_eval();
 static LispFunc_import lispfunc_import = LispFunc_import();
+static LispFunc_eval_file lispfunc_eval_file = LispFunc_eval_file();
 
 static LispFunc_quote lispfunc_quote = LispFunc_quote();
 
@@ -133,7 +135,7 @@ LispEnvironmentRow builtins[] = {
   // Eval modules and other files
   {"eval", NULL, NULL, (LispBuiltin *)(&lispfunc_eval), NULL},
   {"import", NULL, NULL, (LispBuiltin *)(&lispfunc_import), NULL},
-  // eval_file_row, import_row,
+  {"eval-file", NULL, NULL, (LispBuiltin *)(&lispfunc_eval_file), NULL},
 
   // Misc functions
   // lisp_exit_row,
