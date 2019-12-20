@@ -60,7 +60,7 @@ LispToken_ptr tokenise(std::string input)
 
   for (i = 0, ch = input[0], nch=input[1]; i < input.length(); ch = input[++i], nch=input[i+1]) {
 
-    if (input[i] == ';') {
+    if ((input[i] == ';') and (not in_quote)) {
       for (;input[i] != '\n' && i < input.length(); i++);
       continue;
     }
