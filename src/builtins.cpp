@@ -25,6 +25,7 @@
 #include "builtins/boolean.hpp"
 #include "builtins/cond.hpp"
 #include "builtins/if.hpp"
+#include "builtins/append.hpp"
 
 static LispFunc_defun lispfunc_defun = LispFunc_defun();
 static LispFunc_defmacro lispfunc_defmacro = LispFunc_defmacro();
@@ -61,6 +62,8 @@ static LispFunc_and lispfunc_and = LispFunc_and();
 static LispFunc_not lispfunc_not = LispFunc_not();
 static LispFunc_cond lispfunc_cond = LispFunc_cond();
 static LispFunc_if lispfunc_if = LispFunc_if();
+
+static LispFunc_append lispfunc_append = LispFunc_append();
 
 // builtins are enumerated here, and referred to in the global env setup
 LispEnvironmentRow builtins[] = {
@@ -108,6 +111,7 @@ LispEnvironmentRow builtins[] = {
   {"if", NULL, NULL, (LispBuiltin *)(&lispfunc_if), NULL},
 
   // // List operations
+  {"append", NULL, NULL, (LispBuiltin *)(&lispfunc_append), NULL},
   // list_row, rest_row, pop_row, append_row,
 
   // // Eval modules and other files
