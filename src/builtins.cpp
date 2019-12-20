@@ -7,6 +7,8 @@
 
 //#include "builtins.hpp"
 #include "builtins/defmacro.hpp"
+#include "builtins/defun.hpp"
+
 #include "builtins/add.hpp"
 #include "builtins/subtract.hpp"
 #include "builtins/multiply.hpp"
@@ -14,6 +16,7 @@
 #include "builtins/modulo.hpp"
 
 static LispFunc_defmacro lispfunc_defmacro = LispFunc_defmacro();
+static LispFunc_defun lispfunc_defun = LispFunc_defun();
 
 static LispFunc_add lispfunc_add = LispFunc_add();
 static LispFunc_subtract lispfunc_subtract = LispFunc_subtract();
@@ -25,7 +28,7 @@ static LispFunc_modulo lispfunc_modulo = LispFunc_modulo();
 LispEnvironmentRow builtins[] = {
 
   // Function, macro, variable
-  //defun_row, 
+  {"defun", NULL, NULL, (LispBuiltin *)(&lispfunc_defun), NULL},
   {"defmacro", NULL, NULL, (LispBuiltin *)(&lispfunc_defmacro), NULL},
   //defvar_row,
 
