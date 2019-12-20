@@ -9,8 +9,10 @@
 
 class LispFunc_subtract : public virtual LispBuiltin {
   private:
-    inline static const std::string name = "";
-    inline static const std::string doc = "";
+    inline static const std::string name = "subtract";
+    inline static const std::string doc = 
+      "(subtract left right)\n\
+      Subtract the right operand from the left, returning the result.";
 
   public:
     LispFunc_subtract()

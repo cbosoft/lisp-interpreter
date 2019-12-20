@@ -9,8 +9,8 @@
 
 class LispFunc_add : public virtual LispBuiltin {
   private:
-    const std::string name = "add";
-    const std::string doc = \
+    inline static const std::string name = "add";
+    inline static const std::string doc =
       "(add left right)\n\
       Adds the left and right operands returning the result. If either of the operands\n\
       are Strings, concatenation is performed instead.";
