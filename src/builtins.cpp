@@ -10,6 +10,8 @@
 #include "builtins/defmacro.hpp"
 #include "builtins/defvar.hpp"
 
+#include "builtins/print.hpp"
+
 #include "builtins/add.hpp"
 #include "builtins/subtract.hpp"
 #include "builtins/multiply.hpp"
@@ -22,6 +24,8 @@
 static LispFunc_defun lispfunc_defun = LispFunc_defun();
 static LispFunc_defmacro lispfunc_defmacro = LispFunc_defmacro();
 static LispFunc_defvar lispfunc_defvar = LispFunc_defvar();
+
+static LispFunc_print lispfunc_print = LispFunc_print();
 
 static LispFunc_add lispfunc_add = LispFunc_add();
 static LispFunc_subtract lispfunc_subtract = LispFunc_subtract();
@@ -46,6 +50,7 @@ LispEnvironmentRow builtins[] = {
   {"defvar", NULL, NULL, (LispBuiltin *)(&lispfunc_defvar), NULL},
 
   // Input/Output
+  {"print", NULL, NULL, (LispBuiltin *)(&lispfunc_print), NULL},
   // print_row, with_open_row, lisp_read_row, lisp_write_row,
 
   // Maths
