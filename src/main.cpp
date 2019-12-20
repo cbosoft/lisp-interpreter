@@ -77,7 +77,8 @@ int main(int argc, char **argv)
     else if (EITHER(argv[i], "-c", "--command")) {
       EXECUTED_FILE_OR_CLI_STRING = 1;
       try {
-        root = parser.parse_string(argv[++i]);
+        i++;
+        root = parser.parse_string(argv[i], {.type=TRACESOURCE_ARGUMENT, .path_or_commands=argv[i], .row=0, .column=0});
         result = root->eval_each(env);
       }
       catch (const Exception& ex) {
@@ -157,7 +158,7 @@ int main(int argc, char **argv)
       
       input_str = input_ss.str();
       add_history(input_str.c_str());
-      root = parser.parse_string(input_str);
+      root = parser.parse_string(input_str, {.type=TRACESOURCE_ARGUMENT, .path_or_commands=input_str, .row=0, .column=0});
       result = root->eval_each(env);
       std::cout << "--> ";
       result->print();

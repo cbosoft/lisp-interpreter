@@ -19,3 +19,4 @@ template std::shared_ptr<LispFunction> make_ptr(LispFunction);
 template std::shared_ptr<LispAtom> make_ptr(LispAtom);
 template std::shared_ptr<LispEnvironment> make_ptr(LispEnvironment);
 template std::shared_ptr<LispList> make_ptr(LispList);
+template std::shared_ptr<TraceSource> make_ptr(TraceSource);

@@ -12,6 +12,10 @@
 
 #define ADD_TO_TOKENS(KW) \
   new_token = std::make_shared<LispToken>(LispToken(KW));\
+  new_source = proto_source;\
+  new_source.row = row;\
+  new_source.column = col;\
+  new_token->set_source(make_ptr(proto_source));\
   if (rv == NULL) {\
     rv = new_token;\
   }\
@@ -46,7 +50,7 @@ void LispToken::print()
 
 
 // Convert input into list of tokens
-LispToken_ptr tokenise(std::string input)
+LispToken_ptr tokenise(std::string input, TraceSource proto_source)
 {
 
   char ch, nch;
@@ -55,13 +59,18 @@ LispToken_ptr tokenise(std::string input)
   std::stringstream kw_or_name_builder;
   bool in_quote = false, add_close_parens_on_break = false;
   int parens_level = 0, add_close_parens_on_parens = -1;
+  int row = 0, col = 0;
+  TraceSource new_source;
 
   LispToken_ptr rv, current_token, new_token;
 
   for (i = 0, ch = input[0], nch=input[1]; i < input.length(); ch = input[++i], nch=input[i+1]) {
+    col++;
 
     if ((input[i] == ';') and (not in_quote)) {
       for (;input[i] != '\n' && i < input.length(); i++);
+      col = 0;
+      row ++;
       continue;
     }
     
@@ -81,39 +90,49 @@ LispToken_ptr tokenise(std::string input)
 
       // TODO switch-case
       // action needed on breaking char?
-      if (ch == '(') {
-        ADD_TO_TOKENS("(");
-        parens_level++;
-      }
-      if (ch == ')') {
-        ADD_TO_TOKENS(")");
-        parens_level--;
+      switch (ch) {
 
-        if (add_close_parens_on_parens >= 0 && (parens_level == add_close_parens_on_parens)) {
-          add_close_parens_on_parens = -1;
+        case '(':
+          ADD_TO_TOKENS("(");
+          parens_level++;
+          break;
+
+        case  ')':
           ADD_TO_TOKENS(")");
-        }
-      }
-      else if (ch == '\'') {
+          parens_level--;
 
-        ADD_TO_TOKENS("(");
-        ADD_TO_TOKENS("quote");
+          if (add_close_parens_on_parens >= 0 && (parens_level == add_close_parens_on_parens)) {
+            add_close_parens_on_parens = -1;
+            ADD_TO_TOKENS(")");
+          }
+          break;
 
-        if (nch == '('){
-          //debug_message("NEXT CHAR IS '('; quote list\n");
-          add_close_parens_on_parens = parens_level;
-          debug_message(Formatter() << parens_level << "\n");
-        }
-        else if (IS_WHITESPACE(nch)) {
-          //error
-          //debug_message("NEXT CHAR IS WHITE SPACE! ERROR");
-          //Exception_raise("SyntaxError", "tokenise", NULL, "single quote should be before a list or other object.");
-          throw SyntaxError(Formatter() << "Single quote ' should be before an object: 'object = (quote object)");
-        }
-        else {
-          add_close_parens_on_break = true;
-          //debug_message("NEXT CHAR IS '('; quote kw\n");
-        }
+        case '\'':
+
+          ADD_TO_TOKENS("(");
+          ADD_TO_TOKENS("quote");
+
+          if (nch == '('){
+            //debug_message("NEXT CHAR IS '('; quote list\n");
+            add_close_parens_on_parens = parens_level;
+            debug_message(Formatter() << parens_level << "\n");
+          }
+          else if (IS_WHITESPACE(nch)) {
+            //error
+            //debug_message("NEXT CHAR IS WHITE SPACE! ERROR");
+            //Exception_raise("SyntaxError", "tokenise", NULL, "single quote should be before a list or other object.");
+            throw SyntaxError(Formatter() << "Single quote ' should be before an object: 'object = (quote object)");
+          }
+          else {
+            add_close_parens_on_break = true;
+            //debug_message("NEXT CHAR IS '('; quote kw\n");
+          }
+          break;
+
+        case '\n':
+          row ++;
+          col = 0;
+          break;
       }
 
     }

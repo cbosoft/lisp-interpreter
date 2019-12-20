@@ -128,6 +128,85 @@ class LispSymbol : virtual public Printable{
 
 
 
+enum TraceSource_Type {
+  TRACESOURCE_STDIN,
+  TRACESOURCE_ARGUMENT,
+  TRACESOURCE_FILE
+};
+
+typedef struct _TraceSource {
+  TraceSource_Type type;
+  std::string path_or_commands;
+  int row;
+  int column;
+} TraceSource;
+typedef std::shared_ptr<TraceSource> TraceSource_ptr;
+
+class Traceable {
+  private:
+    TraceSource_ptr source;
+
+    const std::string get_file_trace() const
+    {
+      std::ifstream istr(this->source->path_or_commands);
+      if (istr.fail())
+        throw IOError("Error opening source file \"" + this->source->path_or_commands + "\".");
+
+      std::stringstream buf;
+      buf << istr.rdbuf();
+
+      std::string line;
+      for (int i = 0; i < (this->source->row - 1); i++) {
+        if (!std::getline(istr, line))
+          throw IOError("file ended unexpectedly.");
+      }
+
+      std::string rv = "";
+      for (int i = 0; i < 3; i++) {
+        if (!std::getline(istr, line))
+          break;
+        rv = rv + line;
+        if (i > 0) rv = rv + "\n";
+      }
+      return rv;
+    }
+
+  public:
+    Traceable() { }
+
+    void set_source(TraceSource_ptr source)
+    {
+      this->source = source;
+    }
+
+    const std::string repr_source()
+    {
+      switch (this->source->type) {
+
+        case TRACESOURCE_STDIN:
+          return "STDIN:" + this->source->path_or_commands;
+
+        case TRACESOURCE_ARGUMENT:
+          return "ARGUMENT:" + this->source->path_or_commands;
+
+        case TRACESOURCE_FILE:
+          return "FILE:" + this->source->path_or_commands + ":\n" + this->get_file_trace();
+      }
+
+      throw AuthorError("Unexpected type encountered in Traceable::repr_source()!");
+    }
+
+    template<typename T>
+    void inherits_from(std::shared_ptr<T> obj) {
+      Traceable *t = &(*obj);
+      this->source = t->source;
+    }
+
+    //void inherits_from(std::shared_ptr<LispObject> obj);
+};
+
+
+
 
 
 
@@ -143,7 +222,7 @@ enum LispObject_Type {
 };
 
 
-class LispObject : virtual public Printable {
+class LispObject : virtual public Printable, public Traceable {
   private:
     LispAtom_ptr value_atom;
     LispList_ptr value_list;
@@ -157,6 +236,13 @@ class LispObject : virtual public Printable {
       this->value_symbol = o.value_symbol;
       this->value_atom = o.value_atom;
       this->value_list = o.value_list;
+    }
+    LispObject operator=(const LispObject& o) {
+      this->type = o.type;
+      this->value_symbol = o.value_symbol;
+      this->value_atom = o.value_atom;
+      this->value_list = o.value_list;
+      return *this;
     }
 
     std::string str();
@@ -242,7 +328,7 @@ class LispList : virtual public Printable {
 
 class LispToken;
 typedef std::shared_ptr<LispToken> LispToken_ptr;
-class LispToken {
+class LispToken : public Traceable {
   private:
     std::string token;
 
@@ -281,13 +367,14 @@ class LispParser {
     int string_is_float(std::string s);
     int string_is_string(std::string s);
 
-    LispList_ptr parse(LispToken_ptr tokens);
-    LispList_ptr parse_string(char *char_arr);
-    LispList_ptr parse_string(std::string s);
-    LispList_ptr parse_file(const char* path);
-    LispList_ptr parse_file(std::string path);
+    LispList_ptr parse_string(char *char_arr, TraceSource proto_source);
+    LispList_ptr parse_string(std::string s, TraceSource proto_source);
     LispList_ptr parse_module(const char* path);
     LispList_ptr parse_module(std::string path);
+
+    LispList_ptr parse(LispToken_ptr tokens);
+    LispList_ptr parse_file(const char* path);
+    LispList_ptr parse_file(std::string path);
 
     int count_parens(char *s);
     int count_parens(std::string s);
@@ -335,25 +422,13 @@ class Executable {
     virtual LispObject_ptr eval(LispList_ptr arg, LispEnvironment_ptr env) const =0;
 };
 
+
+
+
+
 class Documented {
   public:
     virtual std::string get_doc() { return "Documentation for this object not available."; }
-};
-
-class Traceable {
-  private:
-    int source_id;
-    int row;
-    int column;
-  public:
-    Traceable(int sid, int row, int col)
-    {
-      this->source_id = sid;
-      this->row = row;
-      this->column = col;
-    }
-
-    virtual const std::string where_defined() const { return "TODO"; }
 };
 
 class LispBuiltin : public virtual Printable, public virtual Executable, public virtual Documented {

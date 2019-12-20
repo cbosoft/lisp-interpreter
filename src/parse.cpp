@@ -60,36 +60,37 @@ LispObject_ptr LispParser::new_object_guess_type(LispToken_ptr t) {
   std::string s = t->get_token();
 
   debug_message(Formatter() << "GUESSING " << s);
+  LispObject rv;
   
   if (s.compare("(") == 0) {
     debug_message(Formatter() << "GUESSING "<< s << "is LIST");
     LispList_ptr newlist = std::make_shared<LispList>(LispList());
-    return std::make_shared<LispObject>(LispObject(newlist));
+    rv = LispObject(newlist);
   }
-
-  if (this->string_is_int(s)) {
+  else if (this->string_is_int(s)) {
     debug_message(Formatter() << "GUESSING " << s << " is INT");
     LispAtom_ptr newatom = std::make_shared<LispAtom>(LispAtom( atol(s.c_str()) ));
-    return std::make_shared<LispObject>(LispObject(newatom));
+    rv = LispObject(newatom);
   }
-
-  if (this->string_is_float(s)) {
+  else if (this->string_is_float(s)) {
     debug_message(Formatter() << "GUESSING " << s << " is FLOAT");
     LispAtom_ptr newatom = std::make_shared<LispAtom>(LispAtom( atof(s.c_str()) ));
-    return std::make_shared<LispObject>(LispObject(newatom));
+    rv = LispObject(newatom);
   }
-
-
-  if (this->string_is_string(s)) {
+  else if (this->string_is_string(s)) {
     debug_message(Formatter() << "GUESSING " << s << " is STRING");
     std::string body = s.substr(1, s.length()-2);
     LispAtom_ptr newatom = std::make_shared<LispAtom>(LispAtom(body));
-    return std::make_shared<LispObject>(LispObject(newatom));
+    rv = LispObject(newatom);
+  }
+  else {
+    debug_message(Formatter() << "GUESSING " << s << " is SYMBOL");
+    LispSymbol_ptr newsymbol = std::make_shared<LispSymbol>(LispSymbol(s));
+    rv = LispObject(newsymbol);
   }
 
-  debug_message(Formatter() << "GUESSING " << s << " is SYMBOL");
-  LispSymbol_ptr newsymbol = std::make_shared<LispSymbol>(LispSymbol(s));
-  return std::make_shared<LispObject>(LispObject(newsymbol));
+  rv.inherits_from(t);
+  return make_ptr(rv);
 }
 
 
@@ -143,11 +144,11 @@ LispList_ptr LispParser::parse(LispToken_ptr tokens)
 
 
 // parse
-LispList_ptr LispParser::parse_string(char *char_arr){ return this->parse_string(std::string(char_arr)); }
-LispList_ptr LispParser::parse_string(std::string s)
+LispList_ptr LispParser::parse_string(char *char_arr, TraceSource proto_source){ return this->parse_string(std::string(char_arr), proto_source); }
+LispList_ptr LispParser::parse_string(std::string s, TraceSource proto_source)
 {
 
-  LispToken_ptr tokens = tokenise(s);
+  LispToken_ptr tokens = tokenise(s, proto_source);
 
   debug_message("tokens:");
   for (LispToken_ptr i = tokens; i != NULL; i = i->next) {
@@ -179,7 +180,8 @@ LispList_ptr LispParser::parse_file(std::string path)
     file_contents.erase(file_contents.begin(), it);
   }
 
-  return this->parse_string(file_contents);
+  TraceSource proto_source = {.type=TRACESOURCE_FILE, .path_or_commands=path, .row=0, .column=0};
+  return this->parse_string(file_contents, proto_source);
 }
 
 
