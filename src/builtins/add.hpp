@@ -16,7 +16,8 @@ class LispFunc_add : public virtual LispBuiltin {
       are Strings, concatenation is performed instead.";
 
   public:
-    LispFunc_add() {
+    LispFunc_add() 
+    {
     }
 
     const std::string repr() const
