@@ -22,6 +22,8 @@
 
 #include "builtins/comparison.hpp"
 
+#include "builtins/types.hpp"
+
 static LispFunc_defun lispfunc_defun = LispFunc_defun();
 static LispFunc_defmacro lispfunc_defmacro = LispFunc_defmacro();
 static LispFunc_defvar lispfunc_defvar = LispFunc_defvar();
@@ -44,6 +46,13 @@ static LispFunc_ge lispfunc_ge = LispFunc_ge();
 static LispFunc_lt lispfunc_lt = LispFunc_lt();
 static LispFunc_le lispfunc_le = LispFunc_le();
 static LispFunc_eq lispfunc_eq = LispFunc_eq();
+
+static LispFunc_is_list lispfunc_is_list = LispFunc_is_list();
+static LispFunc_is_symbol lispfunc_is_symbol = LispFunc_is_symbol();
+static LispFunc_is_atom lispfunc_is_atom = LispFunc_is_atom();
+static LispFunc_is_int lispfunc_is_int = LispFunc_is_int();
+static LispFunc_is_float lispfunc_is_float = LispFunc_is_float();
+static LispFunc_is_string lispfunc_is_string = LispFunc_is_string();
 
 // builtins are enumerated here, and referred to in the global env setup
 LispEnvironmentRow builtins[] = {
@@ -76,7 +85,12 @@ LispEnvironmentRow builtins[] = {
   {"equal?", "=", NULL, (LispBuiltin *)(&lispfunc_eq), NULL},
 
   // // Type checking
-  // is_list_row, is_symbol_row, is_atom_row, is_int_row, is_float_row, is_string_row,
+  {"list?", NULL, NULL, (LispBuiltin *)(&lispfunc_is_list), NULL},
+  {"symbol?", NULL, NULL, (LispBuiltin *)(&lispfunc_is_symbol), NULL},
+  {"atom?", NULL, NULL, (LispBuiltin *)(&lispfunc_is_atom), NULL},
+  {"int?", NULL, NULL, (LispBuiltin *)(&lispfunc_is_int), NULL},
+  {"float?", NULL, NULL, (LispBuiltin *)(&lispfunc_is_float), NULL},
+  {"string?", NULL, NULL, (LispBuiltin *)(&lispfunc_is_string), NULL},
 
   // // Boolean logic and flow control
   // cond_row, lisp_if_row, lisp_and_row, lisp_or_row, lisp_not_row,
