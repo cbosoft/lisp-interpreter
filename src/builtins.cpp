@@ -10,12 +10,14 @@
 #include "builtins/add.hpp"
 #include "builtins/subtract.hpp"
 #include "builtins/multiply.hpp"
+#include "builtins/divide.hpp"
 
 static LispFunc_defmacro lispfunc_defmacro = LispFunc_defmacro();
 
 static LispFunc_add lispfunc_add = LispFunc_add();
 static LispFunc_subtract lispfunc_subtract = LispFunc_subtract();
 static LispFunc_multiply lispfunc_multiply = LispFunc_multiply();
+static LispFunc_divide lispfunc_divide = LispFunc_divide();
 
 // builtins are enumerated here, and referred to in the global env setup
 LispEnvironmentRow builtins[] = {
@@ -32,7 +34,8 @@ LispEnvironmentRow builtins[] = {
   {"add", "+", NULL, (LispBuiltin *)(&lispfunc_add), NULL},
   {"subtract", "-", NULL, (LispBuiltin *)(&lispfunc_subtract), NULL},
   {"multiply", "*", NULL, (LispBuiltin *)(&lispfunc_multiply), NULL},
-  // multiply_row, divide_row, modulo_row, random_row, randint_row,
+  {"divide", "/", NULL, (LispBuiltin *)(&lispfunc_divide), NULL},
+  // modulo_row, random_row, randint_row,
 
   // // Comparison
   // gt_row, ge_row, lt_row, le_row, eq_row,
