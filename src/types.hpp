@@ -340,34 +340,22 @@ class Documented {
     virtual std::string get_doc() { return "Documentation for this object not available."; }
 };
 
-
-
-// 
-typedef LispObject_ptr (LispCppFunc)(LispList_ptr arg, LispEnvironment_ptr env);
-class LispBuiltin : virtual public Printable, virtual public Executable {
+class Traceable {
   private:
-    std::string doc = "UNSET";
-    LispCppFunc * func = NULL;
+    int source_id;
+    int row;
+    int column;
   public:
-
-    LispBuiltin() : Executable () {
-      this->func = NULL;
+    Traceable(int sid, int row, int col)
+    {
+      this->source_id = sid;
+      this->row = row;
+      this->column = col;
     }
 
-    LispBuiltin(LispCppFunc * func, std::string doc, bool is_macro) : Executable() { 
-      this->func = func; 
-      this->doc = doc;
+    virtual std::string where_defined() { return "TODO"; }
+};
 
-      if (is_macro)
-        this->set_macro(); 
-    }
-
-    LispObject_ptr eval(LispList_ptr arg, LispEnvironment_ptr env) { 
-      return this->func(arg, env); 
-    }
-
-    std::string repr();
-    std::string str();
 class LispBuiltin : public virtual Printable, public virtual Executable, public virtual Documented {
 };
 
