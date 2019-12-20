@@ -60,8 +60,8 @@ obj/%.o: src/%.cpp $(HDRS)
 	mkdir -p `dirname $@`
 	$(CXX) $(CFLAGS) $< -c -o $@
 
-crisp: obj/main.o $(OBJ) $(HDRS)
-	$(CXX) $(CFLAGS) obj/main.o $(OBJ) -o $@ $(LINK)
+crisp: obj/main.o $(OBJ)
+	$(CXX) $(CFLAGS) $^ -o $@ $(LINK)
 
 #tests: obj/tests.o $(OBJ)
 #	$(CXX) $(CFLAGS) obj/tests.o $(OBJ) -o $@ $(LINK) && ./tests
