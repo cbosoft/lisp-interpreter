@@ -66,6 +66,8 @@ static LispFunc_if lispfunc_if = LispFunc_if();
 
 static LispFunc_append lispfunc_append = LispFunc_append();
 static LispFunc_list lispfunc_list = LispFunc_list();
+static LispFunc_pop lispfunc_pop = LispFunc_pop();
+static LispFunc_rest lispfunc_rest = LispFunc_rest();
 
 // builtins are enumerated here, and referred to in the global env setup
 LispEnvironmentRow builtins[] = {
@@ -115,7 +117,8 @@ LispEnvironmentRow builtins[] = {
   // // List operations
   {"append", NULL, NULL, (LispBuiltin *)(&lispfunc_append), NULL},
   {"list", NULL, NULL, (LispBuiltin *)(&lispfunc_list), NULL},
-  // list_row, rest_row, pop_row, append_row,
+  {"pop", NULL, NULL, (LispBuiltin *)(&lispfunc_pop), NULL},
+  {"rest", NULL, NULL, (LispBuiltin *)(&lispfunc_rest), NULL},
 
   // // Eval modules and other files
   // eval_row, eval_file_row, import_row,

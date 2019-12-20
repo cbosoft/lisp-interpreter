@@ -33,3 +33,74 @@ class LispFunc_list : public virtual LispBuiltin {
       return make_ptr(LispObject(arg));
     }
 };
+
+
+
+class LispFunc_pop : public virtual LispBuiltin {
+  private:
+    inline static const std::string name = "pop";
+    inline static const std::string doc = 
+      "(pop list)";
+
+  public:
+    LispFunc_pop()
+    {
+    }
+
+    const std::string repr() const
+    {
+      return "Func(" + this->name + ",builtin)";
+    }
+
+    const std::string get_doc() const
+    {
+      return this->doc;
+    }
+
+    LispObject_ptr eval(LispList_ptr arg, LispEnvironment_ptr env) const
+    {
+      (void) env;
+      narg_check(arg, 1, this->repr(), "list");
+
+      LispObject_ptr list_arg = arg->next(true);
+      type_check_one(list_arg, LISPOBJECT_LIST, this->repr(), "list");
+      LispList_ptr list_var = list_arg->get_value_list();
+      return list_var->first();
+    }
+};
+
+
+
+
+class LispFunc_rest : public virtual LispBuiltin {
+  private:
+    inline static const std::string name = "rest";
+    inline static const std::string doc = 
+      "(rest list)";
+
+  public:
+    LispFunc_rest()
+    {
+    }
+
+    const std::string repr() const
+    {
+      return "Func(" + this->name + ",builtin)";
+    }
+
+    const std::string get_doc() const
+    {
+      return this->doc;
+    }
+
+    LispObject_ptr eval(LispList_ptr arg, LispEnvironment_ptr env) const
+    {
+      (void) env;
+      narg_check(arg, 1, this->repr(), "list");
+
+      LispObject_ptr list_arg = arg->next(true);
+      type_check_one(list_arg, LISPOBJECT_LIST, this->repr(), "list");
+      LispList_ptr list_var = list_arg->get_value_list();
+      return std::make_shared<LispObject>(LispObject(list_var->rest()));
+    }
+};
