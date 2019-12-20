@@ -25,9 +25,12 @@
 #include "builtins/boolean.hpp"
 #include "builtins/cond.hpp"
 #include "builtins/if.hpp"
+
 #include "builtins/append.hpp"
 #include "builtins/list.hpp"
 #include "builtins/quote.hpp"
+
+#include "builtins/eval.hpp"
 
 static LispFunc_defun lispfunc_defun = LispFunc_defun();
 static LispFunc_defmacro lispfunc_defmacro = LispFunc_defmacro();
@@ -69,6 +72,8 @@ static LispFunc_append lispfunc_append = LispFunc_append();
 static LispFunc_list lispfunc_list = LispFunc_list();
 static LispFunc_pop lispfunc_pop = LispFunc_pop();
 static LispFunc_rest lispfunc_rest = LispFunc_rest();
+
+static LispFunc_eval lispfunc_eval = LispFunc_eval();
 
 static LispFunc_quote lispfunc_quote = LispFunc_quote();
 
@@ -124,7 +129,8 @@ LispEnvironmentRow builtins[] = {
   {"rest", NULL, NULL, (LispBuiltin *)(&lispfunc_rest), NULL},
 
   // Eval modules and other files
-  // eval_row, eval_file_row, import_row,
+  {"eval", NULL, NULL, (LispBuiltin *)(&lispfunc_eval), NULL},
+  // eval_file_row, import_row,
 
   // Misc functions
   // lisp_exit_row,
