@@ -16,6 +16,8 @@
 #include "builtins/divide.hpp"
 #include "builtins/modulo.hpp"
 
+#include "builtins/comparison.hpp"
+
 static LispFunc_defun lispfunc_defun = LispFunc_defun();
 static LispFunc_defmacro lispfunc_defmacro = LispFunc_defmacro();
 static LispFunc_defvar lispfunc_defvar = LispFunc_defvar();
@@ -25,6 +27,12 @@ static LispFunc_subtract lispfunc_subtract = LispFunc_subtract();
 static LispFunc_multiply lispfunc_multiply = LispFunc_multiply();
 static LispFunc_divide lispfunc_divide = LispFunc_divide();
 static LispFunc_modulo lispfunc_modulo = LispFunc_modulo();
+
+static LispFunc_gt lispfunc_gt = LispFunc_gt();
+static LispFunc_ge lispfunc_ge = LispFunc_ge();
+static LispFunc_lt lispfunc_lt = LispFunc_lt();
+static LispFunc_le lispfunc_le = LispFunc_le();
+static LispFunc_eq lispfunc_eq = LispFunc_eq();
 
 // builtins are enumerated here, and referred to in the global env setup
 LispEnvironmentRow builtins[] = {
@@ -46,7 +54,11 @@ LispEnvironmentRow builtins[] = {
   // random_row, randint_row,
 
   // // Comparison
-  // gt_row, ge_row, lt_row, le_row, eq_row,
+  {"greater-than?", ">", NULL, (LispBuiltin *)(&lispfunc_gt), NULL},
+  {"greater-than-or-equal-to?", ">=", NULL, (LispBuiltin *)(&lispfunc_ge), NULL},
+  {"less-than?", "<", NULL, (LispBuiltin *)(&lispfunc_lt), NULL},
+  {"less-than-or-equal-to?", "<=", NULL, (LispBuiltin *)(&lispfunc_le), NULL},
+  {"equal?", "=", NULL, (LispBuiltin *)(&lispfunc_eq), NULL},
 
   // // Type checking
   // is_list_row, is_symbol_row, is_atom_row, is_int_row, is_float_row, is_string_row,
