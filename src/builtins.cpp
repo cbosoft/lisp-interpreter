@@ -27,6 +27,7 @@
 #include "builtins/if.hpp"
 #include "builtins/append.hpp"
 #include "builtins/list.hpp"
+#include "builtins/quote.hpp"
 
 static LispFunc_defun lispfunc_defun = LispFunc_defun();
 static LispFunc_defmacro lispfunc_defmacro = LispFunc_defmacro();
@@ -69,6 +70,8 @@ static LispFunc_list lispfunc_list = LispFunc_list();
 static LispFunc_pop lispfunc_pop = LispFunc_pop();
 static LispFunc_rest lispfunc_rest = LispFunc_rest();
 
+static LispFunc_quote lispfunc_quote = LispFunc_quote();
+
 // builtins are enumerated here, and referred to in the global env setup
 LispEnvironmentRow builtins[] = {
 
@@ -99,7 +102,7 @@ LispEnvironmentRow builtins[] = {
   {"less-than-or-equal-to?", "<=", NULL, (LispBuiltin *)(&lispfunc_le), NULL},
   {"equal?", "=", NULL, (LispBuiltin *)(&lispfunc_eq), NULL},
 
-  // // Type checking
+  // Type checking
   {"list?", NULL, NULL, (LispBuiltin *)(&lispfunc_is_list), NULL},
   {"symbol?", NULL, NULL, (LispBuiltin *)(&lispfunc_is_symbol), NULL},
   {"atom?", NULL, NULL, (LispBuiltin *)(&lispfunc_is_atom), NULL},
@@ -107,25 +110,25 @@ LispEnvironmentRow builtins[] = {
   {"float?", NULL, NULL, (LispBuiltin *)(&lispfunc_is_float), NULL},
   {"string?", NULL, NULL, (LispBuiltin *)(&lispfunc_is_string), NULL},
 
-  // // Boolean logic and flow control
+  // Boolean logic and flow control
   {"or", "||", NULL, (LispBuiltin *)(&lispfunc_or), NULL},
   {"and", "&&", NULL, (LispBuiltin *)(&lispfunc_and), NULL},
   {"not", "!", NULL, (LispBuiltin *)(&lispfunc_not), NULL},
   {"cond", NULL, NULL, (LispBuiltin *)(&lispfunc_cond), NULL},
   {"if", NULL, NULL, (LispBuiltin *)(&lispfunc_if), NULL},
 
-  // // List operations
+  // List operations
   {"append", NULL, NULL, (LispBuiltin *)(&lispfunc_append), NULL},
   {"list", NULL, NULL, (LispBuiltin *)(&lispfunc_list), NULL},
   {"pop", NULL, NULL, (LispBuiltin *)(&lispfunc_pop), NULL},
   {"rest", NULL, NULL, (LispBuiltin *)(&lispfunc_rest), NULL},
 
-  // // Eval modules and other files
+  // Eval modules and other files
   // eval_row, eval_file_row, import_row,
 
-  // // Misc functions
+  // Misc functions
   // lisp_exit_row,
-  // quote_row,
+  {"quote", NULL, NULL, (LispBuiltin *)(&lispfunc_quote), NULL},
 
 
 
