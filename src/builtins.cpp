@@ -4,18 +4,19 @@
 #include "formatter.hpp"
 //#include "builtins.hpp"
 #include "builtins/defmacro.hpp"
+#include "builtins/add.hpp"
 #include "pointer.hpp"
 #include "version.hpp"
 
 LispEnvironmentRow sentinal = {NULL, NULL, NULL, NULL, NULL};
 static LispFunc_defmacro lispfunc_defmacro = LispFunc_defmacro();
+static LispFunc_add lispfunc_add = LispFunc_add();
 
 // builtins are enumerated here, and referred to in the global env setup
 LispEnvironmentRow builtins[] = {
 
   // Function, macro, variable
   //defun_row, 
-  //defmacro_row,
   {"defmacro", NULL, NULL, (LispBuiltin *)(&lispfunc_defmacro), NULL},
   //defvar_row,
 
@@ -23,7 +24,8 @@ LispEnvironmentRow builtins[] = {
   // print_row, with_open_row, lisp_read_row, lisp_write_row,
 
   // // Maths
-  // add_row, subtract_row, multiply_row, divide_row, modulo_row, random_row, randint_row,
+  {"add", "+", NULL, (LispBuiltin *)(&lispfunc_add), NULL},
+  // subtract_row, multiply_row, divide_row, modulo_row, random_row, randint_row,
 
   // // Comparison
   // gt_row, ge_row, lt_row, le_row, eq_row,
