@@ -335,6 +335,10 @@ class Executable {
     virtual LispObject_ptr eval(LispList_ptr arg, LispEnvironment_ptr env) =0;
 };
 
+class Documented {
+  public:
+    virtual std::string get_doc() { return "Documentation for this object not available."; }
+};
 
 
 
