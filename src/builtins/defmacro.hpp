@@ -13,7 +13,7 @@ class LispFunc_defmacro : LispBuiltin {
       "(defmacro name list &rest body)\n\
       Creates a new macro with NAME in environment. ARGS is a list of symbols which \n\
       are arguments to the macro. These are NOT evaluated before the macro is run.\n\
-      This is the difference between a macro and a function.";
+      If you want args to be eval'd before runing, use 'defun'.";
 
   public:
     LispFunc_defmacro()
@@ -23,7 +23,7 @@ class LispFunc_defmacro : LispBuiltin {
 
     std::string repr() const
     {
-      return "Func(defmacro,builtin)";
+      return "Macro(defmacro,builtin)";
     }
 
     LispObject_ptr eval(LispList_ptr arg, LispEnvironment_ptr env) const
