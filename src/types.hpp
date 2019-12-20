@@ -31,7 +31,7 @@ class Printable {
 
 class LispBuiltin; 
 //typedef std::shared_ptr<LispBuiltin> LispBuiltin_ptr;
-typedef LispBuiltin * LispBuiltin_ptr;
+typedef const LispBuiltin * LispBuiltin_ptr;
 
 class LispFunction; 
 typedef std::shared_ptr<LispFunction> LispFunction_ptr;
@@ -194,17 +194,17 @@ class LispObject : virtual public Printable {
 class LispList : virtual public Printable {
   private:
     std::list<LispObject_ptr> obj_list;
-    std::list<LispObject_ptr>::iterator it;
+    std::list<LispObject_ptr>::const_iterator it;
 
   public:
     LispList(){};
 
-    LispList(std::list<LispObject_ptr>::iterator from, std::list<LispObject_ptr>::iterator to){ 
+    LispList(std::list<LispObject_ptr>::const_iterator from, std::list<LispObject_ptr>::const_iterator to){ 
       this->obj_list = std::list<LispObject_ptr>(from, to);
     }
 
-    std::list<LispObject_ptr>::iterator end() { return this->obj_list.end(); }
-    std::list<LispObject_ptr>::iterator begin() { return this->obj_list.begin(); }
+    std::list<LispObject_ptr>::const_iterator end() const { return this->obj_list.end(); }
+    std::list<LispObject_ptr>::const_iterator begin() const { return this->obj_list.begin(); }
     LispObject_ptr first() { return this->obj_list.front(); }
     LispObject_ptr next(bool restart = false) {
       if (restart) {
@@ -232,7 +232,7 @@ class LispList : virtual public Printable {
     std::string repr();
     std::string str();
 
-    LispObject_ptr eval_each(LispEnvironment_ptr env);
+    LispObject_ptr eval_each(LispEnvironment_ptr env) const;
 };
 
 
@@ -332,7 +332,7 @@ class Executable {
     ~Executable() { }
     void set_macro() { this->_is_macro = true; }
     bool is_macro() const { return this->_is_macro; }
-    virtual LispObject_ptr eval(LispList_ptr arg, LispEnvironment_ptr env) =0;
+    virtual LispObject_ptr eval(LispList_ptr arg, LispEnvironment_ptr env) const =0;
 };
 
 class Documented {
@@ -353,7 +353,7 @@ class Traceable {
       this->column = col;
     }
 
-    virtual std::string where_defined() { return "TODO"; }
+    virtual const std::string where_defined() const { return "TODO"; }
 };
 
 class LispBuiltin : public virtual Printable, public virtual Executable, public virtual Documented {
@@ -383,9 +383,9 @@ class LispFunction : virtual public Printable, virtual public Executable {
       }
       if (is_macro) this->set_macro();
     };
-    LispObject_ptr eval(LispList_ptr arg, LispEnvironment_ptr env);
-    std::string repr() { return this->body->repr(); }
-    std::string str() {return this->body->str(); }
+    LispObject_ptr eval(LispList_ptr arg, LispEnvironment_ptr env) const;
+    const std::string repr() const { return this->body->repr(); }
+    const std::string str() const {return this->body->str(); }
 };
 
 

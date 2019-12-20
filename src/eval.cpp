@@ -18,7 +18,7 @@ LispObject_ptr LispObject::eval(LispEnvironment_ptr env)
   LispList_ptr list_args, list_obj;
   LispBuiltin_ptr var_bfunc;
   LispFunction_ptr var_lfunc;
-  std::list<LispObject_ptr>::iterator list_elem, list_iter;
+  std::list<LispObject_ptr>::const_iterator list_elem, list_iter;
 
 
   if (env == NULL) throw AuthorError(Formatter() << "Eval called without environment.");
@@ -118,7 +118,7 @@ LispObject_ptr LispObject::eval(LispEnvironment_ptr env)
 
 
 // 
-LispObject_ptr LispFunction::eval(LispList_ptr arg, LispEnvironment_ptr env)
+LispObject_ptr LispFunction::eval(LispList_ptr arg, LispEnvironment_ptr env) const
 {
   unsigned long n_args_supplied = arg->count(), n_args_expected = this->arg_names.size();
   if (n_args_supplied != n_args_expected)
@@ -138,7 +138,8 @@ LispObject_ptr LispFunction::eval(LispList_ptr arg, LispEnvironment_ptr env)
 
 
 //
-LispObject_ptr LispList::eval_each(LispEnvironment_ptr env) {
+LispObject_ptr LispList::eval_each(LispEnvironment_ptr env) const
+{
   debug_message("eval each");
 
   auto iter = this->begin();
