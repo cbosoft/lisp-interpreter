@@ -78,7 +78,7 @@ int main(int argc, char **argv)
       EXECUTED_FILE_OR_CLI_STRING = 1;
       try {
         i++;
-        root = parser.parse_string(argv[i], {.type=TRACESOURCE_ARGUMENT, .path_or_commands=argv[i], .row=0, .column=0});
+        root = parser.parse_string(argv[i], {.type=TRACESOURCE_ARGUMENT, .path_or_commands=argv[i], .row=0, .column=0, .token_length=0});
         result = root->eval_each(env);
       }
       catch (const Exception& ex) {
@@ -158,9 +158,9 @@ int main(int argc, char **argv)
       
       input_str = input_ss.str();
       add_history(input_str.c_str());
-      root = parser.parse_string(input_str, {.type=TRACESOURCE_ARGUMENT, .path_or_commands=input_str, .row=0, .column=0});
+      root = parser.parse_string(input_str, {.type=TRACESOURCE_REPL, .path_or_commands=input_str, .row=0, .column=0, .token_length=0});
       result = root->eval_each(env);
-      std::cout << "--> ";
+      std::cout << "=> ";
       result->print();
     }
     catch (const Exception& ex) {

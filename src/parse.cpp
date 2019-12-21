@@ -180,7 +180,7 @@ LispList_ptr LispParser::parse_file(std::string path)
     file_contents.erase(file_contents.begin(), it);
   }
 
-  TraceSource proto_source = {.type=TRACESOURCE_FILE, .path_or_commands=path, .row=0, .column=0};
+  TraceSource proto_source = {.type=TRACESOURCE_FILE, .path_or_commands=path, .row=0, .column=0, .token_length=0};
   return this->parse_string(file_contents, proto_source);
 }
 
