@@ -10,6 +10,7 @@
 #include "colour.hpp"
 #include "debug.hpp"
 #include "exception.hpp"
+#include "formatter.hpp"
 #include "pointer.hpp"
 
 
@@ -391,7 +392,7 @@ class LispBuiltin : public virtual Printable, public virtual Executable, public 
 
 
 
-class LispFunction : virtual public Printable, virtual public Executable {
+class LispFunction : virtual public Printable, virtual public Executable, virtual public Documented {
   private:
     std::vector<std::string> arg_names;
     LispList_ptr body;
