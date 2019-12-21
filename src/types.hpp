@@ -197,19 +197,6 @@ class LispObject : virtual public Printable, public Traceable {
 
   public:
     LispObject();
-    LispObject(const LispObject& o) {
-      this->type = o.type;
-      this->value_symbol = o.value_symbol;
-      this->value_atom = o.value_atom;
-      this->value_list = o.value_list;
-    }
-    LispObject operator=(const LispObject& o) {
-      this->type = o.type;
-      this->value_symbol = o.value_symbol;
-      this->value_atom = o.value_atom;
-      this->value_list = o.value_list;
-      return *this;
-    }
 
     std::string str();
     std::string repr();
