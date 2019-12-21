@@ -15,7 +15,8 @@
   new_source = proto_source;\
   new_source.row = row;\
   new_source.column = col;\
-  new_token->set_source(make_ptr(proto_source));\
+  new_source.token_length = string_length(KW);\
+  new_token->set_source(make_ptr(new_source));\
   if (rv == NULL) {\
     rv = new_token;\
   }\
@@ -25,6 +26,15 @@
   current_token = new_token;
 
 
+int string_length(std::string s)
+{
+  return s.size();
+}
+
+int string_length(const char *s)
+{
+  return strlen(s);
+}
 
 
 // LispToken constructor
