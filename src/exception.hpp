@@ -19,7 +19,7 @@ class Exception : public std::exception {
       this->detail = detail; 
       this->type = type; 
       this->cause = cause;
-      this->cause_set = true;
+      this->cause_set = cause.size() > 0;
     }
 
     Exception(std::string detail, std::string type) 
