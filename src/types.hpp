@@ -381,7 +381,7 @@ class Executable {
 
 class Documented {
   public:
-    virtual std::string get_doc() { return "Documentation for this object not available."; }
+    virtual const std::string get_doc() const { return "Documentation for this object not available."; }
 };
 
 class LispBuiltin : public virtual Printable, public virtual Executable, public virtual Documented {
