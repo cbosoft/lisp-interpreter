@@ -90,7 +90,7 @@ LispEnvironment::LispEnvironment()
 
 
 
-int LispEnvironment::get(std::string name, LispObject_ptr *obj, LispBuiltin_ptr *bf, LispFunction_ptr *lf)
+LispEnvironment_Type LispEnvironment::get(std::string name, LispObject_ptr *obj, LispBuiltin_ptr *bf, LispFunction_ptr *lf)
 {
   debug_message(Formatter() << "looking for \"" << name << "\" in environment");
   (*obj) = NULL;
@@ -120,7 +120,7 @@ int LispEnvironment::get(std::string name, LispObject_ptr *obj, LispBuiltin_ptr 
 
   if (this->parent == NULL) {
     debug_message(Formatter() << "object not found, and no parent. get failed.");
-    return -1;
+    return LISPENV_NOTFOUND;
   }
 
   return this->parent->get(name, obj, bf, lf);

@@ -129,7 +129,7 @@ class LispSymbol : virtual public Printable{
 
 
 enum TraceSource_Type {
-  TRACESOURCE_STDIN,
+  TRACESOURCE_REPL,
   TRACESOURCE_ARGUMENT,
   TRACESOURCE_FILE
 };
@@ -335,7 +335,7 @@ class LispParser {
 
 
 
-enum LISPENV_RET { LISPENV_OBJ, LISPENV_BFUNC, LISPENV_LFUNC };
+enum LispEnvironment_Type { LISPENV_OBJ, LISPENV_BFUNC, LISPENV_LFUNC, LISPENV_NOTFOUND = -1 };
 class LispEnvironment {
   private:
     std::map<std::string, LispObject_ptr> objects_map;
@@ -357,7 +357,7 @@ class LispEnvironment {
     void add(std::string name, LispFunction_ptr val);
     void add_something(std::string name, LispObject_ptr obj, LispBuiltin_ptr bfunc, LispFunction_ptr lfunc);
 
-    int get(std::string name, LispObject_ptr *obj, LispBuiltin_ptr *bf, LispFunction_ptr *lf);
+    LispEnvironment_Type get(std::string name, LispObject_ptr *obj, LispBuiltin_ptr *bf, LispFunction_ptr *lf);
 
 };
 
