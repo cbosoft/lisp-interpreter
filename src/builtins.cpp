@@ -28,14 +28,15 @@
 
 #include "builtins/append.hpp"
 #include "builtins/list.hpp"
-#include "builtins/quote.hpp"
 #include "builtins/range.hpp"
 
 #include "builtins/eval.hpp"
 #include "builtins/import.hpp"
 #include "builtins/eval_file.hpp"
 
+#include "builtins/quote.hpp"
 #include "builtins/exit.hpp"
+#include "builtins/doc.hpp"
 
 static LispFunc_defun lispfunc_defun = LispFunc_defun();
 static LispFunc_defmacro lispfunc_defmacro = LispFunc_defmacro();
@@ -85,6 +86,7 @@ static LispFunc_eval_file lispfunc_eval_file = LispFunc_eval_file();
 
 static LispFunc_quote lispfunc_quote = LispFunc_quote();
 static LispFunc_exit lispfunc_exit = LispFunc_exit();
+static LispFunc_doc lispfunc_doc = LispFunc_doc();
 
 // builtins are enumerated here, and referred to in the global env setup
 LispEnvironmentRow builtins[] = {
@@ -146,6 +148,7 @@ LispEnvironmentRow builtins[] = {
   // Misc functions
   {"quote", NULL, NULL, (LispBuiltin *)(&lispfunc_quote), NULL},
   {"exit", NULL, NULL, (LispBuiltin *)(&lispfunc_exit), NULL},
+  {"doc", NULL, NULL, (LispBuiltin *)(&lispfunc_doc), NULL},
 
 
 
