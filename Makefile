@@ -10,6 +10,7 @@ OBJ = \
 			obj/environment.o \
 			obj/exception_check.o \
 			obj/builtins.o \
+			obj/traceable.o \
 			obj/list.o \
 			obj/eval.o \
 			obj/search.o \

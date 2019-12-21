@@ -139,38 +139,14 @@ typedef struct _TraceSource {
   std::string path_or_commands;
   int row;
   int column;
+  int token_length;
 } TraceSource;
 typedef std::shared_ptr<TraceSource> TraceSource_ptr;
 
 class Traceable {
   private:
     TraceSource_ptr source;
-
-    const std::string get_file_trace() const
-    {
-      std::ifstream istr(this->source->path_or_commands);
-      if (istr.fail())
-        throw IOError("Error opening source file \"" + this->source->path_or_commands + "\".");
-
-      std::stringstream buf;
-      buf << istr.rdbuf();
-
-      std::string line;
-      for (int i = 0; i < (this->source->row - 1); i++) {
-        if (!std::getline(istr, line))
-          throw IOError("file ended unexpectedly.");
-      }
-
-      std::string rv = "";
-      for (int i = 0; i < 3; i++) {
-        if (!std::getline(istr, line))
-          break;
-        rv = rv + line;
-        if (i > 0) rv = rv + "\n";
-      }
-      return rv;
-    }
-
+    const std::string get_file_trace() const;
   public:
     Traceable() { }
 
@@ -179,27 +155,17 @@ class Traceable {
       this->source = source;
     }
 
-    const std::string repr_source()
+    TraceSource_ptr get_source()
     {
-      switch (this->source->type) {
-
-        case TRACESOURCE_STDIN:
-          return "STDIN:" + this->source->path_or_commands;
-
-        case TRACESOURCE_ARGUMENT:
-          return "ARGUMENT:" + this->source->path_or_commands;
-
-        case TRACESOURCE_FILE:
-          return "FILE:" + this->source->path_or_commands + ":\n" + this->get_file_trace();
-      }
-
-      throw AuthorError("Unexpected type encountered in Traceable::repr_source()!");
+      return this->source;
     }
+
+    const std::string repr_source();
 
     template<typename T>
     void inherits_from(std::shared_ptr<T> obj) {
-      Traceable *t = &(*obj);
-      this->source = t->source;
+      this->source = obj->get_source();
+      debug_message(Formatter() << "inherited: " << this->repr_source());
     }
 
     //void inherits_from(std::shared_ptr<LispObject> obj);
