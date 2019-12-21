@@ -22,6 +22,14 @@ HDRS = \
 
 LINK = -ledit -lncurses -lgc -lpcre
 
+.PHONY: default
+
+default: crisp
+
+obj/builtins.o: src/builtins.cpp $(shell ls src/builtins/*.hpp)
+	mkdir -p `dirname $@`
+	$(CXX) $(CFLAGS) $< -c -o $@
+
 obj/%.o: src/%.cpp $(HDRS)
 	mkdir -p `dirname $@`
 	$(CXX) $(CFLAGS) $< -c -o $@
