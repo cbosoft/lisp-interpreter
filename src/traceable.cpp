@@ -48,9 +48,6 @@ const std::string Traceable::get_file_trace() const
   if (istr.fail())
     throw IOError("Error opening source file \"" + this->source->path_or_commands + "\".");
 
-  std::stringstream buf;
-  buf << istr.rdbuf();
-
   std::string line;
   for (int i = 0; i < (this->source->row - 1); i++) {
     if (!std::getline(istr, line))
