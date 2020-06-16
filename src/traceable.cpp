@@ -50,6 +50,7 @@ const std::string Traceable::get_file_trace() const
 
   std::string line;
   for (int i = 0; i < (this->source->row - 1); i++) {
+    // skip down in file until on correct line
     if (!std::getline(istr, line))
       throw IOError("file ended unexpectedly.");
   }
