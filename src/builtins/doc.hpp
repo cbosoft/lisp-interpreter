@@ -56,6 +56,7 @@ class LispFunc_doc : public virtual LispBuiltin {
           return make_ptr(LispObject(value_lfunc->get_doc()));
           break;
 
+        default:
         case LISPENV_NOTFOUND:
           debug_message("not found");
           throw EnvironmentError(Formatter() << "symbol \"" << symbol_name << "\" not found in environment.", symbol_obj->repr_source());
