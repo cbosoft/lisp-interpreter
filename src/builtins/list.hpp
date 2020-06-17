@@ -65,6 +65,10 @@ class LispFunc_pop : public virtual LispBuiltin {
       LispObject_ptr list_arg = arg->next(true);
       type_check_one(list_arg, LISPOBJECT_LIST, this->repr(), "list");
       LispList_ptr list_var = list_arg->get_value_list();
+
+      if (!list_var->count())
+        return std::make_shared<LispObject>(std::make_shared<LispList>());
+
       return list_var->first();
     }
 };
@@ -101,6 +105,10 @@ class LispFunc_rest : public virtual LispBuiltin {
       LispObject_ptr list_arg = arg->next(true);
       type_check_one(list_arg, LISPOBJECT_LIST, this->repr(), "list");
       LispList_ptr list_var = list_arg->get_value_list();
-      return std::make_shared<LispObject>(LispObject(list_var->rest()));
+
+      if (!list_var->count())
+        return std::make_shared<LispObject>(std::make_shared<LispList>());
+
+      return std::make_shared<LispObject>(list_var->rest());
     }
 };
