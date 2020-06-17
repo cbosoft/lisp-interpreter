@@ -21,7 +21,7 @@ LispParser::LispParser() {
   std::string home(getenv("HOME"));
   std::stringstream ss;
 
-  ss << "/lib/crisp/";
+  ss << "./lib/";
   this->module_paths.push_back(ss.str());
   ss.str("");
 
@@ -29,9 +29,10 @@ LispParser::LispParser() {
   this->module_paths.push_back(ss.str());
   ss.str("");
 
-  ss << "./lib/";
+  ss << "/lib/crisp/";
   this->module_paths.push_back(ss.str());
   ss.str("");
+
 }
 
 
