@@ -41,7 +41,7 @@ class LispFunc_cond : public virtual LispBuiltin {
           throw TypeError(Formatter() << "cond expects Lists as argument: got " << (*it)->repr_type() << ".");
     
         LispList_ptr cond_then = (*it)->get_value_list();
-        LispObject_ptr condition = cond_then->next(true);
+        LispObject_ptr condition = cond_then->next(true)->eval(env);
         LispObject_ptr then = cond_then->next();
     
         if (condition->is_truthy(env)) {
