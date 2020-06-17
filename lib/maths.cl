@@ -1,4 +1,4 @@
-;; chrisp math library
+;; crisp math library
 
 ;; Good ole pi.
 (defvar pi 3.14159263)
