@@ -17,3 +17,5 @@
 (defun abs (x) 
   ((if (< x 0) 
      (* x -1) x)))
+
+;; crisp maths library ends here
