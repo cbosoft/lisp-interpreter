@@ -221,7 +221,7 @@ class LispObject : virtual public Printable, public Traceable {
     LispList_ptr get_value_list() { return this->value_list; }
     LispSymbol_ptr get_value_symbol() { return this->value_symbol; }
 
-    bool is_truthy();
+    bool is_truthy(LispEnvironment_ptr env=nullptr);
 
 };
 

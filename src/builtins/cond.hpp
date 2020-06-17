@@ -33,7 +33,6 @@ class LispFunc_cond : public virtual LispBuiltin {
 
     LispObject_ptr eval(LispList_ptr arg, LispEnvironment_ptr env) const
     {
-      (void) env;
       narg_check_min(arg, 1, this->repr(), "&rest (condition body)");
       LispObject_ptr result;
       for (auto it = arg->begin(); it != arg->end(); ++it) {
@@ -45,7 +44,7 @@ class LispFunc_cond : public virtual LispBuiltin {
         LispObject_ptr condition = cond_then->next(true);
         LispObject_ptr then = cond_then->next();
     
-        if (condition->is_truthy()) {
+        if (condition->is_truthy(env)) {
           return then->eval(env);
         }
       }

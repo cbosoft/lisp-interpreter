@@ -31,14 +31,13 @@ class LispFunc_if : public virtual LispBuiltin {
 
     LispObject_ptr eval(LispList_ptr arg, LispEnvironment_ptr env) const
     {
-      (void) env;
       narg_check(arg, 3, this->repr(), "cond value-true value-false");
 
       LispObject_ptr condition = arg->next(true)->eval(env);
       LispObject_ptr value_true = arg->next();
       LispObject_ptr value_else = arg->next();
 
-      if (condition->is_truthy())
+      if (condition->is_truthy(env))
         return value_true->eval(env);
 
       return value_else->eval(env);
