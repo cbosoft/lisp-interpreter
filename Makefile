@@ -43,6 +43,8 @@ crisp: obj/main.o $(OBJ)
 
 install:
 	cp crisp /usr/bin/.
+	mkdir -p /usr/lib/crisp
+	cp lib/* /usr/lib/crisp/.
 
 uninstall:
 	rm -rf /usr/bin/crisp
