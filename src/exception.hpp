@@ -50,6 +50,7 @@ EXCEPTION(ArgumentError, "ArgumentError");
 EXCEPTION(NameError, "NameError");
 EXCEPTION(TypeError, "TypeError");
 EXCEPTION(SyntaxError, "SyntaxError");
+EXCEPTION(FormatError, "FormatError");
 EXCEPTION(NotImplementedError, "NotImplementedError");
 EXCEPTION(DivideByZeroError, "DivideByZeroError");
 EXCEPTION(AuthorError, "AuthorError");
