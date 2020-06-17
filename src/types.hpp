@@ -178,6 +178,10 @@ class Traceable {
 
 
 
+class Documented {
+  public:
+    virtual const std::string get_doc() const { return "Documentation for this object not available."; }
+};
 
 
 
@@ -189,18 +193,19 @@ enum LispObject_Type {
 };
 
 
-class LispObject : virtual public Printable, public Traceable {
+class LispObject : virtual public Printable, public Traceable, virtual public Documented {
   private:
     LispAtom_ptr value_atom;
     LispList_ptr value_list;
     LispSymbol_ptr value_symbol;
     LispObject_Type type;
+    std::string doc;
 
   public:
     LispObject();
 
     std::string str();
-    std::string repr();
+    std::string repr() const;
     std::string repr_type();
     std::string static repr_type(LispObject_Type type);
 
@@ -222,6 +227,9 @@ class LispObject : virtual public Printable, public Traceable {
     LispSymbol_ptr get_value_symbol() { return this->value_symbol; }
 
     bool is_truthy(LispEnvironment_ptr env=nullptr);
+
+    const std::string get_doc() const override { return (this->doc.size() ? this->doc : this->repr()); }
+    void set_doc(std::string s) { this->doc = s; }
 
 };
 
@@ -380,10 +388,6 @@ class Executable {
 
 
 
-class Documented {
-  public:
-    virtual const std::string get_doc() const { return "Documentation for this object not available."; }
-};
 
 class LispBuiltin : public virtual Printable, public virtual Executable, public virtual Documented {
 };
@@ -415,6 +419,7 @@ class LispFunction : virtual public Printable, virtual public Executable, virtua
     LispObject_ptr eval(LispList_ptr arg, LispEnvironment_ptr env) const;
     const std::string repr() const { return this->body->repr(); }
     const std::string str() const {return this->body->str(); }
+    const std::string get_doc() const override { return this->doc; }
 };
 
 

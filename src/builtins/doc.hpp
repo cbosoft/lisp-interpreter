@@ -45,16 +45,13 @@ class LispFunc_doc : public virtual LispBuiltin {
       switch (type) {
 
         case LISPENV_OBJ:
-          return make_ptr(LispObject(value_obj->repr()));
-          break;
+          return std::make_shared<LispObject>(value_obj->get_doc());
 
         case LISPENV_BFUNC:
-          return make_ptr(LispObject(value_bfunc->get_doc()));
-          break;
+          return std::make_shared<LispObject>(value_bfunc->get_doc());
 
         case LISPENV_LFUNC:
-          return make_ptr(LispObject(value_lfunc->get_doc()));
-          break;
+          return std::make_shared<LispObject>(value_lfunc->get_doc());
 
         default:
         case LISPENV_NOTFOUND:
