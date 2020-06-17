@@ -32,7 +32,7 @@ class LispFunc_defun : public virtual LispBuiltin {
 
     LispObject_ptr eval(LispList_ptr arg, LispEnvironment_ptr env) const
     {
-      narg_check(arg, 3, this->name, "name arglist &rest body");
+      narg_check_min(arg, 3, this->name, "name arglist &rest body");
      
       LispObject_ptr name = arg->next(true);
       type_check_one(name, LISPOBJECT_SYMBOL, this->name, "name");
