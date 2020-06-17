@@ -52,7 +52,7 @@ int main(int argc, char **argv)
 
   LispEnvironment_ptr env;
   try {
-    env = std::make_shared<LispEnvironment>(LispEnvironment());
+    env = std::make_shared<LispEnvironment>();
   }
   catch (const Exception& ex) {
     ex.pretty_print();
