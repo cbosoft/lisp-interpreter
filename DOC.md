@@ -122,6 +122,7 @@ Inspired by both context management in `Python` and RAII in `C++`.
 
 ### `write`
 ### `read`
+### `format`
 
 ## Maths
 ### `add`
@@ -170,6 +171,13 @@ Inspired by both context management in `Python` and RAII in `C++`.
 ### `quote`
 ### `exit`
 ### `doc`
+
+## Threading functions
+### `thread`
+### `join`
+
+## Timing functions
+### `sleep`
 
 ## Variables
 ### `stdin`
