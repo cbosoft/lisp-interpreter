@@ -6,7 +6,6 @@
 #include "../singletons.hpp"
 #include "../exception.hpp"
 #include "../exception_check.hpp"
-#include "../pointer.hpp"
 
 
 

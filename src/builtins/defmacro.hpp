@@ -3,7 +3,6 @@
 #include "../types.hpp"
 #include "../exception_check.hpp"
 #include "../formatter.hpp"
-#include "../pointer.hpp"
 
 
 class LispFunc_defmacro : LispBuiltin {
@@ -44,7 +43,7 @@ class LispFunc_defmacro : LispBuiltin {
     
       std::string name_str = name_obj->get_value_symbol()->get_name();
       LispList_ptr body = arg->rest(2);
-      LispFunction_ptr lfunc = std::make_shared<LispFunction>(LispFunction(argnames_list, body, name_str, "TODO"));
+      LispFunction_ptr lfunc = std::make_shared<LispFunction>(argnames_list, body, name_str, "TODO");
       env->add_something(name_str, NULL, NULL, lfunc);
       return name_obj;
     }

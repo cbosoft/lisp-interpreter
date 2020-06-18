@@ -4,7 +4,6 @@
 #include "../debug.hpp"
 #include "../exception.hpp"
 #include "../exception_check.hpp"
-#include "../pointer.hpp"
 #include "../singletons.hpp"
 
 
@@ -37,7 +36,7 @@ class LispFunc_or : public virtual LispBuiltin {
       LispObject_ptr left = arg->next(true);
       LispObject_ptr right = arg->next();
       bool rv = left->is_truthy() || right->is_truthy();
-      return std::make_shared<LispObject>(LispObject(rv));
+      return std::make_shared<LispObject>(rv);
     }
 };
 
@@ -70,7 +69,7 @@ class LispFunc_and : public virtual LispBuiltin {
       LispObject_ptr left = arg->next(true);
       LispObject_ptr right = arg->next();
       bool rv = left->is_truthy() && right->is_truthy();
-      return std::make_shared<LispObject>(LispObject(rv));
+      return std::make_shared<LispObject>(rv);
     }
 };
 
@@ -102,6 +101,6 @@ class LispFunc_not : public virtual LispBuiltin {
       narg_check(arg, 1, this->repr(), "val");
       LispObject_ptr val = arg->next(true);
       bool rv = !val->is_truthy();
-      return std::make_shared<LispObject>(LispObject(rv));
+      return std::make_shared<LispObject>(rv);
     }
 };

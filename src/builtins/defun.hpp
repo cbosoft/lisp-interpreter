@@ -3,7 +3,7 @@
 #include "../types.hpp"
 #include "../formatter.hpp"
 #include "../exception_check.hpp"
-#include "../pointer.hpp"
+
 
 class LispFunc_defun : public virtual LispBuiltin {
   private:
@@ -52,7 +52,7 @@ class LispFunc_defun : public virtual LispBuiltin {
     
       std::string name_str = name->get_value_symbol()->get_name();
       LispList_ptr body = arg->rest(3);
-      LispFunction_ptr lfunc = make_ptr(LispFunction(argnames_list, body, name_str, docstring_string));
+      LispFunction_ptr lfunc = std::make_shared<LispFunction>(argnames_list, body, name_str, docstring_string);
       env->add(name_str, lfunc);
       return name;
     }

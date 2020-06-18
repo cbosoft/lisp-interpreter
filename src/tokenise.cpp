@@ -16,7 +16,7 @@
   new_source.row = row;\
   new_source.column = col;\
   new_source.token_length = string_length(KW);\
-  new_token->set_source(make_ptr(new_source));\
+  new_token->set_source(std::make_shared<TraceSource>(new_source));\
   if (rv == NULL) {\
     rv = new_token;\
   }\

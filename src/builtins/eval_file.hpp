@@ -4,7 +4,7 @@
 #include "../debug.hpp"
 #include "../exception.hpp"
 #include "../exception_check.hpp"
-#include "../pointer.hpp"
+
 
 extern LispParser parser; // Boo: global var
 

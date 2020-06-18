@@ -4,9 +4,9 @@
 #include "../debug.hpp"
 #include "../exception.hpp"
 #include "../exception_check.hpp"
-#include "../pointer.hpp"
 
 #include "binary_check.hpp"
+
 
 class LispFunc_gt : public virtual LispBuiltin {
   private:

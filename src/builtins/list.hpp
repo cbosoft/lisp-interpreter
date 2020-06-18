@@ -4,7 +4,7 @@
 #include "../debug.hpp"
 #include "../exception.hpp"
 #include "../exception_check.hpp"
-#include "../pointer.hpp"
+
 
 class LispFunc_list : public virtual LispBuiltin {
   private:
@@ -30,7 +30,7 @@ class LispFunc_list : public virtual LispBuiltin {
     LispObject_ptr eval(LispList_ptr arg, LispEnvironment_ptr env) const
     {
       (void) env;
-      return make_ptr(LispObject(arg));
+      return std::make_shared<LispObject>(arg);
     }
 };
 

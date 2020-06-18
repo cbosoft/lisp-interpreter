@@ -4,7 +4,7 @@
 #include "../debug.hpp"
 #include "../exception.hpp"
 #include "../exception_check.hpp"
-#include "../pointer.hpp"
+
 
 class LispFunc_append : public virtual LispBuiltin {
   private:
@@ -34,7 +34,7 @@ class LispFunc_append : public virtual LispBuiltin {
       LispObject_ptr list_obj = arg->next(true);
       type_check_one(list_obj, LISPOBJECT_LIST, this->repr(), "list");
 
-      LispList_ptr rv_list = std::make_shared<LispList>(LispList()), in_list = list_obj->get_value_list();
+      LispList_ptr rv_list = std::make_shared<LispList>(), in_list = list_obj->get_value_list();
       for (auto it = in_list->begin(); it != in_list->end(); ++it) {
         rv_list->append((*it));
       }
@@ -42,6 +42,6 @@ class LispFunc_append : public virtual LispBuiltin {
       for (auto it = ++arg->begin(); it != arg->end(); ++it) {
         rv_list->append((*it));
       }
-      return std::make_shared<LispObject>(LispObject(rv_list));
+      return std::make_shared<LispObject>(rv_list);
     }
 };

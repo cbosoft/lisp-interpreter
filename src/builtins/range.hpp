@@ -2,7 +2,7 @@
 #include "../types.hpp"
 #include "../exception.hpp"
 #include "../exception_check.hpp"
-#include "../pointer.hpp"
+
 
 class LispFunc_range : public virtual LispBuiltin {
   private:
@@ -40,10 +40,10 @@ class LispFunc_range : public virtual LispBuiltin {
       int lower = lower_arg->get_value_atom()->get_value_int();
       int upper = upper_arg->get_value_atom()->get_value_int();
 
-      LispList_ptr range = make_ptr(LispList());
+      LispList_ptr range = std::make_shared<LispList>();
       for (int i = lower; i < upper; i++)
-        range->append(make_ptr(LispObject(i)));
+        range->append(std::make_shared<LispObject>(i));
 
-      return make_ptr(LispObject(range));
+      return std::make_shared<LispObject>(range);
     }
 };

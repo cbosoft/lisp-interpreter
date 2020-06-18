@@ -3,9 +3,6 @@
 #include "../types.hpp"
 #include "../formatter.hpp"
 #include "../exception_check.hpp"
-#include "../pointer.hpp"
-
-
 
 
 class LispFunc_defvar : public virtual LispBuiltin {

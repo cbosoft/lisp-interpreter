@@ -61,37 +61,37 @@ LispObject_ptr LispParser::new_object_guess_type(LispToken_ptr t) {
   std::string s = t->get_token();
 
   debug_message(Formatter() << "GUESSING " << s);
-  LispObject rv;
+  LispObject_ptr rv;
   
   if (s.compare("(") == 0) {
     debug_message(Formatter() << "GUESSING "<< s << "is LIST");
-    LispList_ptr newlist = std::make_shared<LispList>(LispList());
-    rv = LispObject(newlist);
+    LispList_ptr newlist = std::make_shared<LispList>();
+    rv = std::make_shared<LispObject>(newlist);
   }
   else if (this->string_is_int(s)) {
     debug_message(Formatter() << "GUESSING " << s << " is INT");
-    LispAtom_ptr newatom = std::make_shared<LispAtom>(LispAtom( atol(s.c_str()) ));
-    rv = LispObject(newatom);
+    LispAtom_ptr newatom = std::make_shared<LispAtom>(std::stol(s));
+    rv = std::make_shared<LispObject>(newatom);
   }
   else if (this->string_is_float(s)) {
     debug_message(Formatter() << "GUESSING " << s << " is FLOAT");
-    LispAtom_ptr newatom = std::make_shared<LispAtom>(LispAtom( atof(s.c_str()) ));
-    rv = LispObject(newatom);
+    LispAtom_ptr newatom = std::make_shared<LispAtom>(std::stof(s));
+    rv = std::make_shared<LispObject>(newatom);
   }
   else if (this->string_is_string(s)) {
     debug_message(Formatter() << "GUESSING " << s << " is STRING");
     std::string body = s.substr(1, s.length()-2);
-    LispAtom_ptr newatom = std::make_shared<LispAtom>(LispAtom(body));
-    rv = LispObject(newatom);
+    LispAtom_ptr newatom = std::make_shared<LispAtom>(body);
+    rv = std::make_shared<LispObject>(newatom);
   }
   else {
     debug_message(Formatter() << "GUESSING " << s << " is SYMBOL");
-    LispSymbol_ptr newsymbol = std::make_shared<LispSymbol>(LispSymbol(s));
-    rv = LispObject(newsymbol);
+    LispSymbol_ptr newsymbol = std::make_shared<LispSymbol>(s);
+    rv = std::make_shared<LispObject>(newsymbol);
   }
 
-  rv.inherits_from(t);
-  return make_ptr(rv);
+  rv->inherits_from(t);
+  return rv;
 }
 
 
@@ -113,8 +113,8 @@ LispList_ptr LispParser::parse(LispToken_ptr tokens)
     if (token->compare("(") == 0) {
 
       debug_message("opening new list");
-      LispList_ptr newlist = std::make_shared<LispList>(LispList());
-      new_obj = std::make_shared<LispObject>(LispObject(newlist));
+      LispList_ptr newlist = std::make_shared<LispList>();
+      new_obj = std::make_shared<LispObject>(newlist);
       open_lists.top()->append(new_obj);
       open_lists.push(newlist);
       debug_message("after opening new list");

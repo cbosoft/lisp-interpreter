@@ -2,7 +2,6 @@
 #include "../types.hpp"
 #include "../exception.hpp"
 #include "../exception_check.hpp"
-#include "../pointer.hpp"
 
 
 
@@ -45,6 +44,6 @@ class LispFunc_add : public virtual LispBuiltin {
     
       LispAtom_ptr left_atom = left->get_value_atom();
       LispAtom_ptr right_atom = right->get_value_atom();
-      return make_ptr(LispObject(left_atom->add(right_atom)));
+      return std::make_shared<LispObject>(left_atom->add(right_atom));
     }
 };

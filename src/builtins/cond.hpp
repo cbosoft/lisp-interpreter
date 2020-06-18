@@ -4,7 +4,6 @@
 #include "../debug.hpp"
 #include "../exception.hpp"
 #include "../exception_check.hpp"
-#include "../pointer.hpp"
 #include "../singletons.hpp"
 
 
@@ -49,6 +48,6 @@ class LispFunc_cond : public virtual LispBuiltin {
         }
       }
     
-      return std::make_shared<LispObject>(nil);
+      return nil;
     }
 };

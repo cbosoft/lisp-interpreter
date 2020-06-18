@@ -1,5 +1,5 @@
 #pragma once
 #include "types.hpp"
 
-extern LispObject nil;
-extern LispObject t;
+extern LispObject_ptr nil;
+extern LispObject_ptr t;

@@ -2,7 +2,6 @@
 #include "singletons.hpp"
 #include "debug.hpp"
 #include "formatter.hpp"
-#include "pointer.hpp"
 #include "version.hpp"
 
 //#include "builtins.hpp"
@@ -172,16 +171,16 @@ LispEnvironmentRow builtins[] = {
 
   // Variables
   // Standard file descriptors
-	{ "stdin", NULL, make_ptr(LispObject((int)0)), NULL, NULL },
-	{ "stdout", NULL, make_ptr(LispObject((int)1)), NULL, NULL },
-	{ "stderr", NULL, make_ptr(LispObject((int)2)), NULL, NULL },
+	{ "stdin", NULL, std::make_shared<LispObject>((int)0), NULL, NULL },
+	{ "stdout", NULL, std::make_shared<LispObject>((int)1), NULL, NULL },
+	{ "stderr", NULL, std::make_shared<LispObject>((int)2), NULL, NULL },
 
   // true/false
-	{ "nil", "false", make_ptr(nil), NULL, NULL },
-	{ "t", "true", make_ptr(t), NULL, NULL },
+	{ "nil", "false", nil, NULL, NULL },
+	{ "t", "true", t, NULL, NULL },
 
   // Meta
-	{ "_crisp_version", NULL, make_ptr(LispObject(VERSION)), NULL, NULL },
+	{ "_crisp_version", NULL, std::make_shared<LispObject>(VERSION), NULL, NULL },
 
 
 

@@ -7,7 +7,6 @@
 #include "../debug.hpp"
 #include "../exception.hpp"
 #include "../exception_check.hpp"
-#include "../pointer.hpp"
 #include "../singletons.hpp"
 
 
@@ -47,6 +46,6 @@ class LispFunc_print : public virtual LispBuiltin {
       }
 
       std::cout << ss.str() << std::endl;
-      return make_ptr(nil);
+      return nil;
     }
 };

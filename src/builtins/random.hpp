@@ -6,7 +6,6 @@
 #include "../debug.hpp"
 #include "../exception.hpp"
 #include "../exception_check.hpp"
-#include "../pointer.hpp"
 
 
 static std::random_device rd;
@@ -41,7 +40,7 @@ class LispFunc_random : public virtual LispBuiltin {
     {
       (void) env;
       narg_check(arg, 0, this->name, "");
-      return make_ptr(LispObject( float_dist(randgen) ));
+      return std::make_shared<LispObject>(float_dist(randgen));
     }
 };
 
@@ -74,6 +73,6 @@ class LispFunc_randint : public virtual LispBuiltin {
     {
       (void) env;
       narg_check(arg, 0, this->name, "");
-      return make_ptr(LispObject( integer_dist(randgen) ));
+      return std::make_shared<LispObject>( integer_dist(randgen) );
     }
 };

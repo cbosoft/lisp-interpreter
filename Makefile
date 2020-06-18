@@ -2,7 +2,6 @@ CXX = g++
 CFLAGS = -g -Wall -Wextra -std=c++17 -O0
 OBJ = \
 			obj/singletons.o \
-			obj/pointer.o \
 			obj/tokenise.o \
 			obj/parse.o \
 			obj/debug.o \

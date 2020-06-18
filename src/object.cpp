@@ -94,5 +94,5 @@ bool LispObject::is_truthy(LispEnvironment_ptr env)
 
 LispObject::LispObject() {
   this->type = LISPOBJECT_LIST;
-  this->value_list = make_ptr(LispList());
+  this->value_list = std::make_shared<LispList>();
 }

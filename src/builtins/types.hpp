@@ -4,7 +4,6 @@
 #include "../debug.hpp"
 #include "../exception.hpp"
 #include "../exception_check.hpp"
-#include "../pointer.hpp"
 
 
 class LispFunc_is_list : public virtual LispBuiltin {
@@ -34,7 +33,7 @@ class LispFunc_is_list : public virtual LispBuiltin {
     (void) env;
     narg_check(arg, 1, this->repr(), "obj");
     LispObject_ptr obj = arg->next(true);
-    return make_ptr(LispObject(obj->get_type() == LISPOBJECT_LIST));
+    return std::make_shared<LispObject>(obj->get_type() == LISPOBJECT_LIST);
   }
 };
 
@@ -68,7 +67,7 @@ class LispFunc_is_symbol : public virtual LispBuiltin {
     (void) env;
     narg_check(arg, 1, this->repr(), "obj");
     LispObject_ptr obj = arg->next(true);
-    return make_ptr(LispObject(obj->get_type() == LISPOBJECT_SYMBOL));
+    return std::make_shared<LispObject>(obj->get_type() == LISPOBJECT_SYMBOL);
   }
 };
 
@@ -101,7 +100,7 @@ class LispFunc_is_atom : public virtual LispBuiltin {
     (void) env;
     narg_check(arg, 1, this->repr(), "obj");
     LispObject_ptr obj = arg->next(true);
-    return make_ptr(LispObject(obj->get_type() == LISPOBJECT_ATOM));
+    return std::make_shared<LispObject>(obj->get_type() == LISPOBJECT_ATOM);
   }
 };
 
@@ -135,10 +134,10 @@ class LispFunc_is_int : public virtual LispBuiltin {
     narg_check(arg, 1, this->repr(), "obj");
     LispObject_ptr obj = arg->next(true);
     if (obj->get_type() != LISPOBJECT_ATOM)
-      return make_ptr(LispObject(false));
+      return std::make_shared<LispObject>(false);
 
     LispAtom_ptr val = obj->get_value_atom();
-    return make_ptr(LispObject(val->get_type() == LISPATOM_INT));
+    return std::make_shared<LispObject>(val->get_type() == LISPATOM_INT);
   }
 };
 
@@ -172,10 +171,10 @@ class LispFunc_is_float : public virtual LispBuiltin {
     narg_check(arg, 1, this->repr(), "obj");
     LispObject_ptr obj = arg->next(true);
     if (obj->get_type() != LISPOBJECT_ATOM)
-      return make_ptr(LispObject(false));
+      return std::make_shared<LispObject>(false);
 
     LispAtom_ptr val = obj->get_value_atom();
-    return make_ptr(LispObject(val->get_type() == LISPATOM_FLOAT));
+    return std::make_shared<LispObject>(val->get_type() == LISPATOM_FLOAT);
   }
 };
 
@@ -209,9 +208,9 @@ class LispFunc_is_string : public virtual LispBuiltin {
     narg_check(arg, 1, this->repr(), "obj");
     LispObject_ptr obj = arg->next(true);
     if (obj->get_type() != LISPOBJECT_ATOM)
-      return make_ptr(LispObject(false));
+      return std::make_shared<LispObject>(false);
 
     LispAtom_ptr val = obj->get_value_atom();
-    return make_ptr(LispObject(val->get_type() == LISPATOM_STRING));
+    return std::make_shared<LispObject>(val->get_type() == LISPATOM_STRING);
   }
 };

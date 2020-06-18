@@ -8,7 +8,6 @@
 #include "../debug.hpp"
 #include "../exception.hpp"
 #include "../exception_check.hpp"
-#include "../pointer.hpp"
 
 
 class LispFunc_with_open : public virtual LispBuiltin {
@@ -85,8 +84,8 @@ class LispFunc_with_open : public virtual LispBuiltin {
       if (fd < 0)
         throw IOError(Formatter() << "Could not open file \"" << path_atom->get_value_string() << "\" (" << errno << ") " << strerror(errno));
     
-      LispEnvironment_ptr subenv = make_ptr(LispEnvironment(env, true));
-      subenv->add(name_symb->get_name(), make_ptr(LispObject((long)fd)));
+      LispEnvironment_ptr subenv = std::make_shared<LispEnvironment>(env, true);
+      subenv->add(name_symb->get_name(), std::make_shared<LispObject>((long)fd));
     
       LispList_ptr body = arg->rest(3);
       LispObject_ptr rv = body->eval_each(subenv);
@@ -94,6 +93,7 @@ class LispFunc_with_open : public virtual LispBuiltin {
       return rv;
     }
 };
+
 
 class LispFunc_write : public virtual LispBuiltin{
   private:
@@ -141,7 +141,7 @@ class LispFunc_write : public virtual LispBuiltin{
           throw IOError(Formatter() << "Error writing to fd " << fd << " (" << errno << ") " << strerror(errno));
       }
 
-      return make_ptr(LispObject(tot_written.str()));
+      return std::make_shared<LispObject>(tot_written.str());
     }
 };
 
@@ -190,7 +190,7 @@ class LispFunc_read : public virtual LispBuiltin {
       if (rv < 0)
         throw IOError(Formatter() << "Error reading file descriptor " << fd << " (" << errno << ") " << strerror(errno));
 
-      return make_ptr(LispObject(ss.str()));
+      return std::make_shared<LispObject>(ss.str());
     }
 
 };

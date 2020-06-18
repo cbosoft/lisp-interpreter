@@ -4,7 +4,7 @@
 #include "../debug.hpp"
 #include "../exception.hpp"
 #include "../exception_check.hpp"
-#include "../pointer.hpp"
+
 
 class LispFunc_modulo : public virtual LispBuiltin {
   private:
@@ -41,6 +41,6 @@ class LispFunc_modulo : public virtual LispBuiltin {
       type_check_one(right_obj, LISPOBJECT_ATOM, this->name, "right");
       LispAtom_ptr right_atom = right_obj->get_value_atom();
 
-      return make_ptr(LispObject(left_atom->modulo(right_atom)));
+      return std::make_shared<LispObject>(left_atom->modulo(right_atom));
     }
 };

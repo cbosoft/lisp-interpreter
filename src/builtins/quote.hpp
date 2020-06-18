@@ -3,6 +3,7 @@
 #include "../exception.hpp"
 #include "../exception_check.hpp"
 
+
 class LispFunc_quote : public virtual LispBuiltin {
   private:
     inline static const std::string name = "quote";

@@ -4,7 +4,6 @@
 #include "../debug.hpp"
 #include "../exception.hpp"
 #include "../exception_check.hpp"
-#include "../pointer.hpp"
 
 
 class LispFunc_subtract : public virtual LispBuiltin {
@@ -43,6 +42,6 @@ class LispFunc_subtract : public virtual LispBuiltin {
       type_check_one(right, LISPOBJECT_ATOM, this->name, "right");
       LispAtom_ptr right_atom = right->get_value_atom();
     
-      return make_ptr(LispObject(left_atom->subtract(right_atom)));
+      return std::make_shared<LispObject>(left_atom->subtract(right_atom));
     }
 };

@@ -1,5 +1,4 @@
 #include "types.hpp"
-#include "pointer.hpp"
 
-LispObject t = LispObject(true);
-LispObject nil = LispObject(make_ptr(LispList()));
+LispObject_ptr t = std::make_shared<LispObject>(true);
+LispObject_ptr nil = std::make_shared<LispObject>(std::make_shared<LispList>());

@@ -3,7 +3,7 @@
 #include "../exception.hpp"
 #include "../formatter.hpp"
 #include "../exception_check.hpp"
-#include "../pointer.hpp"
+
 
 class LispFunc_doc : public virtual LispBuiltin {
   private:
