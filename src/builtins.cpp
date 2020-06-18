@@ -40,6 +40,8 @@
 #include "builtins/doc.hpp"
 
 #include "builtins/thread.hpp"
+#include "builtins/sleep.hpp"
+
 static LispFunc_defun lispfunc_defun = LispFunc_defun();
 static LispFunc_defmacro lispfunc_defmacro = LispFunc_defmacro();
 static LispFunc_defvar lispfunc_defvar = LispFunc_defvar();
@@ -93,6 +95,8 @@ static LispFunc_doc lispfunc_doc = LispFunc_doc();
 
 static LispFunc_thread lispfunc_thread = LispFunc_thread();
 static LispFunc_join lispfunc_join = LispFunc_join();
+
+static LispFunc_sleep lispfunc_sleep = LispFunc_sleep();
 
 // builtins are enumerated here, and referred to in the global env setup
 LispEnvironmentRow builtins[] = {
@@ -160,6 +164,9 @@ LispEnvironmentRow builtins[] = {
   // Threading functions
   {"thread", NULL, NULL, (LispBuiltin *)(&lispfunc_thread), NULL},
   {"join", NULL, NULL, (LispBuiltin *)(&lispfunc_join), NULL},
+
+  // Timing functions
+  {"sleep", NULL, NULL, (LispBuiltin *)(&lispfunc_sleep), NULL},
 
 
 
