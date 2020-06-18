@@ -39,6 +39,7 @@
 #include "builtins/exit.hpp"
 #include "builtins/doc.hpp"
 
+#include "builtins/thread.hpp"
 static LispFunc_defun lispfunc_defun = LispFunc_defun();
 static LispFunc_defmacro lispfunc_defmacro = LispFunc_defmacro();
 static LispFunc_defvar lispfunc_defvar = LispFunc_defvar();
@@ -89,6 +90,9 @@ static LispFunc_eval_file lispfunc_eval_file = LispFunc_eval_file();
 static LispFunc_quote lispfunc_quote = LispFunc_quote();
 static LispFunc_exit lispfunc_exit = LispFunc_exit();
 static LispFunc_doc lispfunc_doc = LispFunc_doc();
+
+static LispFunc_thread lispfunc_thread = LispFunc_thread();
+static LispFunc_join lispfunc_join = LispFunc_join();
 
 // builtins are enumerated here, and referred to in the global env setup
 LispEnvironmentRow builtins[] = {
@@ -152,6 +156,10 @@ LispEnvironmentRow builtins[] = {
   {"quote", NULL, NULL, (LispBuiltin *)(&lispfunc_quote), NULL},
   {"exit", NULL, NULL, (LispBuiltin *)(&lispfunc_exit), NULL},
   {"doc", NULL, NULL, (LispBuiltin *)(&lispfunc_doc), NULL},
+
+  // Threading functions
+  {"thread", NULL, NULL, (LispBuiltin *)(&lispfunc_thread), NULL},
+  {"join", NULL, NULL, (LispBuiltin *)(&lispfunc_join), NULL},
 
 
 

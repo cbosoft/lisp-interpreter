@@ -21,7 +21,7 @@ HDRS = \
   		src/types.hpp \
 			src/exception.hpp
 
-LINK = -ledit -lncurses -lgc -lpcre
+LINK = -ledit -lncurses -lgc -lpcre -lpthread
 
 .PHONY: default
 
