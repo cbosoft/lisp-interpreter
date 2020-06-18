@@ -10,6 +10,7 @@
 
 
 static std::map<int, std::thread> threads_map;
+static std::map<int, LispFunction_ptr> threaded_funcs_map;
 
 
 
@@ -51,6 +52,7 @@ class LispFunc_thread : public virtual LispBuiltin {
         case LISPENV_LFUNC:
           debug_message("running lfunc in other thread");
           threads_map[id] = std::thread(&LispFunction::eval, lfunc, arg->rest(1), env);
+          threaded_funcs_map[id] = lfunc;
           break;
 
         case LISPENV_BFUNC:
@@ -101,16 +103,29 @@ class LispFunc_join : public virtual LispBuiltin {
 
       int id = id_obj->get_value_atom()->get_value_int();
 
-      std::thread t;
-      auto it = threads_map.find(id);
+      {
+        std::thread t;
+        auto it = threads_map.find(id);
 
-      if (it == threads_map.end())
-        throw EnvironmentError(Formatter() << "thread with ID " << id << "not found.");
+        if (it == threads_map.end())
+          throw EnvironmentError(Formatter() << "thread with ID " << id << "not found.");
 
-      t.swap(it->second);
-      threads_map.erase(it);
-      t.join();
+        t.swap(it->second);
+        threads_map.erase(it);
+        t.join();
+      }
 
-      return std::make_shared<LispObject>(true);
+      LispObject_ptr result;
+      {
+        auto it = threaded_funcs_map.find(id);
+
+        if (it == threaded_funcs_map.end())
+          throw EnvironmentError(Formatter() << "thread with ID " << id << "not found.");
+
+        result = it->second->get_result();
+        threaded_funcs_map.erase(it);
+      }
+
+      return result;
     }
 };

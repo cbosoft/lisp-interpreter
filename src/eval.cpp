@@ -144,7 +144,8 @@ LispObject_ptr LispFunction::eval(LispList_ptr arg, LispEnvironment_ptr env) con
     subenv->add((*argname_iter), (*arg_iter));
   }
 
-  return this->body->eval_each(subenv);
+  this->result = this->body->eval_each(subenv);
+  return this->result;
 }
 
 
