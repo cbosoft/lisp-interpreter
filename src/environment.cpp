@@ -93,28 +93,28 @@ LispEnvironment::LispEnvironment()
 LispEnvironment_Type LispEnvironment::get(std::string name, LispObject_ptr *obj, LispBuiltin_ptr *bf, LispFunction_ptr *lf)
 {
   debug_message(Formatter() << "looking for \"" << name << "\" in environment");
-  (*obj) = NULL;
-  (*bf) = NULL;
-  (*lf) = NULL;
+  if (obj) (*obj) = NULL;
+  if (bf) (*bf) = NULL;
+  if (lf) (*lf) = NULL;
 
   auto obj_iter = this->objects_map.find(name);
   if (obj_iter != this->objects_map.end()) {
     debug_message(Formatter() << "found \"" << name << "\" in environment as object");
-    (*obj) = obj_iter->second;
+    if (obj) (*obj) = obj_iter->second;
     return LISPENV_OBJ;
   }
 
   auto bf_iter = this->builtin_functions_map.find(name);
   if (bf_iter != this->builtin_functions_map.end()) {
     debug_message(Formatter() << "found \"" << name << "\" in environment as builtin function");
-    (*bf) = bf_iter->second;
+    if (bf) (*bf) = bf_iter->second;
     return LISPENV_BFUNC;
   }
 
   auto lf_iter = this->lisp_functions_map.find(name);
   if (lf_iter != this->lisp_functions_map.end()) {
     debug_message(Formatter() << "found \"" << name << "\" in environment as lisp function");
-    (*lf) = lf_iter->second;
+    if (lf) (*lf) = lf_iter->second;
     return LISPENV_LFUNC;
   }
 
