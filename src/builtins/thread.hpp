@@ -47,7 +47,8 @@ class LispFunc_thread : public virtual LispBuiltin {
       std::string symname = func_name->get_value_symbol()->get_name();
       auto type = env->get(symname, nullptr, &bfunc, &lfunc);
 
-      int id = threads_map.size();
+      static int id = -1;
+      id ++;
       switch (type) {
         case LISPENV_LFUNC:
           debug_message("running lfunc in other thread");
