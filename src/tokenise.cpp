@@ -67,9 +67,10 @@ LispToken_ptr tokenise(std::string input, TraceSource proto_source)
   unsigned long i = 0;
 
   std::stringstream kw_or_name_builder;
-  bool in_quote = false, add_close_parens_on_break = false;
+  bool in_quote=false, in_str=false, add_close_parens_on_break = false;
   int parens_level = 0, add_close_parens_on_parens = -1;
   int row = 0, col = 0;
+  bool leading_space = true;
   TraceSource new_source;
 
   LispToken_ptr rv, current_token, new_token;
@@ -81,11 +82,12 @@ LispToken_ptr tokenise(std::string input, TraceSource proto_source)
       for (;input[i] != '\n' && i < input.length(); i++);
       col = 0;
       row ++;
+      leading_space = true;
       continue;
     }
     
     // if breaking char: space, newline, or parens
-    if (( IS_WHITESPACE(ch) || (ch == ')') || (ch == '(') || (ch == '\'')) && !in_quote) {
+    if (( IS_WHITESPACE(ch) || (ch == ')') || (ch == '(') || (ch == '\'')) and (not in_quote) and (not in_str)) {
 
       // finish reading keyword or name
       if (kw_or_name_builder.str().length()) {
@@ -143,15 +145,38 @@ LispToken_ptr tokenise(std::string input, TraceSource proto_source)
           row ++;
           col = 0;
           break;
+
       }
 
     }
     else {
 
-      if (ch == '"')
-        in_quote = !in_quote;
+      switch (ch) {
 
-      kw_or_name_builder << ch;
+        case '"':
+          in_quote = !in_quote;
+          in_str = !in_str;
+          break;
+
+        case '\n':
+          leading_space = true;
+          kw_or_name_builder << ch;
+          break;
+      }
+      
+
+      // TODO this is a bit messy; could definitely be tidied up
+      if (in_str) {
+
+        if (not (IS_WHITESPACE(ch) and leading_space)) {
+          leading_space = false;
+          kw_or_name_builder << ch;
+        }
+
+      }
+      else {
+        kw_or_name_builder << ch;
+      }
 
     }
 

@@ -16,7 +16,7 @@
 LispParser::LispParser() {
   this->string_is_int_re = std::regex("^-?\\d+$");
   this->string_is_float_re = std::regex("^-?\\d+(\\.|e\\+|e-|e)\\d+$");
-  this->string_is_string_re = std::regex("^\".*\"$");
+  this->string_is_string_re = std::regex("\".*\"", std::regex::extended);
 
   std::string home(getenv("HOME"));
   std::stringstream ss;
