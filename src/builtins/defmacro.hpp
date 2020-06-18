@@ -21,7 +21,7 @@ class LispFunc_defmacro : LispBuiltin {
       this->set_macro();
     }
 
-    std::string repr() const
+    const std::string repr() const
     {
       return "Macro(defmacro,builtin)";
     }

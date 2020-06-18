@@ -4,7 +4,7 @@
 
 
 // Convert object to string.
-std::string LispObject::str()
+const std::string LispObject::str() const
 {
 
   switch (this->type) {
@@ -25,7 +25,7 @@ std::string LispObject::str()
 
 
 // Gets a string representation of the object's value.
-std::string LispObject::repr() const
+const std::string LispObject::repr() const
 {
 
   switch (this->type) {

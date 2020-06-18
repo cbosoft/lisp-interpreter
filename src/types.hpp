@@ -24,8 +24,8 @@ enum LispAtom_Type {
 class Printable {
   public:
     Printable(){};
-    virtual std::string repr(){ throw NotImplementedError("In Printable::repr(): virtual function not implemented: intended to be used by sub class."); }
-    virtual std::string str(){ throw NotImplementedError("In Printable::str(): virtual function not implemented: intended to be used by sub class."); }
+    virtual const std::string repr() const{ throw NotImplementedError("In Printable::repr(): virtual function not implemented: intended to be used by sub class."); }
+    virtual const std::string str() const{ throw NotImplementedError("In Printable::str(): virtual function not implemented: intended to be used by sub class."); }
     void print(){ this->_print(); std::cout << std::endl; };
     virtual void _print() { std::cout << this->repr() << " "; }
 };
@@ -77,8 +77,8 @@ class LispAtom : virtual public Printable {
     LispAtom(const char* value) : LispAtom(std::string(value)) {};
 
     LispAtom_Type get_type() { return this->type; }
-    std::string str();
-    std::string repr();
+    const std::string str() const;
+    const std::string repr() const;
     std::string repr_type();
     static std::string repr_type(LispAtom_Type& type);
     long get_value_int(){ return this->value_int; }
@@ -119,8 +119,8 @@ class LispSymbol : virtual public Printable{
     LispSymbol() {};
     LispSymbol(std::string name){ this->name = name; }
     std::string get_name(){ return this->name; }
-    std::string repr() { return this->name; }
-    std::string str() {return this->name; }
+    const std::string repr() const override { return this->name; }
+    const std::string str() const override {return this->name; }
 };
 
 
@@ -204,8 +204,8 @@ class LispObject : virtual public Printable, public Traceable, virtual public Do
   public:
     LispObject();
 
-    std::string str();
-    std::string repr() const;
+    const std::string str() const override;
+    const std::string repr() const override;
     std::string repr_type();
     std::string static repr_type(LispObject_Type type);
 

@@ -54,7 +54,7 @@ LispAtom::LispAtom(std::string s)
 
 
 
-std::string LispAtom::str()
+const std::string LispAtom::str() const
 {
   std::stringstream ss;
   switch (this->type) {
@@ -81,7 +81,7 @@ std::string LispAtom::str()
 
 
 
-std::string LispAtom::repr()
+const std::string LispAtom::repr() const
 {
   std::stringstream ss;
   switch (this->type) {
