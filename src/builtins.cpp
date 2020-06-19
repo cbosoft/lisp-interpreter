@@ -39,7 +39,11 @@
 #include "builtins/doc.hpp"
 
 #include "builtins/thread.hpp"
+
 #include "builtins/sleep.hpp"
+
+#include "builtins/catch.hpp"
+#include "builtins/throw.hpp"
 
 static LispFunc_defun lispfunc_defun = LispFunc_defun();
 static LispFunc_defmacro lispfunc_defmacro = LispFunc_defmacro();
@@ -96,6 +100,9 @@ static LispFunc_thread lispfunc_thread = LispFunc_thread();
 static LispFunc_join lispfunc_join = LispFunc_join();
 
 static LispFunc_sleep lispfunc_sleep = LispFunc_sleep();
+
+static LispFunc_catch lispfunc_catch = LispFunc_catch();
+static LispFunc_throw lispfunc_throw = LispFunc_throw();
 
 // builtins are enumerated here, and referred to in the global env setup
 LispEnvironmentRow builtins[] = {
@@ -166,6 +173,10 @@ LispEnvironmentRow builtins[] = {
 
   // Timing functions
   {"sleep", NULL, NULL, (LispBuiltin *)(&lispfunc_sleep), NULL},
+
+  // Exception functions
+  {"catch", NULL, NULL, (LispBuiltin *)(&lispfunc_catch), NULL},
+  {"throw", NULL, NULL, (LispBuiltin *)(&lispfunc_throw), NULL},
 
 
 

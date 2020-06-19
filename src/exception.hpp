@@ -13,6 +13,7 @@ class Exception : public std::exception {
     std::string type = "";
     std::string cause = "";
     bool cause_set;
+
   public:
     Exception(std::string detail, std::string type, std::string cause) 
     { 
@@ -29,9 +30,15 @@ class Exception : public std::exception {
       this->cause_set = false;
     }
 
-    void pretty_print() const {
+    void pretty_print() const
+    {
       std::cerr << BOLD << BG_RED << this->type << RESET << ": " << this->detail << std::endl;
       std::cerr << this->cause << std::endl;
+    }
+
+    const std::string &get_type() const
+    {
+      return this->type;
     }
 };
 
