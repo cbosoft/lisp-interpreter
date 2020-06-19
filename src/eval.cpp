@@ -4,9 +4,9 @@
 #include "types.hpp"
 #include "debug.hpp"
 #include "formatter.hpp"
+#include "singletons.hpp"
 
 
-extern LispObject nil;
 
 
 LispObject_ptr LispObject::eval(LispEnvironment_ptr env)
@@ -19,7 +19,7 @@ LispObject_ptr LispObject::eval(LispEnvironment_ptr env)
   LispBuiltin_ptr var_bfunc;
   LispFunction_ptr var_lfunc;
   std::list<LispObject_ptr>::const_iterator list_elem, list_iter;
-
+  int count = -1;
 
   if (env == NULL) throw AuthorError(Formatter() << "Eval called without environment.");
 
@@ -34,9 +34,10 @@ LispObject_ptr LispObject::eval(LispEnvironment_ptr env)
   case LISPOBJECT_LIST:
     list_obj = this->value_list;
     
-    debug_message(Formatter() << "list has size " << list_obj->count());
-    if (list_obj->count() == 0)
-      return std::make_shared<LispObject>(nil); // TODO use the same shared ptr for all nil?
+    count = list_obj->count();
+    debug_message(Formatter() << "list has size " << count);
+    if (count == 0)
+      return nil; // TODO use the same shared ptr for all nil?
 
     //debug_message(Formatter() << "list child is " << list_obj->first()->repr_type()); // invalid: child is eval'd before checking
 
