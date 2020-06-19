@@ -2,6 +2,18 @@
 
 (import 'test)
 
+
+;; definition tests
+(defun definition-test (result expected)
+  "Variable definition test"
+  (defvar testname (format "{0} == {1}" result expected))
+  (if (= result expected)
+    (pass-test testname)
+    (fail-test testname "Variables not equal.")))
+
+(run-test-suite 'definition-test
+                '(( () (list) )))
+
 (defun addition-test (left right expected)
   "Addition test"
   (defvar result (+ left right))
