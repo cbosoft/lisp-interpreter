@@ -28,6 +28,7 @@
 extern int DEBUG_MODE;
 int INTERACTIVE_MODE = 0;
 int EXECUTED_FILE_OR_CLI_STRING = 0;
+int rv = 0;
 
 // BOO: GLOBALS
 LispParser parser;
@@ -58,6 +59,10 @@ int main(int argc, char **argv)
     ex.pretty_print();
     exit(1);
   }
+  catch (const LispObject_ptr& o) {
+    std::cerr << BG_RED "Uncaught thrown object" RESET ": " << o->str() << "." << std::endl;
+    exit(1);
+  }
 
   LispList_ptr root = NULL;
   LispObject_ptr result = NULL;
@@ -73,6 +78,9 @@ int main(int argc, char **argv)
       catch (const Exception& ex) {
         ex.pretty_print();
       }
+      catch (const LispObject_ptr& o) {
+        std::cerr << BG_RED "Uncaught thrown object" RESET ": " << o->str() << "." << std::endl;
+      }
     }
     else if (EITHER(argv[i], "-c", "--command")) {
       EXECUTED_FILE_OR_CLI_STRING = 1;
@@ -83,6 +91,9 @@ int main(int argc, char **argv)
       }
       catch (const Exception& ex) {
         ex.pretty_print();
+      }
+      catch (const LispObject_ptr& o) {
+        std::cerr << BG_RED "Uncaught thrown object" RESET ": " << o->str() << "." << std::endl;
       }
     }
     else if (
@@ -99,12 +110,17 @@ int main(int argc, char **argv)
       }
       catch (const Exception& ex) {
         ex.pretty_print();
+        rv = 1;
+      }
+      catch (const LispObject_ptr& o) {
+        std::cerr << BG_RED "Uncaught thrown object" RESET ": " << o->str() << "." << std::endl;
+        rv = 1;
       }
     }
 
   }
 
-  if (EXECUTED_FILE_OR_CLI_STRING && !INTERACTIVE_MODE) return 0;
+  if (EXECUTED_FILE_OR_CLI_STRING && !INTERACTIVE_MODE) return rv;
 
   display_splash();
 
@@ -165,6 +181,9 @@ int main(int argc, char **argv)
     }
     catch (const Exception& ex) {
       ex.pretty_print();
+    }
+    catch (const LispObject_ptr& o) {
+      std::cerr << BG_RED "Uncaught thrown object" RESET ": " << o->str() << "." << std::endl;
     }
 
     // eval, print, loop
