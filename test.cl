@@ -73,4 +73,23 @@
 (thread-test)
 
 
+(defun default-value-test (args expectation)
+  "Default value test"
+  (defun f (a b c) (1 2)
+    "doc"
+    (+ (+ a b) c))
+  (defvar result (eval (insert 'f args)))
+  (defvar testname (format "default value: {0} == {1} ?" result expectation))
+  (if (= result expectation)
+    (pass-test testname)
+    (fail-test testname "error")))
+
+(run-test-suite 'default-value-test 
+                '(
+                   ( (list 3) 6 )
+                   ( (list 2 1) 5 )
+                   ( (list 1 1 2) 4 )
+                  ))
+
+
 (print "all tests passed!")
