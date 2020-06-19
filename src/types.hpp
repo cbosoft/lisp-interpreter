@@ -275,7 +275,7 @@ class LispList : virtual public Printable {
       if (it == this->end())
         return std::make_shared<LispList>();
 
-      return std::make_shared<LispList>(LispList(it, this->end())); 
+      return std::make_shared<LispList>(it, this->end()); 
     }
 
     int count() const { return this->obj_list.size(); }
@@ -378,6 +378,21 @@ class LispEnvironment {
     { 
       this->parent = parent; 
       this->readonly = readonly; 
+    }
+
+    static std::string repr_type(LispEnvironment_Type type) {
+
+      switch (type) {
+        case LISPENV_OBJ:
+          return "object";
+        case LISPENV_LFUNC:
+        case LISPENV_BFUNC:
+          return "function";
+        case LISPENV_NOTFOUND:
+          return "absent";
+      }
+
+      throw AuthorError("EnvType not handled in LispEnvironment::repr_type");
     }
 
     void add(std::string name, LispObject_ptr obj);
