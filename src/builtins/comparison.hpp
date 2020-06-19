@@ -157,32 +157,6 @@ class LispFunc_eq : public virtual LispBuiltin {
       LispObject_ptr left_obj = arg->next(true);\
       LispObject_ptr right_obj = arg->next();\
 
-      auto left_type = left_obj->get_type();
-      auto right_type = right_obj->get_type();
-
-      if (left_type != right_type)
-        return std::make_shared<LispObject>(false);
-
-      auto type = left_type;
-
-      LispAtom_ptr left_atom, right_atom;
-
-      switch (type) {
-        case LISPOBJECT_ATOM:
-          type_check_one(left_obj, LISPOBJECT_ATOM, this->name, "left");\
-          left_atom = left_obj->get_value_atom();\
-          type_check_one(right_obj, LISPOBJECT_ATOM, this->name, "right");\
-          right_atom = right_obj->get_value_atom();
-          return std::make_shared<LispObject>(left_atom->eq(right_atom));
-
-        case LISPOBJECT_SYMBOL:
-          return std::make_shared<LispObject>(
-              left_obj->get_value_symbol()->get_name() == right_obj->get_value_symbol()->get_name());
-
-        case LISPOBJECT_LIST:
-          throw NotImplementedError(Formatter() << "List comparison not yet implemented.");
-      }
-
-      return std::make_shared<LispObject>(false);
+      return std::make_shared<LispObject>(left_obj->eq(right_obj));
     }
 };

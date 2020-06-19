@@ -46,7 +46,7 @@ const std::string LispObject::repr() const
 
 
 // Gets a string representation of the object's type (Atom, Symbol or List)
-std::string LispObject::repr_type()
+std::string LispObject::repr_type() const
 {
   return this->repr_type(this->type);
 }
@@ -95,4 +95,30 @@ bool LispObject::is_truthy(LispEnvironment_ptr env)
 LispObject::LispObject() {
   this->type = LISPOBJECT_LIST;
   this->value_list = std::make_shared<LispList>();
+}
+
+
+
+bool LispObject::eq(const LispObject_ptr &other) const
+{
+  auto this_type = this->get_type();
+  auto other_type = other->get_type();
+
+  if (this_type != other_type)
+    return false;
+
+  auto type = this_type;
+
+  switch (type) {
+    case LISPOBJECT_ATOM:
+      return this->get_value_atom()->eq(other->get_value_atom())->is_truthy();
+
+    case LISPOBJECT_SYMBOL:
+      return this->get_value_symbol()->get_name() == other->get_value_symbol()->get_name();
+
+    case LISPOBJECT_LIST:
+      return this->get_value_list()->eq(other->get_value_list());
+  }
+
+  throw AuthorError("Unhandled type in LispObject::eq.");
 }

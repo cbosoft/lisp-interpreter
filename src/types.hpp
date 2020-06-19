@@ -205,10 +205,10 @@ class LispObject : virtual public Printable, public Traceable, virtual public Do
 
     const std::string str() const override;
     const std::string repr() const override;
-    std::string repr_type();
+    std::string repr_type() const;
     std::string static repr_type(LispObject_Type type);
 
-    LispObject_Type get_type(){ return this->type; }
+    LispObject_Type get_type() const { return this->type; }
     LispObject_ptr eval(LispEnvironment_ptr env);
 
     template<typename T>
@@ -222,10 +222,14 @@ class LispObject : virtual public Printable, public Traceable, virtual public Do
     void set_value(LispSymbol_ptr symbol) {this->value_symbol = symbol; }
 
     LispAtom_ptr get_value_atom() { return this->value_atom; }
+    const LispAtom_ptr get_value_atom() const { return this->value_atom; }
     LispList_ptr get_value_list() { return this->value_list; }
+    const LispList_ptr get_value_list() const { return this->value_list; }
     LispSymbol_ptr get_value_symbol() { return this->value_symbol; }
+    const LispSymbol_ptr get_value_symbol() const { return this->value_symbol; }
 
     bool is_truthy(LispEnvironment_ptr env=nullptr);
+    bool eq(const LispObject_ptr &other) const;
 
     const std::string get_doc() const override { return (this->doc.size() ? this->doc : this->repr()); }
     void set_doc(std::string s) { this->doc = s; }
@@ -274,10 +278,26 @@ class LispList : virtual public Printable {
       return std::make_shared<LispList>(LispList(it, this->end())); 
     }
 
-    int count() { return this->obj_list.size(); }
+    int count() const { return this->obj_list.size(); }
     void append(LispObject_ptr next_value) { this->obj_list.push_back(next_value); }
     std::string repr();
     std::string str();
+    bool eq(const LispList_ptr &other) const
+    {
+
+      if (this->count() != other->count()) {
+        return false;
+      }
+
+      auto itthis = this->begin(), itother = other->begin();
+      for (; (itthis != this->end()) and (itother != other->end()); itthis++,itother++) {
+        auto objthis = (*itthis), objother = (*itother);
+        if (not objthis->eq(objother))
+          return false;
+      }
+
+      return true;
+    }
 
     LispObject_ptr eval_each(LispEnvironment_ptr env) const;
 };
