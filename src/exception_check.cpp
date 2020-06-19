@@ -39,6 +39,16 @@ void type_check_atom(LispObject_ptr obj, LispAtom_Type type, std::string in, std
     throw TypeError(Formatter() << "In " << in << ": Argument \"" << arg << "\" should be " << LispAtom::repr_type(type) << ". Got " << LispAtom::repr_type(atom_type) << ".");
 }
 
+void type_check_symbol(LispObject_ptr obj, LispEnvironment_Type type, std::string in, std::string arg, LispEnvironment_ptr env)
+{
+  if (obj->get_type() != LISPOBJECT_SYMBOL)
+    throw TypeError(Formatter() << "In " << in << ": Argument \"" << arg << "\" should be " << LispEnvironment::repr_type(type) << ". Got " << obj->repr_type() << ".");
+
+  LispEnvironment_Type symtype = env->get(obj, nullptr, nullptr, nullptr);
+  if (symtype != type)
+    throw TypeError(Formatter() << "In " << in << ": Argument \"" << arg << "\" should be " << LispEnvironment::repr_type(type) << ". Got " << LispEnvironment::repr_type(symtype) << ".");
+}
+
 void narg_check(LispList_ptr arg, int expected_nargs, std::string in, std::string argnames)
 {
   int nargs = arg->count();
