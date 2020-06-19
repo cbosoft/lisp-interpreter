@@ -91,5 +91,25 @@
                    ( (list 1 1 2) 4 )
                   ))
 
+(defun simple-callback (type)
+  "returns arg"
+  type)
 
-(print "all tests passed!")
+(defun callback-test (f args expectation)
+  "calls F on ARGS, catching exceptions and checking against RESULT"
+  (defvar result (catch "DivideByZeroError" simple-callback ("DivideByZeroError")
+                        (catch "ArgumentError" simple-callback ("ArgumentError")
+                               (apply 'f 'args))))
+  (if (= result expectation)
+    (pass-test "throw-catch test")
+    (fail-test "throw-catch test" "reasons")))
+
+(run-test-suite 'callback-test
+                '(
+                  ('divide (list 1 2) 0)
+                  ('divide (list 1 0) "DivideByZeroError")
+                  ('throw (list "DivideByZeroError") "DivideByZeroError")
+                  ))
+
+
+(print "All tests passed!")
