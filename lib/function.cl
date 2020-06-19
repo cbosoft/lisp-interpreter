@@ -1,5 +1,7 @@
 ;; crisp function operations library
 
+(import 'list)
+
 
 (defun apply (f args)
   "Apply function F to ARGS."
