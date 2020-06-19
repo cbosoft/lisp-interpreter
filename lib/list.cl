@@ -13,4 +13,14 @@
   (concat (list e) l))
 
 
+(defun count (l)
+  "Count elements of list L."
+  (defun --count-iter (rl i)
+    ""
+    (if (rest rl)
+      (--count-iter (rest rl) (+ i 1))
+      (+ i 1)))
+  (--count-iter l 0))
+
+
 ;; crisp list op library ends here
