@@ -385,7 +385,12 @@ class LispEnvironment {
     void add(std::string name, LispFunction_ptr val);
     void add_something(std::string name, LispObject_ptr obj, LispBuiltin_ptr bfunc, LispFunction_ptr lfunc);
 
+    LispEnvironment_Type get(LispSymbol_ptr sym, LispObject_ptr *obj, LispBuiltin_ptr *bf, LispFunction_ptr *lf);
+    LispEnvironment_Type get(LispObject_ptr sym, LispObject_ptr *obj, LispBuiltin_ptr *bf, LispFunction_ptr *lf);
     LispEnvironment_Type get(std::string name, LispObject_ptr *obj, LispBuiltin_ptr *bf, LispFunction_ptr *lf);
+    LispEnvironment_ptr get_parent() const {
+      return this->parent;
+    }
 
 };
 

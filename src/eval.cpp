@@ -27,7 +27,7 @@ LispObject_ptr LispObject::eval(LispEnvironment_ptr env)
   switch (this->type) {
 
   case LISPOBJECT_SYMBOL:
-    if (env->get(this->value_symbol->get_name(), &var_obj, &var_bfunc, &var_lfunc) != LISPENV_OBJ)
+    if (env->get(this->value_symbol, &var_obj, &var_bfunc, &var_lfunc) != LISPENV_OBJ)
       throw NameError(Formatter() << "Symbol " << this->value_symbol->get_name() << " has no value as variable.");
     return var_obj;
 
@@ -37,7 +37,7 @@ LispObject_ptr LispObject::eval(LispEnvironment_ptr env)
     count = list_obj->count();
     debug_message(Formatter() << "list has size " << count);
     if (count == 0)
-      return nil; // TODO use the same shared ptr for all nil?
+      return nil;
 
     //debug_message(Formatter() << "list child is " << list_obj->first()->repr_type()); // invalid: child is eval'd before checking
 
@@ -61,16 +61,18 @@ LispObject_ptr LispObject::eval(LispEnvironment_ptr env)
       fn = fn->eval(env);
       debug_message(Formatter() << "AFTER");
     }
+
     if (fn->get_type() != LISPOBJECT_SYMBOL) throw SyntaxError(Formatter() << "List called as a function must start with a Symbol.");
     fname = fn->get_value_symbol()->get_name();
 
     debug_message(Formatter() << "applying function \"" << fname << "\".");
 
-    if (env->get(fname, &var_obj, &var_bfunc, &var_lfunc) < 0) throw NameError(Formatter() << "Object \"" << fname << "\" not found in environment.");
+    if (env->get(fn, &var_obj, &var_bfunc, &var_lfunc) == LISPENV_NOTFOUND)
+      throw NameError(Formatter() << "Object \"" << fname << "\" not found in environment.");
 
     if (var_lfunc != NULL) {
       debug_message(Formatter() << "symbol " << fn->value_symbol << " is lisp function");
-      
+
       if (var_lfunc->is_macro()) {
         list_args = list_obj->rest();
       }
@@ -84,7 +86,7 @@ LispObject_ptr LispObject::eval(LispEnvironment_ptr env)
       return var_lfunc->eval(list_args, env);
     }
     else if (var_bfunc != NULL) {
-      
+
       if (var_bfunc->is_macro()) {
         debug_message(Formatter() << "symbol " << fn->value_symbol << " is builtin (macro)");
 
@@ -104,13 +106,13 @@ LispObject_ptr LispObject::eval(LispEnvironment_ptr env)
     else {
       throw NameError(Formatter() << "Object \"" << fname << "\" has no value as function.");
     }
-    
+
     break;
 
   default:
     break;
   }
-  
+
   // default: root is atom (float, int, string, bool...)
   return std::make_shared<LispObject>(LispObject(*this)); // should return self? Or copy of self?
 }
