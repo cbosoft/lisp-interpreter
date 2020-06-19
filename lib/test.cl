@@ -1,6 +1,7 @@
 ;; crisp testing library
 
 (import 'list)
+(import 'function)
 
 
 (defun fail-test (name why)
@@ -13,11 +14,6 @@
   "Called when a test NAME is passed. Prints success message."
   (print (format "Test {0} passed." name))
   nil)
-
-
-(defun apply (f args)
-  "Apply function F to ARGS."
-  (eval (insert f args)))
 
 
 (defun run-test-suite (f list-of-args)
