@@ -5,9 +5,10 @@
 
 
 class LispFunc_eval : public virtual LispBuiltin {
+
   private:
     inline static const std::string name = "eval";
-    inline static const std::string doc = 
+    inline static const std::string doc =
       "(eval obj)";
 
   public:
@@ -33,4 +34,5 @@ class LispFunc_eval : public virtual LispBuiltin {
       LispObject_ptr obj = arg->next(true);
       return obj->eval(env);
     }
+
 };
