@@ -1,7 +1,10 @@
-#include "types.hpp"
-#include "exception_check.hpp"
-#include "formatter.hpp"
-#include "debug.hpp"
+#include "../types.hpp"
+#include "../util/exception_check.hpp"
+#include "../util/formatter.hpp"
+#include "../util/debug.hpp"
+#include "../symbol/symbol.hpp"
+#include "env.hpp"
+
 
 void LispEnvironment::add_something(std::string name, LispObject_ptr obj, LispBuiltin_ptr bfunc, LispFunction_ptr lfunc)
 {
@@ -31,8 +34,6 @@ void LispEnvironment::add_something(std::string name, LispObject_ptr obj, LispBu
     throw EnvironmentError("Tried to add nothing to environment.");
   }
 }
-
-
 
 
 void LispEnvironment::add(std::string name, LispObject_ptr obj) 
