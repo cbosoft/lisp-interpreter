@@ -1,13 +1,7 @@
-#include <exception>
-
-//#include "eval.h"
-#include "types.hpp"
-#include "debug.hpp"
-#include "formatter.hpp"
-#include "singletons.hpp"
-
-
-
+#include "../util/debug.hpp"
+#include "../env/env.hpp"
+#include "../object/object.hpp"
+#include "function.hpp"
 
 // 
 LispObject_ptr LispFunction::eval(LispList_ptr arg, LispEnvironment_ptr env) const
