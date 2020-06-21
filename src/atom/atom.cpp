@@ -1,8 +1,9 @@
 #include <sstream>
 
-#include "types.hpp"
-#include "exception.hpp"
-#include "formatter.hpp"
+#include "../types.hpp"
+#include "../util/exception.hpp"
+#include "../util/formatter.hpp"
+#include "atom.hpp"
 
 LispAtom::LispAtom(std::string s)
 {
