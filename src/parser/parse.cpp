@@ -6,10 +6,14 @@
 #include <fstream>
 #include <ios>
 
-#include "types.hpp"
-#include "debug.hpp"
-#include "tokenise.hpp"
-#include "formatter.hpp"
+#include "../types.hpp"
+#include "../util/debug.hpp"
+#include "../util/formatter.hpp"
+#include "../token/tokenise.hpp"
+#include "../list/list.hpp"
+#include "../atom/atom.hpp"
+#include "../symbol/symbol.hpp"
+#include "parser.hpp"
 
 
 

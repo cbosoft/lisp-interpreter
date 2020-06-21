@@ -3,9 +3,10 @@
 
 #include <glob.h>
 
-#include "types.hpp"
-#include "exception.hpp"
-#include "formatter.hpp"
+#include "../types.hpp"
+#include "../util/exception.hpp"
+#include "../util/formatter.hpp"
+#include "parser.hpp"
 
 
 // Looks around for the file with name $name, no extension
