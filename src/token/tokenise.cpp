@@ -4,9 +4,11 @@
 #include <memory>
 
 
+#include "../util/exception.hpp"
+#include "../util/formatter.hpp"
+#include "../traceable/traceable.hpp"
+#include "token.hpp"
 #include "tokenise.hpp"
-#include "exception.hpp"
-#include "formatter.hpp"
 
 #define IS_WHITESPACE(C) ((C == '\n') || (C == ' ') || (C == '\t'))
 
