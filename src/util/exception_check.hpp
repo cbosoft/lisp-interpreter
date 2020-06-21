@@ -1,4 +1,4 @@
-#include "types.hpp"
+#include "../types.hpp"
 #include "exception.hpp"
 
 void type_check_any(LispObject_ptr obj, std::list<LispObject_Type> types, std::string in, std::string arg);

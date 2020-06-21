@@ -1,6 +1,10 @@
-#include "exception.hpp"
-#include "types.hpp"
+#include "../types.hpp"
+#include "../object/object.hpp"
+#include "../atom/atom.hpp"
+#include "../env/env.hpp"
+#include "../list/list.hpp"
 #include "formatter.hpp"
+#include "exception.hpp"
 
 void type_check_any(LispObject_ptr obj, std::list<LispObject_Type> types, std::string in, std::string arg)
 {

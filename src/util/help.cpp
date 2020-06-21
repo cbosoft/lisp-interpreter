@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "version.hpp"
+#include "../version.hpp"
 #include "help.hpp"
 #include "colour.hpp"
 
