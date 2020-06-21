@@ -1,9 +1,16 @@
 #pragma once
-#include "../debug.hpp"
 #include "../types.hpp"
-#include "../formatter.hpp"
-#include "../singletons.hpp"
-#include "../exception_check.hpp"
+#include "../util/debug.hpp"
+#include "../util/formatter.hpp"
+#include "../util/exception_check.hpp"
+#include "../object/singletons.hpp"
+#include "../object/object.hpp"
+#include "../list/list.hpp"
+#include "../atom/atom.hpp"
+#include "../env/env.hpp"
+#include "../symbol/symbol.hpp"
+#include "../function/function.hpp"
+#include "builtin.hpp"
 
 
 class LispFunc_defun : public virtual LispBuiltin {

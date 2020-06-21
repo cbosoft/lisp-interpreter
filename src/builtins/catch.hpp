@@ -1,13 +1,13 @@
 #pragma once
-#include <string>
-#include <sstream>
-
 #include "../types.hpp"
-#include "../formatter.hpp"
-#include "../debug.hpp"
-#include "../exception.hpp"
-#include "../exception_check.hpp"
-#include "../singletons.hpp"
+#include "../util/exception.hpp"
+#include "../util/exception_check.hpp"
+#include "../object/object.hpp"
+#include "../list/list.hpp"
+#include "../atom/atom.hpp"
+#include "../env/env.hpp"
+#include "../function/function.hpp"
+#include "builtin.hpp"
 
 
 

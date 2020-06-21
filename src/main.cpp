@@ -4,10 +4,14 @@
 
 #include <editline/readline.h>
 
+#include "util/debug.hpp"
+#include "util/exception.hpp"
+#include "util/help.hpp"
 #include "types.hpp"
-#include "debug.hpp"
-#include "exception.hpp"
-#include "help.hpp"
+#include "parser/parser.hpp"
+#include "object/object.hpp"
+#include "list/list.hpp"
+#include "env/env.hpp"
 
 
 #define EITHER(S, A, B) ((strcmp(S, A) == 0) || (strcmp(S, B) == 0))

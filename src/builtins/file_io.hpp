@@ -4,10 +4,16 @@
 #include <unistd.h>
 
 #include "../types.hpp"
-#include "../formatter.hpp"
-#include "../debug.hpp"
-#include "../exception.hpp"
-#include "../exception_check.hpp"
+#include "../util/formatter.hpp"
+#include "../util/debug.hpp"
+#include "../util/exception.hpp"
+#include "../util/exception_check.hpp"
+#include "../symbol/symbol.hpp"
+#include "../env/env.hpp"
+#include "../atom/atom.hpp"
+#include "../object/object.hpp"
+#include "../list/list.hpp"
+#include "builtin.hpp"
 
 
 class LispFunc_with_open : public virtual LispBuiltin {

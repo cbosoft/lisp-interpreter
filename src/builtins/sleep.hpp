@@ -4,7 +4,11 @@
 #include <thread>
 
 #include "../types.hpp"
-#include "../exception_check.hpp"
+#include "../util/exception_check.hpp"
+#include "../atom/atom.hpp"
+#include "../object/object.hpp"
+#include "../list/list.hpp"
+#include "builtin.hpp"
 
 
 class LispFunc_sleep : public virtual LispBuiltin {

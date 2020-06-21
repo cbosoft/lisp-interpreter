@@ -1,8 +1,14 @@
 #pragma once
 #include "../types.hpp"
-#include "../formatter.hpp"
-#include "../exception.hpp"
-#include "../exception_check.hpp"
+#include "../util/formatter.hpp"
+#include "../util/exception.hpp"
+#include "../util/exception_check.hpp"
+#include "../atom/atom.hpp"
+#include "../object/object.hpp"
+#include "../list/list.hpp"
+#include "../parser/parser.hpp"
+#include "../symbol/symbol.hpp"
+#include "builtin.hpp"
 
 
 extern LispParser parser; // Boo: global var

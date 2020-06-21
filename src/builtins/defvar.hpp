@@ -1,8 +1,13 @@
 #pragma once
-#include "../debug.hpp"
 #include "../types.hpp"
-#include "../formatter.hpp"
-#include "../exception_check.hpp"
+#include "../util/debug.hpp"
+#include "../util/formatter.hpp"
+#include "../util/exception_check.hpp"
+#include "../list/list.hpp"
+#include "../object/object.hpp"
+#include "../env/env.hpp"
+#include "../symbol/symbol.hpp"
+#include "builtin.hpp"
 
 
 class LispFunc_defvar : public virtual LispBuiltin {

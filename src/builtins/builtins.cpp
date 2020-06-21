@@ -1,49 +1,49 @@
-#include "types.hpp"
-#include "singletons.hpp"
-#include "debug.hpp"
-#include "formatter.hpp"
-#include "version.hpp"
+#include "../types.hpp"
+#include "../object/singletons.hpp"
+#include "../util/debug.hpp"
+#include "../util/formatter.hpp"
+#include "../version.hpp"
 
 //#include "builtins.hpp"
-#include "builtins/defun.hpp"
-#include "builtins/defmacro.hpp"
-#include "builtins/defvar.hpp"
+#include "defun.hpp"
+#include "defmacro.hpp"
+#include "defvar.hpp"
 
-#include "builtins/print.hpp"
-#include "builtins/format.hpp"
-#include "builtins/file_io.hpp"
+#include "print.hpp"
+#include "format.hpp"
+#include "file_io.hpp"
 
-#include "builtins/add.hpp"
-#include "builtins/subtract.hpp"
-#include "builtins/multiply.hpp"
-#include "builtins/divide.hpp"
-#include "builtins/modulo.hpp"
-#include "builtins/random.hpp"
+#include "add.hpp"
+#include "subtract.hpp"
+#include "multiply.hpp"
+#include "divide.hpp"
+#include "modulo.hpp"
+#include "random.hpp"
 
-#include "builtins/comparison.hpp"
-#include "builtins/types.hpp"
-#include "builtins/boolean.hpp"
-#include "builtins/cond.hpp"
-#include "builtins/if.hpp"
+#include "comparison.hpp"
+#include "types.hpp"
+#include "boolean.hpp"
+#include "cond.hpp"
+#include "if.hpp"
 
-#include "builtins/append.hpp"
-#include "builtins/list.hpp"
-#include "builtins/range.hpp"
+#include "append.hpp"
+#include "list.hpp"
+#include "range.hpp"
 
-#include "builtins/eval.hpp"
-#include "builtins/import.hpp"
-#include "builtins/eval_file.hpp"
+#include "eval.hpp"
+#include "import.hpp"
+#include "eval_file.hpp"
 
-#include "builtins/quote.hpp"
-#include "builtins/exit.hpp"
-#include "builtins/doc.hpp"
+#include "quote.hpp"
+#include "exit.hpp"
+#include "doc.hpp"
 
-#include "builtins/thread.hpp"
+#include "thread.hpp"
 
-#include "builtins/sleep.hpp"
+#include "sleep.hpp"
 
-#include "builtins/catch.hpp"
-#include "builtins/throw.hpp"
+#include "catch.hpp"
+#include "throw.hpp"
 
 static LispFunc_defun lispfunc_defun = LispFunc_defun();
 static LispFunc_defmacro lispfunc_defmacro = LispFunc_defmacro();
@@ -187,8 +187,8 @@ LispEnvironmentRow builtins[] = {
 	{ "stderr", NULL, std::make_shared<LispObject>((int)2), NULL, NULL },
 
   // true/false
-	{ "nil", "false", nil, NULL, NULL },
-	{ "t", "true", t, NULL, NULL },
+	{ "nil", "false", std::make_shared<LispObject>(false), NULL, NULL },
+	{ "t", "true", std::make_shared<LispObject>(true), NULL, NULL },
 
   // Meta
 	{ "_crisp_version", NULL, std::make_shared<LispObject>(VERSION), NULL, NULL },

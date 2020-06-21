@@ -4,11 +4,15 @@
 #include <regex>
 
 #include "../types.hpp"
-#include "../formatter.hpp"
-#include "../debug.hpp"
-#include "../exception.hpp"
-#include "../exception_check.hpp"
-#include "../singletons.hpp"
+#include "../util/formatter.hpp"
+#include "../util/debug.hpp"
+#include "../util/exception.hpp"
+#include "../util/exception_check.hpp"
+#include "../object/singletons.hpp"
+#include "../atom/atom.hpp"
+#include "../object/object.hpp"
+#include "../list/list.hpp"
+#include "builtin.hpp"
 
 
 
