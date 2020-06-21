@@ -1,6 +1,60 @@
-#include "types.hpp"
-#include "debug.hpp"
-#include "formatter.hpp"
+#include "../types.hpp"
+#include "../util/debug.hpp"
+#include "../util/formatter.hpp"
+#include "../atom/atom.hpp"
+#include "../list/list.hpp"
+#include "../symbol/symbol.hpp"
+#include "object.hpp"
+
+
+// Constructors
+LispObject::LispObject(int atom_val)
+{
+  this->value_atom = std::make_shared<LispAtom>(atom_val);
+  this->type = LISPOBJECT_ATOM;
+}
+
+LispObject::LispObject(bool atom_val)
+{
+  this->value_atom = std::make_shared<LispAtom>(atom_val);
+  this->type = LISPOBJECT_ATOM;
+}
+
+LispObject::LispObject(long atom_val)
+{
+  this->value_atom = std::make_shared<LispAtom>(atom_val);
+  this->type = LISPOBJECT_ATOM;
+}
+
+LispObject::LispObject(double atom_val)
+{
+  this->value_atom = std::make_shared<LispAtom>(atom_val);
+  this->type = LISPOBJECT_ATOM;
+}
+
+LispObject::LispObject(std::string atom_val)
+{
+  this->value_atom = std::make_shared<LispAtom>(atom_val);
+  this->type = LISPOBJECT_ATOM;
+}
+
+LispObject::LispObject(LispAtom_ptr atom)
+{
+  this->value_atom = atom;
+  this->type = LISPOBJECT_ATOM;
+}
+
+LispObject::LispObject(LispList_ptr list)
+{
+  this->value_list = list;
+  this->type = LISPOBJECT_LIST;
+}
+
+LispObject::LispObject(LispSymbol_ptr symbol)
+{
+  this->value_symbol = symbol;
+  this->type = LISPOBJECT_SYMBOL;
+}
 
 
 // Convert object to string.

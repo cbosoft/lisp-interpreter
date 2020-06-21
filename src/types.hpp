@@ -11,6 +11,7 @@
 #include "debug.hpp"
 #include "exception.hpp"
 #include "formatter.hpp"
+#include "object/object_types.hpp"
 #include "atom/atom_types.hpp"
 #include "env/env_types.hpp"
 #include "traceable/traceable_types.hpp"
@@ -69,59 +70,6 @@ typedef std::shared_ptr<LispAtom> LispAtom_ptr;
 
 
 
-
-
-
-enum LispObject_Type {
-  LISPOBJECT_ATOM,
-  LISPOBJECT_SYMBOL,
-  LISPOBJECT_LIST
-};
-
-
-class LispObject : virtual public Printable, public Traceable, virtual public Documented {
-  private:
-    LispAtom_ptr value_atom;
-    LispList_ptr value_list;
-    LispSymbol_ptr value_symbol;
-    LispObject_Type type;
-    std::string doc;
-
-  public:
-    LispObject();
-
-    const std::string str() const override;
-    const std::string repr() const override;
-    std::string repr_type() const;
-    std::string static repr_type(LispObject_Type type);
-
-    LispObject_Type get_type() const { return this->type; }
-    LispObject_ptr eval(LispEnvironment_ptr env);
-
-    template<typename T>
-    LispObject(T atom_val) { this->value_atom = std::make_shared<LispAtom>(LispAtom(atom_val)); this->type = LISPOBJECT_ATOM; }
-    LispObject(LispAtom_ptr atom) { this->value_atom = atom; this->type = LISPOBJECT_ATOM; }
-    LispObject(LispList_ptr list) { this->value_list = list; this->type = LISPOBJECT_LIST; }
-    LispObject(LispSymbol_ptr symbol) { this->value_symbol = symbol; this->type = LISPOBJECT_SYMBOL; }
-
-    void set_value(LispAtom_ptr atom) {this->value_atom = atom;}
-    void set_value(LispList_ptr list) {this->value_list = list; }
-    void set_value(LispSymbol_ptr symbol) {this->value_symbol = symbol; }
-
-    LispAtom_ptr get_value_atom() { return this->value_atom; }
-    const LispAtom_ptr get_value_atom() const { return this->value_atom; }
-    LispList_ptr get_value_list() { return this->value_list; }
-    const LispList_ptr get_value_list() const { return this->value_list; }
-    LispSymbol_ptr get_value_symbol() { return this->value_symbol; }
-    const LispSymbol_ptr get_value_symbol() const { return this->value_symbol; }
-
-    bool is_truthy(LispEnvironment_ptr env=nullptr);
-    bool eq(const LispObject_ptr &other) const;
-
-    const std::string get_doc() const override { return (this->doc.size() ? this->doc : this->repr()); }
-    void set_doc(std::string s) { this->doc = s; }
-
-};
 
 
 
