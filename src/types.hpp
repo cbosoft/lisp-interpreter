@@ -55,16 +55,6 @@ typedef std::shared_ptr<LispAtom> LispAtom_ptr;
 
 
 
-class LispSymbol : virtual public Printable{
-  private:
-    std::string name;
-  public:
-    LispSymbol() {};
-    LispSymbol(std::string name){ this->name = name; }
-    std::string get_name(){ return this->name; }
-    const std::string repr() const override { return this->name; }
-    const std::string str() const override {return this->name; }
-};
 
 
 
