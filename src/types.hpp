@@ -12,6 +12,7 @@
 #include "exception.hpp"
 #include "formatter.hpp"
 #include "atom/atom_types.hpp"
+#include "traceable/traceable_types.hpp"
 
 
 class Printable {
@@ -69,49 +70,6 @@ class LispSymbol : virtual public Printable{
 
 
 
-
-enum TraceSource_Type {
-  TRACESOURCE_REPL,
-  TRACESOURCE_ARGUMENT,
-  TRACESOURCE_FILE
-};
-
-typedef struct _TraceSource {
-  TraceSource_Type type;
-  std::string path_or_commands;
-  int row;
-  int column;
-  int token_length;
-} TraceSource;
-typedef std::shared_ptr<TraceSource> TraceSource_ptr;
-
-class Traceable {
-  private:
-    TraceSource_ptr source;
-    const std::string get_file_trace() const;
-  public:
-    Traceable() { }
-
-    void set_source(TraceSource_ptr source)
-    {
-      this->source = source;
-    }
-
-    TraceSource_ptr get_source()
-    {
-      return this->source;
-    }
-
-    const std::string repr_source();
-
-    template<typename T>
-    void inherits_from(std::shared_ptr<T> obj) {
-      this->source = obj->get_source();
-      debug_message(Formatter() << "inherited: " << this->repr_source());
-    }
-
-    //void inherits_from(std::shared_ptr<LispObject> obj);
-};
 
 
 

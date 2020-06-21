@@ -1,4 +1,7 @@
-#include "types.hpp"
+#include "../types.hpp"
+#include "../util/exception.hpp"
+#include "traceable.hpp"
+
 
 const std::string Traceable::repr_source()
 {
@@ -37,9 +40,6 @@ const std::string Traceable::repr_source()
   return rv.str();
 
 }
-
-
-
 
 
 const std::string Traceable::get_file_trace() const
