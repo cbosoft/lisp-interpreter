@@ -27,7 +27,13 @@ LispObject_ptr LispFunction::eval(LispList_ptr arg, LispEnvironment_ptr env) con
   auto arg_iter = arg->begin();
   auto argname_iter = this->arg_names.begin();
   for (; arg_iter != arg->end(); ++arg_iter, ++argname_iter) {
-    subenv->add((*argname_iter), (*arg_iter));
+    // a function must eval its arguments once
+    auto arg = (*arg_iter);
+    auto argname = (*argname_iter);
+    if (not this->is_macro())
+      arg = arg->eval(env);
+
+    subenv->add(argname, arg);
   }
 
   this->result = this->body->eval_each(subenv);

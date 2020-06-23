@@ -84,17 +84,7 @@ LispObject_ptr LispObject::_eval(LispEnvironment_ptr env)
 
     if (var_lfunc != NULL) {
       debug_message(Formatter() << "symbol " << fn->value_symbol << " is lisp function");
-
-      if (var_lfunc->is_macro()) {
-        list_args = list_obj->rest();
-      }
-      else {
-        list_args = std::make_shared<LispList>(LispList());
-        for (list_iter = ++list_obj->begin(); list_iter != list_obj->end(); ++list_iter) {
-          list_args->append((*list_iter)->eval(env));
-        }
-      }
-
+      list_args = list_obj->rest();
       return var_lfunc->eval(list_args, env);
     }
     else if (var_bfunc != NULL) {
