@@ -9,6 +9,18 @@
 
 LispObject_ptr LispObject::eval(LispEnvironment_ptr env)
 {
+  try {
+    auto rv = this->_eval(env);
+    return rv;
+  }
+  catch (const Exception &e) {
+    debug_message(Formatter() << "extra info " << this->str());
+    throw Exception(e, this->repr_source());
+  }
+}
+
+LispObject_ptr LispObject::_eval(LispEnvironment_ptr env)
+{
   debug_message(Formatter() << "in eval");
 
   std::string fname;

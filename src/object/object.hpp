@@ -18,6 +18,7 @@ class LispObject :
     LispSymbol_ptr value_symbol;
     LispObject_Type type;
     std::string doc;
+    LispObject_ptr _eval(LispEnvironment_ptr env);
 
   public:
     LispObject();
