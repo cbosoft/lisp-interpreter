@@ -43,14 +43,14 @@ class LispFunc_defun : public virtual LispBuiltin {
       narg_check_min(arg, 4, this->name, "name args &optional default-values docstring &rest body");
      
       LispObject_ptr name = arg->next(true);
-      type_check(name, LISPOBJECT_SYMBOL, this->name, "name");
+      type_check_one(name, LISPOBJECT_SYMBOL, this->name, "name");
     
       LispObject_ptr arglist = arg->next();
-      type_check(arglist, LISPOBJECT_LIST, this->name, "args");
+      type_check_one(arglist, LISPOBJECT_LIST, this->name, "args");
 
       LispList_ptr argnames_list = arglist->get_value_list();
       for (auto argnames_iter = argnames_list->begin(); argnames_iter != argnames_list->end(); ++argnames_iter)
-        type_check(*argnames_iter, LISPOBJECT_SYMBOL, this->name, "argname");
+        type_check_one(*argnames_iter, LISPOBJECT_SYMBOL, this->name, "argname");
 
       LispObject_ptr next = arg->next();
       LispObject_ptr docstring;
@@ -67,7 +67,7 @@ class LispFunc_defun : public virtual LispBuiltin {
         docstring = next;
       }
 
-      type_check(docstring, LISPATOM_STRING, this->name, "docstring");
+      type_check_atom(docstring, LISPATOM_STRING, this->name, "docstring");
       LispAtom_ptr docstring_atom = docstring->get_value_atom();
       std::string docstring_string = docstring_atom->get_value_string();
     

@@ -42,7 +42,7 @@ class LispFunc_exit : public virtual LispBuiltin {
       int rc = 0;
       if (nargs == 1) {
         LispObject_ptr rc_obj = arg->first();
-        type_check_atom(rc_obj, LISPATOM_INT, this->repr(), "return-code");
+        type_check(rc_obj, LISPATOM_INT, this->repr(), "return-code");
         LispAtom_ptr rc_atom = rc_obj->get_value_atom();
         rc = rc_atom->get_value_int();
       }

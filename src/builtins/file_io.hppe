@@ -46,13 +46,13 @@ class LispFunc_with_open : public virtual LispBuiltin {
       narg_check_min(arg, 4, this->repr(), "path mode name &rest body");
 
       LispObject_ptr path_obj = arg->next(true);
-      type_check(path_obj, LISPATOM_STRING, this->repr(), "path");
+      type_check_atom(path_obj, LISPATOM_STRING, this->repr(), "path");
       LispAtom_ptr path_atom = path_obj->get_value_atom();
       std::string path_str = path_atom->get_value_string();
       const char *path_cstr = path_str.c_str();
 
       LispObject_ptr mode_obj = arg->next();
-      type_check(mode_obj, LISPATOM_STRING, this->repr(), "mode");
+      type_check_atom(mode_obj, LISPATOM_STRING, this->repr(), "mode");
       LispAtom_ptr mode_atom = mode_obj->get_value_atom();
       std::string mode_str = mode_atom->get_value_string();
       debug_message(Formatter() << this->repr() << "  " << mode_str << "  " << path_str << "  " << path_cstr);
@@ -83,7 +83,7 @@ class LispFunc_with_open : public virtual LispBuiltin {
       }
     
       LispObject_ptr name_obj = arg->next();
-      type_check(name_obj, LISPOBJECT_SYMBOL, this->name, "name");
+      type_check_one(name_obj, LISPOBJECT_SYMBOL, this->name, "name");
     
       LispSymbol_ptr name_symb = name_obj->get_value_symbol();
       int fd = open(path_cstr, oflags, S_IRUSR | S_IWUSR);
@@ -131,7 +131,7 @@ class LispFunc_write : public virtual LispBuiltin{
       narg_check_min(arg, 2, this->name, "fd &rest values");
 
       LispObject_ptr fd_obj = arg->next(true);
-      type_check(fd_obj, LISPATOM_INT, this->name, "fd");
+      type_check_atom(fd_obj, LISPATOM_INT, this->name, "fd");
       LispAtom_ptr fd_atom = fd_obj->get_value_atom();
 
       int fd = (int)fd_atom->get_value_int(), rv = 0;
@@ -181,7 +181,7 @@ class LispFunc_read : public virtual LispBuiltin {
       narg_check(arg, 1, this->name, "fd");
 
       LispObject_ptr fd_obj = arg->next(true);
-      type_check(fd_obj, LISPATOM_INT, this->name, "fd");
+      type_check_atom(fd_obj, LISPATOM_INT, this->name, "fd");
       LispAtom_ptr fd_atom = fd_obj->get_value_atom();
 
       int fd = (int)fd_atom->get_value_int(), rv = 0;

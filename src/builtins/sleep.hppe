@@ -39,7 +39,7 @@ class LispFunc_sleep : public virtual LispBuiltin {
       narg_check(arg, 1, this->repr(), "len");
 
       LispObject_ptr len = arg->next(true);
-      type_check(len, LISPATOM_INT, this->repr(), "len");
+      type_check_atom(len, LISPATOM_INT, this->repr(), "len");
 
       int l = len->get_value_atom()->get_value_int();
 

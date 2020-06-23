@@ -43,7 +43,7 @@ class LispFunc_format : public virtual LispBuiltin {
       narg_check_min(arg, 2, this->name, "format-string &rest objects");
 
       auto fmt_obj = arg->first();
-      type_check(fmt_obj, LISPATOM_STRING, this->name, "format-string");
+      type_check_atom(fmt_obj, LISPATOM_STRING, this->name, "format-string");
 
       std::vector<std::string> objs_to_format;
       auto it = arg->begin();

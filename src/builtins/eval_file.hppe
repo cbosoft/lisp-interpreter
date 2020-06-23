@@ -41,7 +41,7 @@ class LispFunc_eval_file : public virtual LispBuiltin {
       narg_check(arg, 1, this->repr(), "path");
 
       LispObject_ptr path_obj = arg->next(true);
-      type_check(path_obj, LISPATOM_STRING, this->repr(), "path");
+      type_check_atom(path_obj, LISPATOM_STRING, this->repr(), "path");
       LispAtom_ptr path_atom = path_obj->get_value_atom();
 
       LispList_ptr root = parser.parse_file(path_atom->get_value_string());

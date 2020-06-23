@@ -6,7 +6,7 @@
 #include "formatter.hpp"
 #include "exception.hpp"
 
-void type_check_any(LispObject_ptr obj, std::list<LispObject_Type> types, std::string in, std::string arg)
+void type_check(LispObject_ptr obj, std::list<LispObject_Type> types, std::string in, std::string arg)
 {
   bool passing = false;
   for (auto & type : types) {
@@ -27,13 +27,13 @@ void type_check_any(LispObject_ptr obj, std::list<LispObject_Type> types, std::s
 }
 
 
-void type_check_one(LispObject_ptr obj, LispObject_Type type, std::string in, std::string arg)
+void type_check(LispObject_ptr obj, LispObject_Type type, std::string in, std::string arg)
 {
   if (obj->get_type() != type)
     throw TypeError(Formatter() << "In " << in << ": Argument \"" << arg << "\" should be " << obj->repr_type(type) << ". Got " << obj->repr_type() << ".");
 }
 
-void type_check_atom(LispObject_ptr obj, LispAtom_Type type, std::string in, std::string arg)
+void type_check(LispObject_ptr obj, LispAtom_Type type, std::string in, std::string arg)
 {
   if (obj->get_type() != LISPOBJECT_ATOM)
     throw TypeError(Formatter() << "In " << in << ": Argument \"" << arg << "\" should be " << LispAtom::repr_type(type) << ". Got " << obj->repr_type() << ".");
@@ -43,7 +43,7 @@ void type_check_atom(LispObject_ptr obj, LispAtom_Type type, std::string in, std
     throw TypeError(Formatter() << "In " << in << ": Argument \"" << arg << "\" should be " << LispAtom::repr_type(type) << ". Got " << LispAtom::repr_type(atom_type) << ".");
 }
 
-void type_check_symbol(LispObject_ptr obj, LispEnvironment_Type type, std::string in, std::string arg, LispEnvironment_ptr env)
+void type_check(LispObject_ptr obj, LispEnvironment_Type type, std::string in, std::string arg, LispEnvironment_ptr env)
 {
   if (obj->get_type() != LISPOBJECT_SYMBOL)
     throw TypeError(Formatter() << "In " << in << ": Argument \"" << arg << "\" should be " << LispEnvironment::repr_type(type) << ". Got " << obj->repr_type() << ".");
@@ -52,6 +52,10 @@ void type_check_symbol(LispObject_ptr obj, LispEnvironment_Type type, std::strin
   if (symtype != type)
     throw TypeError(Formatter() << "In " << in << ": Argument \"" << arg << "\" should be " << LispEnvironment::repr_type(type) << ". Got " << LispEnvironment::repr_type(symtype) << ".");
 }
+
+
+
+// number of elements in list
 
 void narg_check(LispList_ptr arg, int expected_nargs, std::string in, std::string argnames)
 {

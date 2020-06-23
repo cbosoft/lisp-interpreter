@@ -92,7 +92,7 @@ LispEnvironment::LispEnvironment()
 
 LispEnvironment_Type LispEnvironment::get(LispObject_ptr sym, LispObject_ptr *obj, LispBuiltin_ptr *bf, LispFunction_ptr *lf)
 {
-  type_check_one(sym, LISPOBJECT_SYMBOL, "get", "symbol");
+  type_check(sym, LISPOBJECT_SYMBOL, "get", "symbol");
 
   return this->get(sym->get_value_symbol(), obj, bf, lf);
 }

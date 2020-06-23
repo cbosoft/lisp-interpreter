@@ -39,7 +39,7 @@ class LispFunc_defvar : public virtual LispBuiltin {
       narg_check(arg, 2, this->name, "name value");
      
       LispObject_ptr name = arg->next(true);
-      type_check(name, LISPOBJECT_SYMBOL, this->name, "name");
+      type_check_one(name, LISPOBJECT_SYMBOL, this->name, "name");
     
       LispObject_ptr value_raw = arg->next();
       LispObject_ptr value = value_raw->eval(env);

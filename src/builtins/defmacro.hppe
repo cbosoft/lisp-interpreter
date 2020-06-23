@@ -36,15 +36,15 @@ class LispFunc_defmacro : LispBuiltin {
       narg_check_min(arg, 3, this->name, "name args &rest body");
 
       LispObject_ptr name_obj = arg->next(true);
-      type_check(name_obj, LISPOBJECT_SYMBOL, this->name, "name");
+      type_check_one(name_obj, LISPOBJECT_SYMBOL, this->name, "name");
 
       LispObject_ptr arglist_obj = arg->next();
-      type_check(arglist_obj, LISPOBJECT_LIST, this->name, "arglist");
+      type_check_one(arglist_obj, LISPOBJECT_LIST, this->name, "arglist");
 
       LispList_ptr argnames_list = arglist_obj->get_value_list();
       auto argnames_iter = argnames_list->begin();
       for (; argnames_iter != argnames_list->end(); ++argnames_iter) {
-        type_check(*argnames_iter, LISPOBJECT_SYMBOL, this->name, "arg");
+        type_check_one(*argnames_iter, LISPOBJECT_SYMBOL, this->name, "arg");
       }
     
       std::string name_str = name_obj->get_value_symbol()->get_name();

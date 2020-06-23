@@ -67,7 +67,7 @@ class LispFunc_pop : public virtual LispBuiltin {
       narg_check(arg, 1, this->repr(), "list");
 
       LispObject_ptr list_arg = arg->next(true);
-      type_check(list_arg, LISPOBJECT_LIST, this->repr(), "list");
+      type_check_one(list_arg, LISPOBJECT_LIST, this->repr(), "list");
       LispList_ptr list_var = list_arg->get_value_list();
 
       if (!list_var->count())
@@ -107,7 +107,7 @@ class LispFunc_rest : public virtual LispBuiltin {
       narg_check(arg, 1, this->repr(), "list");
 
       LispObject_ptr list_arg = arg->next(true);
-      type_check(list_arg, LISPOBJECT_LIST, this->repr(), "list");
+      type_check_one(list_arg, LISPOBJECT_LIST, this->repr(), "list");
       LispList_ptr list_var = list_arg->get_value_list();
 
       if (!list_var->count())

@@ -4,23 +4,20 @@
 #include "../util/debug.hpp"
 #include "../util/exception.hpp"
 #include "../util/exception_check.hpp"
+#include "../atom/atom.hpp"
 #include "../object/object.hpp"
 #include "../list/list.hpp"
-#include "../atom/atom.hpp"
-#include "../parser/parser.hpp"
 #include "builtin.hpp"
 
 
-extern LispParser parser; // Boo: global var
-
-class LispFunc_eval_file : public virtual LispBuiltin {
+class LispFunc_exit : public virtual LispBuiltin {
   private:
-    inline static const std::string name = "eval-file";
+    inline static const std::string name = "exit";
     inline static const std::string doc = 
-      "(eval-file path)";
+      "(exit &optional return-code)";
 
   public:
-    LispFunc_eval_file()
+    LispFunc_exit()
     {
     }
 
@@ -37,14 +34,19 @@ class LispFunc_eval_file : public virtual LispBuiltin {
     LispObject_ptr eval(LispList_ptr arg, LispEnvironment_ptr env) const
     {
       (void) env;
+      (void) env;
 
-      narg_check(arg, 1, this->repr(), "path");
+      int nargs = arg->count();
+      narg_check_max(arg, 1, this->repr(), "&optional return-code");
 
-      LispObject_ptr path_obj = arg->next(true);
-      type_check(path_obj, LISPATOM_STRING, this->repr(), "path");
-      LispAtom_ptr path_atom = path_obj->get_value_atom();
+      int rc = 0;
+      if (nargs == 1) {
+        LispObject_ptr rc_obj = arg->first();
+        type_check_atom(rc_obj, LISPATOM_INT, this->repr(), "return-code");
+        LispAtom_ptr rc_atom = rc_obj->get_value_atom();
+        rc = rc_atom->get_value_int();
+      }
 
-      LispList_ptr root = parser.parse_file(path_atom->get_value_string());
-      return root->eval_each(env);
+      exit(rc);
     }
 };

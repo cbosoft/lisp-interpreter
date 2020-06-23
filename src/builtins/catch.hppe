@@ -49,12 +49,12 @@ class LispFunc_catch : public virtual LispBuiltin {
       }
 
       auto cb_obj = arg->next();
-      type_check(cb_obj, LISPENV_LFUNC, this->name, "callback", env);
+      type_check_symbol(cb_obj, LISPENV_LFUNC, this->name, "callback", env);
       LispFunction_ptr cb;
       env->get(cb_obj, nullptr, nullptr, &cb);
 
       auto cb_args_obj = arg->next();
-      type_check(cb_args_obj, LISPOBJECT_LIST, this->name, "callback-args");
+      type_check_one(cb_args_obj, LISPOBJECT_LIST, this->name, "callback-args");
       auto cb_args = cb_args_obj->get_value_list();
 
       auto body = arg->rest(3);

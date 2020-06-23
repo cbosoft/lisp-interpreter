@@ -10,21 +10,21 @@
 #include "builtin.hpp"
 
 
-class LispFunc_subtract : public virtual LispBuiltin {
+class LispFunc_multiply : public virtual LispBuiltin {
   private:
-    inline static const std::string name = "subtract";
+    inline static const std::string name = "multiply";
     inline static const std::string doc = 
-      "(subtract left right)\n\
-      Subtract the right operand from the left, returning the result.";
+      "(multiply left right)\n\
+      Multiply the left and right operands, returning the result.";
 
   public:
-    LispFunc_subtract()
+    LispFunc_multiply()
     {
     }
 
     const std::string repr() const
     {
-      return "Func(subtract,builtin)";
+      return "Func(multiply,builtin)";
     }
 
     const std::string get_doc() const
@@ -35,17 +35,16 @@ class LispFunc_subtract : public virtual LispBuiltin {
     LispObject_ptr eval(LispList_ptr arg, LispEnvironment_ptr env) const
     {
       (void) env;
-    
       narg_check(arg, 2, this->name, "left right");
-    
+
       LispObject_ptr left = arg->next(true);
-      type_check(left, LISPOBJECT_ATOM, this->name, "left");
+      type_check_one(left, LISPOBJECT_ATOM, this->name, "left");
       LispAtom_ptr left_atom = left->get_value_atom();
-    
+
       LispObject_ptr right = arg->next();
-      type_check(right, LISPOBJECT_ATOM, this->name, "right");
+      type_check_one(right, LISPOBJECT_ATOM, this->name, "right");
       LispAtom_ptr right_atom = right->get_value_atom();
-    
-      return std::make_shared<LispObject>(left_atom->subtract(right_atom));
+
+      return std::make_shared<LispObject>(left_atom->multiply(right_atom));
     }
 };

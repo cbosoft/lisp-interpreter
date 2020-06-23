@@ -47,7 +47,7 @@ class LispFunc_thread : public virtual LispBuiltin {
       narg_check_min(arg, 1, this->repr(), "func");
 
       LispObject_ptr func_name = arg->next(true);
-      type_check(func_name, LISPOBJECT_SYMBOL, this->repr(), "func");
+      type_check_one(func_name, LISPOBJECT_SYMBOL, this->repr(), "func");
 
       LispFunction_ptr lfunc;
       LispBuiltin_ptr bfunc;
@@ -107,7 +107,7 @@ class LispFunc_join : public virtual LispBuiltin {
       narg_check(arg, 1, this->repr(), "id");
 
       LispObject_ptr id_obj = arg->next(true);
-      type_check(id_obj, LISPATOM_INT, this->repr(), "id");
+      type_check_atom(id_obj, LISPATOM_INT, this->repr(), "id");
 
       int id = id_obj->get_value_atom()->get_value_int();
 
