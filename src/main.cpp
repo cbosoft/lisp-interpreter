@@ -58,6 +58,13 @@ int main(int argc, char **argv)
   LispEnvironment_ptr env;
   try {
     env = std::make_shared<LispEnvironment>();
+    auto lib = parser.parse_module("--std--");
+    if (lib->count()) {
+      lib->eval_each(env);
+    }
+    else {
+      throw ImportError("Error loading standard library.");
+    }
   }
   catch (const Exception& ex) {
     ex.pretty_print();
