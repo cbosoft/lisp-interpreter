@@ -55,6 +55,7 @@ class LispFunc_defun : public virtual LispBuiltin {
       LispObject_ptr next = arg->next();
       LispObject_ptr docstring;
       LispList_ptr defvalue_list = std::make_shared<LispList>();
+      int body_start = 3;
       auto type = next->get_type();
       if (type == LISPOBJECT_LIST) {
         defvalue_list = next->get_value_list();
@@ -62,6 +63,7 @@ class LispFunc_defun : public virtual LispBuiltin {
           throw ArgumentError(Formatter() << "Default value list cannot be longer than argument list.");
 
         docstring = arg->next();
+        body_start++;
       }
       else {
         docstring = next;
@@ -72,7 +74,7 @@ class LispFunc_defun : public virtual LispBuiltin {
       std::string docstring_string = docstring_atom->get_value_string();
     
       std::string name_str = name->get_value_symbol()->get_name();
-      LispList_ptr body = arg->rest(3);
+      LispList_ptr body = arg->rest(body_start);
       LispFunction_ptr lfunc = std::make_shared<LispFunction>(argnames_list, defvalue_list, body, name_str, docstring_string);
       env->add(name_str, lfunc);
       return name;
