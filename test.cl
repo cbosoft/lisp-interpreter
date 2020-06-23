@@ -112,4 +112,22 @@
                   ))
 
 
+(defun vector-maths-test (args expectation)
+  "Vector maths test"
+  (import 'vector)
+  (defvar result (apply '* args))
+  (defvar testname (format "default value: {0} == {1} ?" result expectation))
+  (if (= result expectation)
+    (pass-test testname)
+    (fail-test testname "error")))
+
+(run-test-suite 'vector-maths-test
+                '(
+                   ( (quote (2 6)) 12 )
+                   ( (quote (2 1)) 2 )
+                   ( (quote (1 2)) 2 )
+                  ))
+
+
+
 (print "All tests passed!")
