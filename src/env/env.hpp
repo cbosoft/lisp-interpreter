@@ -17,11 +17,7 @@ class LispEnvironment {
 
   public:
     LispEnvironment();
-    LispEnvironment(LispEnvironment_ptr parent, bool readonly = false) 
-    { 
-      this->parent = parent; 
-      this->readonly = readonly; 
-    }
+    LispEnvironment(LispEnvironment_ptr parent, bool readonly = false);
 
     static std::string repr_type(LispEnvironment_Type type) {
 

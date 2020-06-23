@@ -8,7 +8,9 @@ BUILTINS = \
 					 obj/builtins/builtins.o
 
 ENV = \
-			obj/env/env.o
+			obj/env/ctor.o \
+			obj/env/add.o \
+			obj/env/get.o
 
 FUNCTION = \
 					 obj/function/eval.o
