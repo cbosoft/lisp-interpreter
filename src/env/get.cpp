@@ -55,18 +55,18 @@ LispEnvironment_Type LispEnvironment::get(std::string name, LispObject_ptr *obj,
     return LISPENV_OBJ;
   }
 
-  auto bf_iter = this->builtin_functions_map.find(name);
-  if (bf_iter != this->builtin_functions_map.end()) {
-    debug_message(Formatter() << "found \"" << name << "\" in environment as builtin function");
-    if (bf) (*bf) = bf_iter->second;
-    return LISPENV_BFUNC;
-  }
-
   auto lf_iter = this->lisp_functions_map.find(name);
   if (lf_iter != this->lisp_functions_map.end()) {
     debug_message(Formatter() << "found \"" << name << "\" in environment as lisp function");
     if (lf) (*lf) = lf_iter->second;
     return LISPENV_LFUNC;
+  }
+
+  auto bf_iter = this->builtin_functions_map.find(name);
+  if (bf_iter != this->builtin_functions_map.end()) {
+    debug_message(Formatter() << "found \"" << name << "\" in environment as builtin function");
+    if (bf) (*bf) = bf_iter->second;
+    return LISPENV_BFUNC;
   }
 
   if (this->parent == NULL) {
