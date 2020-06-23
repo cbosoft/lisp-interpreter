@@ -22,8 +22,8 @@
   `pass-test` as necessary."
   (defun run-next ()
     "Run test, prep running next set."
-    (apply f (pop list-of-args))
-    (run-test-suite f (rest list-of-args)))
+    (apply 'f (pop list-of-args))
+    (run-test-suite 'f (rest list-of-args)))
   (cond (list-of-args
     (run-next)))
   nil)
