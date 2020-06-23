@@ -9,8 +9,10 @@
 
 LispObject_ptr LispObject::eval(LispEnvironment_ptr env)
 {
+  inc_tab();
   try {
     auto rv = this->_eval(env);
+    dec_tab();
     return rv;
   }
   catch (const Exception &e) {
