@@ -31,6 +31,7 @@ LispObject_ptr LispObject::_eval(LispEnvironment_ptr env)
   LispBuiltin_ptr var_bfunc;
   LispFunction_ptr var_lfunc;
   std::list<LispObject_ptr>::const_iterator list_elem, list_iter;
+  LispEnvironment_Type envtype;
   int count = -1;
 
   if (env == NULL) throw AuthorError(Formatter() << "Eval called without environment.");
@@ -41,6 +42,11 @@ LispObject_ptr LispObject::_eval(LispEnvironment_ptr env)
   case LISPOBJECT_SYMBOL:
     if (env->get(this->value_symbol, &var_obj, &var_bfunc, &var_lfunc) != LISPENV_OBJ)
       throw NameError(Formatter() << "Symbol " << this->value_symbol->get_name() << " has no value as variable.");
+    while (var_obj->get_type() == LISPOBJECT_SYMBOL) {
+      if (env->get(var_obj->get_value_symbol()->get_name(), &var_obj, nullptr, nullptr) != LISPENV_OBJ) {
+        throw NameError(Formatter() << "Symbol " << this->value_symbol->get_name() << " has no value as variable.");
+      }
+    }
     return var_obj;
 
   case LISPOBJECT_LIST:
@@ -79,8 +85,13 @@ LispObject_ptr LispObject::_eval(LispEnvironment_ptr env)
 
     debug_message(Formatter() << "applying function \"" << fname << "\".");
 
-    if (env->get(fn, &var_obj, &var_bfunc, &var_lfunc) == LISPENV_NOTFOUND)
+    envtype = env->get(fn, &var_obj, &var_bfunc, &var_lfunc);
+    if (envtype == LISPENV_NOTFOUND)
       throw NameError(Formatter() << "Object \"" << fname << "\" not found in environment.");
+
+    while ((envtype == LISPENV_OBJ) && (var_obj->get_type() == LISPOBJECT_SYMBOL)) {
+      envtype = env->get(var_obj->get_value_symbol()->get_name(), &var_obj, &var_bfunc, &var_lfunc);
+    }
 
     if (var_lfunc != NULL) {
       debug_message(Formatter() << "symbol " << fn->value_symbol << " is lisp function");
