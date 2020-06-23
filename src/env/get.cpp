@@ -51,6 +51,16 @@ LispEnvironment_Type LispEnvironment::get(std::string name, LispObject_ptr *obj,
   auto obj_iter = this->objects_map.find(name);
   if (obj_iter != this->objects_map.end()) {
     debug_message(Formatter() << "found \"" << name << "\" in environment as object " << obj_iter->second->str());
+    auto o = obj_iter->second;
+    if ((o->get_type() == LISPOBJECT_SYMBOL) && (o->get_value_symbol()->str() == name)) {
+      if (this->parent) {
+        return this->parent->get(name, obj, bf, lf);
+      }
+      else {
+        debug_message(Formatter() << "env get returned same obj: error");
+        throw EnvironmentError(Formatter() << name << " resolves to itself in env.");
+      }
+    }
     if (obj) (*obj) = obj_iter->second;
     return LISPENV_OBJ;
   }
